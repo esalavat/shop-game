@@ -187,8 +187,11 @@ docs/                   # GDD, tech plan
 ## 9. Deployment
 
 ### 9.1 GitHub Pages (now)
-- Push to `main` → live at `https://esalavat.github.io/shop-game/`.
-- Cache busting: version query strings on `main.js`/`style.css` (`?v=12`), plus the service worker cache version once we add it.
+- Push to `main` → a GitHub Actions workflow runs the tests, then `scripts/stamp.js` writes an import map that
+  points every module at `file.js?v=<commit>`, and deploys to `https://esalavat.github.io/shop-game/`.
+- Why: GitHub Pages lets browsers cache each file for 10 minutes, and phones were loading a new `index.html`
+  with old cached modules (blank screen). Stamping makes one deploy's files always load together.
+- `index.html` shows a "Reload" card if the game hasn't started within 10 s or `main.js` fails to load.
 - Prototypes live under `prototypes/` and are also published (e.g. `/prototypes/camera/`), which is handy for phone testing.
 
 ### 9.2 Store builds (later)

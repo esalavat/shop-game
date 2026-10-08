@@ -46,10 +46,23 @@
     </div>
   </div>
 
+  <div id="boot-error" hidden>
+    <div class="rotate-card">Oops! The shop didn't open properly.<br><button id="boot-reload">Reload</button></div>
+  </div>
+
   <div id="rotate">
     <div class="rotate-card">📱<br>Turn your phone upright to play!</div>
   </div>
 </div>
-<script type="module" src="js/main.js?v=5"></script>
+<script>
+  // If the game hasn't started after a while (e.g. a file failed to load), offer a fresh reload
+  // instead of leaving a blank screen.
+  function showBootError() { if (!window.__booted) document.getElementById('boot-error').hidden = false; }
+  setTimeout(showBootError, 10000);
+  document.getElementById('boot-reload').addEventListener('click', function () {
+    location.replace(location.pathname + '?fresh=' + Date.now());
+  });
+</script>
+<script type="module" src="js/main.js?v=5" onerror="showBootError()"></script>
 </body>
 </html>

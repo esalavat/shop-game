@@ -188,6 +188,8 @@ if (new URLSearchParams(location.search).has('debug')) {
 // ---------------------------------------------------------------------------
 // Loop
 // ---------------------------------------------------------------------------
+window.__booted = true; // tells the loading guard in index.html the game started
+
 startLoop({
   tickRate: 10,
   tick(dt) {

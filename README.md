@@ -10,6 +10,10 @@ Play: https://esalavat.github.io/shop-game/ (add `?debug` for the debug panel)
 
 Run tests: `npm test` · Local server: `npm run serve`, then open http://localhost:8123
 
+Deploys run through GitHub Actions ([pages.yml](.github/workflows/pages.yml)): tests, then
+[scripts/stamp.js](scripts/stamp.js) version-stamps every module URL so phones never mix cached
+files from different deploys.
+
 - [Game design doc](docs/GDD.md)
 - [Technical plan](docs/TECH.md)
 - [Camera style prototype](https://esalavat.github.io/shop-game/prototypes/camera/)
