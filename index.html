@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#bfe3f5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>My Dream Dollhouse Shop</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css?v=1">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
+</script>
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+
+  <div id="hud">
+    <div class="hud-row">
+      <div class="pill" id="hud-coins"><span class="ico" aria-hidden="true">🪙</span><b>0</b></div>
+      <div class="pill" id="hud-hearts"><span class="ico" aria-hidden="true">❤️</span><b>0</b></div>
+      <div class="pill" id="hud-sparkle"><span class="ico" aria-hidden="true">✨</span><b>0</b></div>
+    </div>
+    <div class="day-chip" id="hud-day"></div>
+  </div>
+
+  <div id="rotate">
+    <div class="rotate-card">📱<br>Turn your phone upright to play!</div>
+  </div>
+</div>
+<script type="module" src="js/main.js?v=1"></script>
+</body>
+</html>
