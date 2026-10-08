@@ -5,7 +5,7 @@ import { makeRoom } from './building.js';
 import { createKeeper } from './keeper.js';
 import { dropBox } from './stock.js';
 
-export const STATE_VERSION = 4;
+export const STATE_VERSION = 5;
 
 /** Live-only fields: never saved, reset on every load (customers just walk in again). */
 export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer'];

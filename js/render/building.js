@@ -85,10 +85,12 @@ function furnishRoom(group, room, cx, fy, lighting) {
   for (const f of room.fixtures) {
     const model = buildFixture(f.kind);
     model.position.set(cx + f.x, fy, f.z);
+    model.rotation.y = f.rot ?? 0;
     group.add(model);
     if (FIXTURES[f.kind].walkable) continue;
     const hit = fixtureHitbox(f.kind);
     hit.position.add(model.position);
+    hit.rotation.y = model.rotation.y;
     hit.userData = { roomId: room.id, fixtureId: f.id };
     group.add(hit);
     targets.push(hit);

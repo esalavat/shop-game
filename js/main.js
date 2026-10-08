@@ -22,6 +22,7 @@ import { buildNav } from './sim/nav.js';
 import { walkTo, walkToFixture, walkToBox, tickKeeper } from './sim/keeper.js';
 import { startNextDay } from './sim/day.js';
 import { tickCustomers } from './sim/customers.js';
+import { separate } from './sim/crowd.js';
 import { checkoutTap, keeperAtCounter } from './sim/checkout.js';
 import { ITEMS } from './data/items.js';
 import { attachGestures } from './input/touch.js';
@@ -224,6 +225,7 @@ startLoop({
     customersView.beforeTick();
     tickKeeper(state, dt);
     tickCustomers(state, navs, dt);
+    separate(state, navs);
   },
   frame(dt, time, alpha) {
     lighting.update(dt);

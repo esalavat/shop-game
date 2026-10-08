@@ -67,3 +67,25 @@ test('a v1 save upgrades: rooms get furniture and the shopkeeper appears', () =>
   assert.deepEqual(s.building.rooms[1].fixtures, []);
   assert.equal(s.keeper.roomId, 'r1');
 });
+
+test('a v4 save takes the Dream Dollhouse out of the shop and keeps shelf stock', () => {
+  const store = memoryStorage();
+  const v4 = {
+    version: 4, nextId: 9, day: { number: 3, phase: 'morning' }, coins: 80, hearts: 2, sparkle: 0,
+    building: { rooms: [{ id: 'r1', type: 'shop', col: 0, floor: 0, fixtures: [
+      { id: 'r1-f1', kind: 'shelf', x: -0.95, z: -1.06, slots: ['doll', null, null, null, null, null, null, null, null] },
+      { id: 'r1-f2', kind: 'shelf', x: 0.25, z: -1.06, slots: [null, 'bed', null, null, null, null, null, null, null] },
+      { id: 'r1-f4', kind: 'pedestal', x: 1.15, z: 0.85 },
+    ] }] },
+    keeper: { roomId: 'r1', x: 0, z: 0, facing: 0, path: [], carrying: null },
+    orders: [], boxes: [], collection: {}, wishes: [], shopkeeper: {}, settings: {}, lastSeen: 0,
+  };
+  store.setItem(SAVE_KEY, JSON.stringify(v4));
+  const s = loadGame(store);
+  const shop = s.building.rooms.find((r) => r.type === 'shop');
+  assert.ok(!shop.fixtures.some((f) => f.kind === 'pedestal'));
+  const shelves = shop.fixtures.filter((f) => f.slots);
+  assert.equal(shelves[0].slots[0], 'doll');
+  assert.equal(shelves[1].slots[1], 'bed');
+  assert.equal(s.building.rooms.length, 1);
+});

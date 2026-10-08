@@ -1,7 +1,7 @@
 // Walking paths inside a room: an occupancy grid over the floor, A* on it, then
 // string-pulling so characters walk in straight lines instead of grid staircases.
 
-import { FIXTURES } from '../data/fixtures.js';
+import { FIXTURES, footprint } from '../data/fixtures.js';
 import { ROOM_SIZE } from '../data/rooms.js';
 
 export const CELL = 0.1;
@@ -14,13 +14,13 @@ export function buildNav(room) {
   const blocked = new Uint8Array(cols * rows);
   const solid = room.fixtures
     .filter((f) => !FIXTURES[f.kind].walkable)
-    .map((f) => ({ f, s: FIXTURES[f.kind].size }));
+    .map((f) => ({ f, s: footprint(f) }));
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const x = -W / 2 + (c + 0.5) * CELL, z = -D / 2 + (r + 0.5) * CELL;
       const outside = x < -W / 2 + RADIUS || x > W / 2 - RADIUS || z < -D / 2 + RADIUS || z > D / 2 - FRONT_MARGIN;
-      const inFixture = solid.some(({ f, s }) => Math.abs(x - f.x) < s.w / 2 + RADIUS && Math.abs(z - f.z) < s.d / 2 + RADIUS);
+      const inFixture = solid.some(({ f, s }) => Math.abs(x - f.x) < s.hw + RADIUS && Math.abs(z - f.z) < s.hd + RADIUS);
       if (outside || inFixture) blocked[r * cols + c] = 1;
     }
   }

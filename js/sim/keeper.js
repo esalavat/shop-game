@@ -2,7 +2,7 @@
 // A walk can carry a `task` (pick up a box, stock a shelf) that runs when she arrives.
 
 import { events } from '../core/events.js';
-import { FIXTURES } from '../data/fixtures.js';
+import { useSpot } from '../data/fixtures.js';
 import { findPath } from './nav.js';
 import { stepAlong } from './walker.js';
 import { boxSpot } from './stock.js';
@@ -13,7 +13,7 @@ const DOORWAY_Z = 1.1; // she leans out from the front edge of the shop to grab 
 
 export function createKeeper(roomId) {
   return {
-    roomId, x: -1.05, z: -0.52, facing: 0,
+    roomId, x: -1.05, z: -0.42, facing: Math.PI / 6, // behind the shop counter
     path: [], fixtureId: null, arriveFacing: null, task: null,
     carrying: null, // a box { id, itemId, qty } while she holds one
   };
@@ -32,9 +32,9 @@ export function walkTo(state, nav, x, z, { fixtureId = null, face = null, task =
 }
 
 export function walkToFixture(state, nav, fixture, task = null) {
-  const use = FIXTURES[fixture.kind].use;
-  if (!use) return walkTo(state, nav, fixture.x, fixture.z, { task });
-  return walkTo(state, nav, fixture.x + use.dx, fixture.z + use.dz, { fixtureId: fixture.id, face: use.face, task });
+  const spot = useSpot(fixture);
+  if (!spot) return walkTo(state, nav, fixture.x, fixture.z, { task });
+  return walkTo(state, nav, spot.x, spot.z, { fixtureId: fixture.id, face: spot.face, task });
 }
 
 export function walkToBox(state, nav, box) {

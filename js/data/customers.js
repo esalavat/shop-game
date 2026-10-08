@@ -1,8 +1,9 @@
 // Who visits the shop and how they look and behave.
 
 export const CUSTOMER = {
-  speed: 1.1,               // walking speed (room units / s); the shopkeeper is quicker
-  maxInShop: 4,
+  speed: 1.1,               // walking speed indoors (room units / s); the shopkeeper is quicker
+  streetSpeed: 1.6,         // a brisker stroll along the sidewalk
+  maxInShop: 5,             // counts people walking in and out along the street too
   spawnEvery: [6, 12],      // seconds between visitors (random in range)
   spawnEveryEmpty: [14, 22],// slower while the shelves are bare
   browseTime: [1.4, 2.8],   // seconds spent looking at a shelf

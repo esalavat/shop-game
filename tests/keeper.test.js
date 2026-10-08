@@ -4,7 +4,7 @@ import { createState } from '../js/sim/state.js';
 import { buildNav } from '../js/sim/nav.js';
 import { walkTo, walkToFixture, tickKeeper, KEEPER_SPEED } from '../js/sim/keeper.js';
 import { events } from '../js/core/events.js';
-import { FIXTURES } from '../js/data/fixtures.js';
+import { useSpot } from '../js/data/fixtures.js';
 
 const run = (state, seconds) => { for (let t = 0; t < seconds; t += 0.1) tickKeeper(state, 0.1); };
 
@@ -29,5 +29,5 @@ test('arriving at furniture faces it and announces arrival', () => {
   run(s, 6);
   off();
   assert.equal(arrived, shelf.id);
-  assert.equal(s.keeper.facing, FIXTURES.shelf.use.face);
+  assert.equal(s.keeper.facing, useSpot(shelf).face);
 });

@@ -2,7 +2,7 @@
 // the counter, their items go on the counter. Each tap scans one; the last tap rings the sale.
 
 import { events } from '../core/events.js';
-import { FIXTURES } from '../data/fixtures.js';
+import { useSpot } from '../data/fixtures.js';
 import { ITEMS } from '../data/items.js';
 import { CUSTOMER } from '../data/customers.js';
 import { addCoins } from './economy.js';
@@ -16,8 +16,8 @@ export function keeperAtCounter(state) {
   const k = state.keeper;
   const counter = counterOf(state, k.roomId);
   if (!counter || k.path.length) return false;
-  const use = FIXTURES.counter.use;
-  return Math.hypot(k.x - (counter.x + use.dx), k.z - (counter.z + use.dz)) < 0.1;
+  const spot = useSpot(counter);
+  return Math.hypot(k.x - spot.x, k.z - spot.z) < 0.1;
 }
 
 export function startCheckout(state, customer) {

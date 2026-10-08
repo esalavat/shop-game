@@ -1,14 +1,19 @@
-// Draws customers from state: pop in at the door, walk (interpolated between sim ticks),
-// carry what they picked, and pop out when they leave.
+// Draws customers from state: they walk in along the sidewalk (interpolated between sim ticks),
+// step up into the shop, carry what they picked, and shrink away near the end of the road.
 
 import * as THREE from 'three';
 import { createCharacter } from '../models/character.js';
 import { buildItem } from '../models/items.js';
+import { DOORSTEP_Y } from '../../sim/stock.js';
+import { STREET } from '../../sim/customers.js';
 
 const POP_TIME = 0.3;
 const HELD_SCALE = 1.5;
 const lerp = (a, b, t) => a + (b - a) * t;
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+const STEP_DEPTH = 0.25; // the front step from the shop floor down to the sidewalk
+/** Height above the shop floor at room-local depth z (drops to the sidewalk out front). */
+const groundAt = (z) => DOORSTEP_Y * Math.min(1, Math.max(0, (z - STREET.edgeZ) / STEP_DEPTH));
 
 export function createCustomersView(state, roomOrigin) {
   const group = new THREE.Group();
@@ -79,7 +84,8 @@ export function createCustomersView(state, roomOrigin) {
         }
         const c = e.c;
         const o = roomOrigin(c.roomId);
-        e.root.position.set(o.x + lerp(e.prev.x, c.x, alpha), o.y, o.z + lerp(e.prev.z, c.z, alpha));
+        const z = lerp(e.prev.z, c.z, alpha);
+        e.root.position.set(o.x + lerp(e.prev.x, c.x, alpha), o.y + groundAt(z), o.z + z);
         e.facing += wrap(c.facing - e.facing) * Math.min(1, dt * 10);
         e.root.rotation.y = e.facing;
         const p = e.t / POP_TIME;

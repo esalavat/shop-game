@@ -33,6 +33,18 @@ const MIGRATIONS = {
   },
   // v4: customers can leave wish notes.
   3: (d) => ({ ...d, version: 4, wishes: [] }),
+  // v5: the Dream Dollhouse leaves the shop (it returns later as its own Window Display room when
+  // the shop grows), and the shop is rearranged: two shelves right of the counter. Stock carries over.
+  4: (d) => {
+    const rooms = d.building.rooms.map((r) => {
+      if (r.type !== 'shop') return r;
+      const oldShelves = r.fixtures.filter((f) => f.slots);
+      const fixtures = defaultFixtures('shop', r.id);
+      fixtures.filter((f) => f.slots).forEach((f, i) => { if (oldShelves[i]) f.slots = [...oldShelves[i].slots]; });
+      return { ...r, fixtures };
+    });
+    return { ...d, version: 5, building: { ...d.building, rooms }, keeper: createKeeper(d.keeper.roomId) };
+  },
 };
 
 export function migrate(data) {

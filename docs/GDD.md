@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.6 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.7 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -29,6 +29,8 @@
 | 20 | **Customizable shopkeeper** (hair, outfits, colors) | v0.5 |
 | 21 | Camera: **orthographic "diorama"**, straight-on (no angle), **no outlines** (chosen from `prototypes/camera/`) | v0.6 |
 | 22 | Evening is **purple twilight**, not orange/golden | v0.6 |
+| 23 | The Dream Dollhouse is **unlocked when the shop first expands**: it gets its own **Window Display room** next to the shop. The starting shop is just counter + two shelves | v0.7 |
+| 24 | Customers **walk in along the sidewalk** from either side and leave the same way, fading out near the end of the road | v0.7 |
 
 ## 1. Pitch
 
@@ -132,6 +134,7 @@ Each item has a set price. You earn more through:
 Your very own dollhouse, displayed in the shop's front window.
 
 ### 6.1 What it is
+- **Unlocked with the first expansion (decided v0.7):** the starting shop is small, so the Dream Dollhouse arrives with a **Window Display room** built next to the shop, facing the street like a real shop window. Unlocking it is a milestone moment.
 - A dollhouse with its own small grid of rooms (bedroom, living room, kitchen, nursery, pet room…), shown in the window and editable in a close-up **decorate mode**.
 - It starts as a bare one-room house and grows: more rooms, roof styles, wallpaper, floors, twinkly lights.
 
@@ -295,7 +298,7 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - [ ] **Stocking:** open boxes, place items on 3–4 shelves
 - [ ] **Checkout:** scan + ring up, with tips
 - [ ] **Collection:** items unlock when first received
-- [ ] **Dream Dollhouse v0:** one room in the window with ~4 fixed slots; Sparkle increases visitors
+- [ ] **First expansion → Window Display room with Dream Dollhouse v0:** one room with ~4 fixed slots; Sparkle increases visitors
 - [ ] Customers browse, buy, and leave wish notes
 - [ ] Hire one cashier helper
 - [ ] Simple shopkeeper creator (a few hairstyles, colors, outfits)

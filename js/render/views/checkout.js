@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import { buildItem } from '../models/items.js';
 import { counterOf } from '../../sim/checkout.js';
+import { rotateOffset } from '../../data/fixtures.js';
 import { events } from '../../core/events.js';
 
 const ITEM_SCALE = 1.6;
@@ -27,7 +28,8 @@ export function createCheckoutView(state, roomOrigin) {
     checkout.items.forEach((it, i) => {
       const obj = buildItem(it.itemId);
       obj.scale.setScalar(ITEM_SCALE);
-      obj.position.set(counterPos.x - 0.3 + i * 0.24, counterPos.y, counterPos.z + 0.08);
+      const off = rotateOffset(-0.3 + i * 0.24, 0.08, counter.rot); // along the counter top
+      obj.position.set(counterPos.x + off.x, counterPos.y, counterPos.z + off.z);
       group.add(obj);
       items.push({ obj, t: 0, scanning: false, y: obj.position.y });
     });

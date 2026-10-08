@@ -1,7 +1,8 @@
 // Customers: walk in, browse shelves for what they want, take it, queue at the counter, pay, leave.
 // If something they want isn't on the shelves, they leave a wish note instead (never upset).
 //
-// States: entering -> toShelf -> browsing -> (next want...) -> toQueue -> queued -> paying -> paid -> leaving
+// States: arriving (walking in from the street) -> entering -> toShelf -> browsing -> (next want...)
+//         -> toQueue -> queued -> paying -> paid -> leaving (out the door and off along the street)
 //         waitingQueue when the line is full; straight to leaving if they found nothing.
 
 import { events } from '../core/events.js';
@@ -12,8 +13,13 @@ import { stepAlong } from './walker.js';
 import { newId, shopRoomId, findFixture } from './stock.js';
 import { keeperAtCounter, startCheckout } from './checkout.js';
 
-/** Where customers appear and leave (front of the shop room, room-local). */
-export const ENTRY = { x: 0.15, z: 1.1 };
+/** Just inside the shop's open front, where customers step in and out (room-local). */
+export const ENTRY = { x: 0.4, z: 1.1 };
+/**
+ * The sidewalk in front of the shop (room-local; below floor level). People walk in from off-screen
+ * along one lane and leave along the other, then disappear near the end of the road.
+ */
+export const STREET = { inLane: 2.25, outLane: 2.65, farX: 8, edgeZ: 1.3 };
 /**
  * The line for the counter; spot 0 is being served. They come up to the counter's end, side-on,
  * so they don't hide the counter (or the shopkeeper) from the camera, then the line snakes forward.
@@ -61,9 +67,11 @@ export function spawnCustomer(state, rand = Math.random) {
     skin: pick(rand, LOOKS.skins), outfit: pick(rand, LOOKS.outfits),
     scale: kid ? KID_SCALE : ADULT_SCALE,
   };
+  const side = rand() < 0.5 ? -1 : 1;
   const c = {
-    id: newId(state, 'c'), roomId, x: ENTRY.x, z: ENTRY.z, facing: Math.PI, path: [], arriveFacing: null,
-    state: 'entering', timer: 0.5, look, wants: chooseWants(state, roomId, rand), basket: [], target: null,
+    id: newId(state, 'c'), roomId, x: side * STREET.farX, z: STREET.inLane, facing: -side * Math.PI / 2,
+    path: [{ x: ENTRY.x, z: STREET.inLane }, { x: ENTRY.x, z: ENTRY.z }], arriveFacing: null,
+    side, state: 'arriving', timer: 0.3, look, wants: chooseWants(state, roomId, rand), basket: [], target: null,
   };
   state.customers.push(c);
   events.emit('customerArrived', { customer: c });
@@ -153,7 +161,14 @@ function leave(state, c, nav) {
       if (j >= i && other && (other.state === 'toQueue' || other.state === 'queued')) goToQueueSpot(other, j, nav);
     });
   }
-  walk(c, nav, ENTRY.x, ENTRY.z);
+  // Out the door, onto the sidewalk, and off the far end of the road from where they came.
+  const side = -c.side;
+  c.path = [
+    ...(findPath(nav, c, ENTRY) ?? []),
+    { x: ENTRY.x, z: STREET.outLane },
+    { x: side * STREET.farX, z: STREET.outLane },
+  ];
+  c.arriveFacing = null;
   c.state = 'leaving';
 }
 
@@ -167,9 +182,13 @@ export function tickCustomers(state, navs, dt, rand = Math.random) {
 
   for (const c of [...state.customers]) {
     const nav = navs.get(c.roomId);
-    if (stepAlong(c, CUSTOMER.speed, dt) && c.arriveFacing !== null) c.facing = c.arriveFacing;
+    const speed = c.z > STREET.edgeZ ? CUSTOMER.streetSpeed : CUSTOMER.speed;
+    if (stepAlong(c, speed, dt) && c.arriveFacing !== null) c.facing = c.arriveFacing;
     const walking = c.path.length > 0;
     switch (c.state) {
+      case 'arriving':
+        if (!walking) c.state = 'entering';
+        break;
       case 'entering':
         if ((c.timer -= dt) <= 0) nextWant(state, c, nav, rand);
         break;
