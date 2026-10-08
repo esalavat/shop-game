@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2b2233">
+<title>Camera Styles</title>
+<style>
+  :root { --ink: #5a3a55; --cream: #fff6ee; --pink: #f27aa8; }
+  html, body { margin: 0; height: 100%; background: #2b2233; overflow: hidden; overscroll-behavior: none;
+    font-family: ui-rounded, "SF Pro Rounded", "Nunito", "Trebuchet MS", system-ui, sans-serif; }
+  /* Portrait frame: fills a phone, shows a phone-shaped viewport on desktop. */
+  #app { position: fixed; inset: 0; margin: auto; width: min(100vw, calc(100dvh * 0.5)); height: 100dvh; overflow: hidden; }
+  canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+  #top { position: absolute; top: 0; left: 0; right: 0; padding: calc(env(safe-area-inset-top) + 10px) 12px 0; pointer-events: none; }
+  .card { position: relative; background: rgba(255, 246, 238, .94); border-radius: 18px; padding: 10px 14px; color: var(--ink);
+    box-shadow: 0 4px 0 rgba(90, 58, 85, .18); }
+  #style-name { font-weight: 800; font-size: 18px; }
+  #style-desc { font-size: 13px; line-height: 1.35; margin-top: 2px; }
+  #fps { position: absolute; right: 12px; top: 10px; font-size: 11px; opacity: .5; }
+  #bottom { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 10px calc(env(safe-area-inset-bottom) + 10px);
+    display: flex; flex-direction: column; gap: 8px; }
+  .row { display: flex; gap: 8px; }
+  button { flex: 1; border: 0; border-radius: 16px; padding: 12px 4px; font: inherit; font-weight: 800; font-size: 14px;
+    color: var(--ink); background: var(--cream); box-shadow: 0 4px 0 #e4c9d6; cursor: pointer;
+    -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  button:active { transform: translateY(2px); box-shadow: 0 2px 0 #e4c9d6; }
+  button.on { background: var(--pink); color: #fff; box-shadow: 0 4px 0 #c45583; }
+  .row.small button { font-size: 12px; padding: 9px 2px; }
+  .hint { text-align: center; font-size: 12px; font-weight: 700; color: var(--cream); text-shadow: 0 1px 2px rgba(60, 30, 50, .6); }
+</style>
+<script type="importmap">
+{ "imports": { "three": "../../vendor/three.module.js", "three/addons/": "../../vendor/addons/" } }
+</script>
+</head>
+<body>
+<div id="app">
+  <canvas id="c"></canvas>
+  <div id="top">
+    <div class="card"><div id="style-name"></div><div id="style-desc"></div><div id="fps"></div></div>
+  </div>
+  <div id="bottom">
+    <div class="hint">Drag to move · pinch to zoom · tap a room</div>
+    <div class="row" id="styles">
+      <button data-style="diorama">Diorama</button>
+      <button data-style="telephoto">Telephoto</button>
+      <button data-style="closeup">Close-up</button>
+    </div>
+    <div class="row small">
+      <button id="b-angle">Angled</button>
+      <button id="b-all">Whole shop</button>
+      <button id="b-eve">Evening</button>
+      <button id="b-outline">Outlines</button>
+    </div>
+  </div>
+</div>
+<script type="module" src="main.js"></script>
+</body>
+</html>

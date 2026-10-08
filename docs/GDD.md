@@ -1,4 +1,4 @@
-# Dream Doll Shop — Game Design Document
+# My Dream Dollhouse Shop — Game Design Document
 
 > **Status:** Draft v0.5 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
@@ -15,7 +15,7 @@
 | 6 | **No failure states.** Cozy, not stressful | v0.2 |
 | 7 | Player does real shop jobs: **inventory, stocking, marketing, checkout** | v0.2 |
 | 8 | Touchstones: *Eatventure*, *TCG Card Shop Tycoon*, *Tiny Tower* (for feel, not for copying mechanics) | v0.2–v0.3 |
-| 9 | Title: **Dream Doll Shop** | v0.3 |
+| 9 | Title: **My Dream Dollhouse Shop** (was *Dream Doll Shop*) | v0.3–v0.5 |
 | 10 | Shop shown as a **dollhouse cutaway**; the building grows on a **grid in both X and Y** (wings and floors), not a tall tower | v0.3 |
 | 11 | **Dream Dollhouse:** the player's own showpiece in the shop window; acts as the shop's advertisement | v0.3 |
 | 12 | **Storyline events** with named regulars as you progress | v0.3 |

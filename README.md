@@ -1,4 +1,4 @@
-# Dream Doll Shop
+# My Dream Dollhouse Shop
 
 A cozy, mobile-first, low-poly 3D game about running a dollhouse shop and building your own dream dollhouse.
 
@@ -8,4 +8,6 @@ A cozy, mobile-first, low-poly 3D game about running a dollhouse shop and buildi
 
 Play: https://esalavat.github.io/shop-game/ (once there's something to play)
 
-See [docs/GDD.md](docs/GDD.md) for the game design doc.
+- [Game design doc](docs/GDD.md)
+- [Technical plan](docs/TECH.md)
+- [Camera style prototype](https://esalavat.github.io/shop-game/prototypes/camera/)
