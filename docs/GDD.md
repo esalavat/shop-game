@@ -1,6 +1,6 @@
 # Dream Doll Shop — Game Design Document
 
-> **Status:** Draft v0.4 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.5 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -20,15 +20,17 @@
 | 11 | **Dream Dollhouse:** the player's own showpiece in the shop window; acts as the shop's advertisement | v0.3 |
 | 12 | **Storyline events** with named regulars as you progress | v0.3 |
 | 13 | **Workshop** is on the roadmap; **sharing creations with friends** is a future goal | v0.3 |
-| 14 | **Fixed prices**, no player price-setting (see §4.5) | v0.3 |
+| 14 | **Fixed prices**, no player price-setting (see §5.5) | v0.3 |
 | 15 | Play is structured in **shop days**; open hours last ~3–5 minutes | v0.3–v0.4 |
 | 16 | Dream Dollhouse uses **fixed placement slots** for now; a free grid may come later | v0.4 |
 | 17 | **Collection:** once you've received an item, it's unlocked forever and can be placed in the Dream Dollhouse at no cost | v0.4 |
-| 18 | **Tone: made for a little girl.** Sweet, playful, whimsical, not a realistic adult retail store | v0.4 |
+| 18 | **Tone:** sweet, playful, whimsical, girl-focused, not a realistic adult retail store | v0.4 |
+| 19 | **Target audience: ages 11–15.** Cute and aesthetic, but never babyish | v0.5 |
+| 20 | **Customizable shopkeeper** (hair, outfits, colors) | v0.5 |
 
 ## 1. Pitch
 
-You've just opened the sweetest little dollhouse shop in town! There are shelves of tiny teacups and itty-bitty beds, a basket of dolls in pretty dresses, and in the front window your very own **Dream Dollhouse**, waiting to be filled.
+You've just opened the cutest little dollhouse shop in town. There are shelves of tiny teacups and miniature beds, a basket of dolls in their best outfits, and in the front window your very own **Dream Dollhouse**, waiting to be filled.
 
 Unpack the delivery boxes, fill up the shelves, and *beep-beep-cha-ching!* ring up the happy kids and families who come to visit. Every new treasure you discover goes into your **Collection**, and you can put it right into your Dream Dollhouse. The prettier your dollhouse gets, the more people stop at the window to peek in, and the bigger your shop grows.
 
@@ -36,24 +38,38 @@ Unpack the delivery boxes, fill up the shelves, and *beep-beep-cha-ching!* ring 
 
 ## 2. Pillars
 
-1. **Sweet and whimsical.** Every screen should make a kid smile: pastel colors, sparkles, hearts, bouncy animations, cute characters.
+1. **Cute and aesthetic.** Every screen should be something you'd want to screenshot: pastel colors, sparkles, bouncy animations, adorable characters. Cute, never babyish.
 2. **Cozy over clicky.** The joy is in the shop looking lovely and customers being happy, not in watching numbers climb. Progress is shown *in the world* first, in numbers second.
 3. **Playing shop.** You do the fun parts of running a shop (unpacking, stocking, ringing up), each as a short, tactile interaction that's satisfying on its own. It's pretend play, not business simulation.
 4. **Your choice of jobs.** Hire helpers for the jobs you don't feel like doing; keep the ones you love.
 5. **Collect and create.** Discover new treasures and decorate your Dream Dollhouse (and your shop) however you like.
 6. **Nothing goes wrong.** No failure, no lost progress, no grumpy customers. The worst outcome is "a little slower."
-7. **One thumb, portrait, little reading.** Every action is a tap or a short drag. Icons and pictures first; text short and simple.
+7. **One thumb, portrait.** Every action is a tap or a short drag. Icons first; text short, friendly, and a little witty.
 
 ## 3. Audience & Tone
 
-- **Who it's for:** a little girl who loves dolls and dollhouses (and anyone who enjoys cute, cozy games).
-- **Feel:** a playset come to life. Think of a toy shop in a picture book, not a real store.
-- **Language:** short, warm, simple words. Icons do most of the explaining. Numbers kept small and friendly.
+- **Who it's for:** players aged **11–15**, mainly girls, who love cute things, decorating, collecting, and cozy games. Comparable vibes: *Animal Crossing*, *Hello Kitty Island Adventure*, *Toca Boca*, *Paper Doll*-style dress-up, plus the "show off your room" culture of social media.
+- **Feel:** a gorgeous miniature world that's fun to play shop in. Charming and a bit whimsical, but with real choices and things worth showing off.
+- **Not babyish:** no baby talk, no over-explaining. Writing is warm, light, and a little funny. Characters have personality.
+- **What this age cares about (design priorities):**
+  - **Self-expression:** shopkeeper style, shop decor, the Dream Dollhouse. Lots of combinations, not just upgrades.
+  - **Aesthetics:** themed collections in styles they recognize (cottagecore, kawaii, fairy, Y2K, princess, cozy café).
+  - **Showing off:** Snapshot sharing matters more for this audience and moves up the roadmap.
+  - **Collecting:** completing Collection pages and finding rare treasures.
 - **Names for things:**
   - **Coins:** the money you earn.
   - **Hearts ❤️:** how much customers love your shop (reputation).
   - **Sparkle ✨:** how dazzling your Dream Dollhouse and displays are (charm).
-- ❓ **Is the actual target player a young child, or is this the tone for a general audience?** This matters for the store releases. Apps aimed at kids (Apple's Kids category, Google Play's Families policy, COPPA in the US) have strict rules: no third-party ads or tracking, a parental gate before purchases or external links, and limits on social features. 💡 Design as if kids will play it either way: no ads, no data collection, and any friend features gated behind a grown-up.
+
+### 3.1 Age rules & privacy
+Ages 11–12 are under 13, so the store versions count as a **mixed-audience** app that includes children:
+- **US COPPA / Google Play Families policy:** no collecting personal data from under-13s without parental consent, no behavioral ads or third-party tracking SDKs.
+- **Apple:** the Kids category is for ages 11 and under, so this probably *won't* go in it, but Apple's rules for apps that children use still apply.
+- **Design rules this gives us:**
+  - No ads, no analytics/tracking SDKs, no accounts in the web build.
+  - Sharing starts as **Snapshot images and share codes**: no chat, no free text, no friend lists.
+  - Any future online features (visiting friends' shops) use **preset reactions only** (hearts, stickers), never free chat, and get an age check / parental gate.
+  - No loot boxes or random paid rewards.
 
 ## 4. Platform & Tech Targets
 
@@ -138,7 +154,8 @@ Your very own dollhouse, displayed in the shop's front window.
 ### 6.5 Sharing (future)
 - **Phase 1 (no server):** a **Snapshot** button makes a pretty photo of your Dream Dollhouse to save or share.
 - **Phase 2:** share a dollhouse as a code or link that friends can open in a view-only viewer.
-- **Phase 3 (needs a backend):** visit friends' dollhouses and leave a heart. If kids are the audience (§3), this must sit behind a parental gate and follow kids-store rules.
+- **Phase 3 (needs a backend):** visit friends' dollhouses and leave a heart or sticker. Preset reactions only (no chat), with an age check / parental gate (§3.1).
+- For this age group, sharing is a big motivator. Snapshot is planned right after the MVP.
 
 ## 7. Shop Days
 
@@ -207,7 +224,9 @@ Your very own dollhouse, displayed in the shop's front window.
 - Helpers are named, cute characters; they work at a steady pace and can be upgraded.
 - Hiring is about choosing what *you* want to do.
 - Your shopkeeper is always there and walks to whatever you tap.
-- ❓ Is the shopkeeper customizable (hair, outfit, colors)? 💡 Yes, a natural fit for the audience, and outfits are nice rewards.
+- **Customizable shopkeeper (decided):** hairstyle, hair color, skin tone, outfits, accessories (bows, glasses, aprons, hats). Set up in a quick character creator at the start, and changeable anytime.
+- Outfits and accessories are earned through Collection pages, story moments, special days, and seasons. They're great rewards because they're about self-expression, not power.
+- 💡 Matching **shop uniforms** for helpers that you design.
 
 ## 11. Economy & Progression
 
@@ -244,7 +263,7 @@ Big buttons sit at the **bottom of the screen**: order book, posters, helpers, d
 - **Lighting:** warm sunlight through the windows moving across the day; twinkly lamps and fairy lights in the evening.
 - **Juice:** sparkles, floating hearts, bouncy squash-and-stretch, confetti for milestones.
 - **Characters:** round bodies, big heads and eyes, rosy cheeks, few polys, lots of outfit/hair color variety.
-- **Products:** tiny furniture, teacups, dolls in dresses, pets, dollhouses (each its own little house!), with a sprinkle of fantasy (unicorn lamp, rainbow rug, castle dollhouse).
+- **Products:** tiny furniture, teacups, dolls with great outfits, pets, dollhouses (each its own little house!), in recognizable aesthetic sets (cottagecore, kawaii, fairy garden, Y2K, princess, cozy café) plus a sprinkle of fantasy (unicorn lamp, mushroom house, castle dollhouse).
 - **UI:** round, chunky, candy-colored buttons; big icons; friendly rounded font.
 - **Assets:** placeholder geometry in code → CC0 low-poly packs (Kenney, Quaternius) → custom Blender glTF later.
 - **Asset reuse:** each product has one model, used on shelves, in customers' hands, in the Collection, and in the Dream Dollhouse.
@@ -256,7 +275,12 @@ Big buttons sit at the **bottom of the screen**: order book, posters, helpers, d
 
 ## 16. Monetization (future store builds)
 
-❓ Undecided and out of scope for the web build. Given the audience, the leading option is **paid up-front with no ads and no in-app purchases** (simplest for kids-store rules and the most parent-friendly).
+❓ Undecided and out of scope for the web build. Options that fit the audience and the age rules (§3.1):
+- **Paid up-front, no ads, no IAP:** simplest and the most parent-friendly.
+- **Free to try + one-time unlock** of the full game: lets players try before a parent pays.
+- **Cosmetic packs** (outfits, decor themes) sold directly with no randomness, behind platform parental controls.
+
+Never: ads, loot boxes, energy timers, or pay-to-skip.
 
 ## 17. Roadmap
 
@@ -273,6 +297,7 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - [ ] **Dream Dollhouse v0:** one room in the window with ~4 fixed slots; Sparkle increases visitors
 - [ ] Customers browse, buy, and leave wish notes
 - [ ] Hire one cashier helper
+- [ ] Simple shopkeeper creator (a few hairstyles, colors, outfits)
 - [ ] Coins, a few upgrades, local save
 - [ ] Toon-shaded low-poly placeholder art in the pastel palette
 - [ ] Playable on a phone browser
@@ -282,19 +307,19 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - More morning picks and special days
 - First regulars and story moments
 - More items, Collection pages, decorations
-- More Dream Dollhouse rooms; Snapshot sharing
-- Shopkeeper customization
+- **Snapshot sharing** (high priority for this audience)
+- More Dream Dollhouse rooms
+- More shopkeeper outfits and accessories
 - Offline earnings; audio
 
 ### Later
 - Workshop and requests
 - Seasons
-- Share codes / friends' dollhouses (parent-gated)
+- Share codes / friends' dollhouses (preset reactions only, age-gated)
 - Second location
 - Capacitor builds for iOS / Android
 
 ## 18. Open Questions
 
-1. **Audience:** is the real target player a young child (which triggers kids-store rules), or is the little-girl feel the tone for a general audience? (§3)
-2. Customizable shopkeeper: yes? (§10)
-3. Orthographic vs perspective camera (we'll prototype both).
+1. Orthographic vs perspective camera (we'll prototype both).
+2. Monetization model for the store builds (§16), which can wait until then.
