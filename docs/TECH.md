@@ -207,7 +207,7 @@ docs/                   # GDD, tech plan
 |---|---|---|
 | M0 | **Camera prototype** ✅ | Chose orthographic diorama, no angle, no outlines, twilight evening (`prototypes/camera/`) |
 | M1 | **Skeleton** ✅ | `index.html`, import map, loop, renderer, camera rig, one empty room, HUD, save/load, debug flag; deployed |
-| M2 | **Shop room & shopkeeper** | Furnished room with shelves and counter; shopkeeper walks to tapped spots |
+| M2 | **Shop room & shopkeeper** ✅ | Furnished room with shelves and counter; shopkeeper walks to tapped spots |
 | M3 | **Stock loop** | Order book → boxes arrive next morning → open boxes → items onto shelves |
 | M4 | **Customers & checkout** | Customers browse, pick, queue; tap-to-scan checkout; coins and tips; wish notes |
 | M5 | **Day cycle** | Morning → Open → Evening → Close with lighting changes and a day summary |

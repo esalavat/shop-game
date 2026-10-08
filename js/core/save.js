@@ -1,11 +1,21 @@
 // Save/load with versioned migrations. Storage is injectable so this runs under node --test.
 
 import { createState, STATE_VERSION } from '../sim/state.js';
+import { defaultFixtures } from '../sim/building.js';
+import { createKeeper } from '../sim/keeper.js';
 
 export const SAVE_KEY = 'mdds_save';
 
 // MIGRATIONS[n] upgrades a version-n save to version n+1.
-const MIGRATIONS = {};
+const MIGRATIONS = {
+  // v2: rooms get furniture; the shopkeeper gets a position.
+  1: (d) => ({
+    ...d,
+    version: 2,
+    building: { ...d.building, rooms: d.building.rooms.map((r) => ({ ...r, fixtures: defaultFixtures(r.type, r.id) })) },
+    keeper: createKeeper(d.building.rooms[0].id),
+  }),
+};
 
 export function migrate(data) {
   let d = data;

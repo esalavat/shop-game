@@ -1,5 +1,6 @@
 // Fixed-step simulation + per-frame rendering.
-// The sim ticks at a steady rate for deterministic logic; rendering runs every animation frame.
+// The sim ticks at a steady rate for deterministic logic; rendering runs every animation frame
+// and gets `alpha` (0..1, how far we are into the next tick) to interpolate movement.
 // requestAnimationFrame already stops while the tab is hidden; the dt cap stops a huge
 // catch-up burst when it comes back (offline time is handled separately by the sim).
 
@@ -18,7 +19,7 @@ export function startLoop({ tickRate = 10, tick, frame }) {
       tick(step);
       acc -= step;
     }
-    frame(dt, elapsed);
+    frame(dt, elapsed, acc / step);
     requestAnimationFrame(onFrame);
   }
 

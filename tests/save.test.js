@@ -51,3 +51,19 @@ test('saving survives a throwing storage', () => {
   const bad = { setItem() { throw new Error('quota'); } };
   assert.equal(saveGame(createState(), bad), false);
 });
+
+test('a v1 save upgrades: rooms get furniture and the shopkeeper appears', () => {
+  const store = memoryStorage();
+  const v1 = {
+    version: 1, day: { number: 1, phase: 'morning' }, coins: 150, hearts: 0, sparkle: 0,
+    building: { rooms: [{ id: 'r1', type: 'shop', col: 0, floor: 0 }, { id: 'r2', type: 'stock', col: 1, floor: 0 }] },
+    shopkeeper: {}, settings: { muted: false }, lastSeen: 0,
+  };
+  store.setItem(SAVE_KEY, JSON.stringify(v1));
+  const s = loadGame(store);
+  assert.equal(s.version, STATE_VERSION);
+  assert.equal(s.coins, 150);
+  assert.ok(s.building.rooms[0].fixtures.some((f) => f.kind === 'counter'));
+  assert.deepEqual(s.building.rooms[1].fixtures, []);
+  assert.equal(s.keeper.roomId, 'r1');
+});

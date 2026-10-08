@@ -3,9 +3,11 @@
 import * as THREE from 'three';
 import { box, prism } from './models/prims.js';
 import { PALETTE as P } from './toon.js';
-import { ROOM_TYPES } from '../data/rooms.js';
+import { ROOM_TYPES, ROOM_SIZE } from '../data/rooms.js';
+import { FIXTURES } from '../data/fixtures.js';
+import { buildFixture, fixtureHitbox } from './models/furniture.js';
 
-export const ROOM = { W: 3.4, H: 2.5, D: 2.6, T: 0.16 };
+export const ROOM = ROOM_SIZE;
 const { W, H, D, T } = ROOM;
 const ROOF_H = 2.1;
 
@@ -57,12 +59,17 @@ export function createBuilding(rooms, lighting) {
   return { group, layout, hitTargets };
 }
 
-/** Wallpaper, floor, window and lamp. Returns the meshes a tap can land on to select this room. */
+/**
+ * Wallpaper, floor, window, lamp and furniture. Returns the meshes a tap can land on, tagged with
+ * userData.roomId plus either `floor: true` or a `fixtureId`.
+ */
 function furnishRoom(group, room, cx, fy, lighting) {
   const look = ROOM_TYPES[room.type];
   const back = box(group, W, H, T, look.paper, cx, fy + H / 2, -D / 2 - T / 2);
   const floor = box(group, W, 0.02, D, look.floor, cx, fy + 0.01, 0);
   back.userData.roomId = floor.userData.roomId = room.id;
+  floor.userData.floor = true;
+  const targets = [back, floor];
 
   const wallZ = -D / 2;
   for (let x = -W / 2 + 0.2; x < W / 2; x += 0.42) {
@@ -74,7 +81,19 @@ function furnishRoom(group, room, cx, fy, lighting) {
   const win = look.window;
   addWindow(group, cx + win.x, fy + 1.55, wallZ + 0.03, win.w, win.h, look.curtain, lighting.glassMat);
   lighting.addPendant(group, cx, fy + H, 0.1);
-  return [back, floor];
+
+  for (const f of room.fixtures) {
+    const model = buildFixture(f.kind);
+    model.position.set(cx + f.x, fy, f.z);
+    group.add(model);
+    if (FIXTURES[f.kind].walkable) continue;
+    const hit = fixtureHitbox(f.kind);
+    hit.position.add(model.position);
+    hit.userData = { roomId: room.id, fixtureId: f.id };
+    group.add(hit);
+    targets.push(hit);
+  }
+  return targets;
 }
 
 function addWindow(group, x, y, z, w, h, curtain, glassMat) {
