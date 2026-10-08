@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.5 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.6 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -27,6 +27,8 @@
 | 18 | **Tone:** sweet, playful, whimsical, girl-focused, not a realistic adult retail store | v0.4 |
 | 19 | **Target audience: ages 11–15.** Cute and aesthetic, but never babyish | v0.5 |
 | 20 | **Customizable shopkeeper** (hair, outfits, colors) | v0.5 |
+| 21 | Camera: **orthographic "diorama"**, straight-on (no angle), **no outlines** (chosen from `prototypes/camera/`) | v0.6 |
+| 22 | Evening is **purple twilight**, not orange/golden | v0.6 |
 
 ## 1. Pitch
 
@@ -163,7 +165,7 @@ Your very own dollhouse, displayed in the shop's front window.
 |---|---|---|
 | **Morning** | Pip's deliveries arrive. Choose today's posters/balloons. Unpack and fill the shelves. | None |
 | **Open** | Customers come and go. Fill shelves, ring up, enjoy. The sun moves across the sky. | ~3–5 min |
-| **Evening** | Golden light; last customers wave goodbye; lamps glow. | Winding down |
+| **Evening** | Purple twilight; last customers wave goodbye; lamps glow softly. | Winding down |
 | **Close** | Day summary: coins, happy customers, wish notes, Sparkle. Story moments happen here. Then order for tomorrow, buy upgrades, and decorate, all with no timer. | None |
 
 - Days only advance when you play.
@@ -251,16 +253,15 @@ Big buttons sit at the **bottom of the screen**: order book, posters, helpers, d
 
 ## 13. Camera
 
-- Front-on **dollhouse cutaway** with a slight top-down tilt.
-- Orthographic vs low-FOV perspective ❓, to be decided by prototyping both.
+- **Orthographic "diorama" camera (decided)**, straight-on with a slight (~9°) top-down tilt and no side angle. No perspective distortion, so rooms line up neatly as the building grows, and zoomed out it reads like a dollhouse.
 - Gentle idle sway; lighting changes through the day.
 
 ## 14. Art Direction
 
 - **Style:** low-poly 3D, chunky cartoony proportions, rounded shapes. It should look like a toy.
 - **Palette:** pastels with pops of brightness: pink, lavender, mint, butter yellow, sky blue, cream, and warm wood.
-- **Shading:** toon shading (`MeshToonMaterial`, stepped gradient), soft colored shadows. Optional outline pass ❓.
-- **Lighting:** warm sunlight through the windows moving across the day; twinkly lamps and fairy lights in the evening.
+- **Shading:** toon shading (`MeshToonMaterial`, stepped gradient), soft colored shadows. **No outlines** (decided).
+- **Lighting:** warm sunlight through the windows during the day. Evening shifts to **purple twilight** (lavender/indigo sky, cool lilac light) with soft pink-white lamps and fairy lights, not orange or golden.
 - **Juice:** sparkles, floating hearts, bouncy squash-and-stretch, confetti for milestones.
 - **Characters:** round bodies, big heads and eyes, rosy cheeks, few polys, lots of outfit/hair color variety.
 - **Products:** tiny furniture, teacups, dolls with great outfits, pets, dollhouses (each its own little house!), in recognizable aesthetic sets (cottagecore, kawaii, fairy garden, Y2K, princess, cozy café) plus a sprinkle of fantasy (unicorn lamp, mushroom house, castle dollhouse).
@@ -321,5 +322,4 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 
 ## 18. Open Questions
 
-1. Orthographic vs perspective camera (we'll prototype both).
-2. Monetization model for the store builds (§16), which can wait until then.
+1. Monetization model for the store builds (§16), which can wait until then.

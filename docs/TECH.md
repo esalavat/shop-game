@@ -143,11 +143,11 @@ docs/                   # GDD, tech plan
 ### 5.1 Look
 - `MeshToonMaterial` with a shared 3-step gradient map, one material per palette color (cached).
 - Lighting: hemisphere (ambient) + **sun** (casts shadows; position/color follow time of day) + **shadowless fill** from the viewer's side so cutaway interiors never go flat + pendant **point lights** that fade in at evening.
-- Outlines: optional `OutlineEffect` (decide by the prototype; costs one extra draw pass).
+- No outline pass (decided). Evening is a purple twilight palette (see `EVE` in the prototype).
 - Proven in `prototypes/camera/`.
 
 ### 5.2 Camera
-- A rig with a **center**, **framing size** (fit room or whole building to the portrait screen), and **zoom**, with smoothing. Works with either an orthographic or perspective camera, so the choice is a parameter.
+- A rig with a **center**, **framing size** (fit room or whole building to the portrait screen), and **zoom**, with smoothing. Uses an **orthographic camera** (decided), front-on with a ~9° downward tilt.
 - Gestures: drag to pan (clamped to the building), pinch to zoom, tap a room to focus it.
 
 ### 5.3 Models
@@ -205,7 +205,7 @@ docs/                   # GDD, tech plan
 
 | # | Milestone | Done when… |
 |---|---|---|
-| M0 | **Camera prototype** ✅ | Camera style chosen (`prototypes/camera/`) |
+| M0 | **Camera prototype** ✅ | Chose orthographic diorama, no angle, no outlines, twilight evening (`prototypes/camera/`) |
 | M1 | **Skeleton** | `index.html`, import map, loop, renderer, camera rig, one empty room, HUD, save/load, debug flag; deployed |
 | M2 | **Shop room & shopkeeper** | Furnished room with shelves and counter; shopkeeper walks to tapped spots |
 | M3 | **Stock loop** | Order book → boxes arrive next morning → open boxes → items onto shelves |

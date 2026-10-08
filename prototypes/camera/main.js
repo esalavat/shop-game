@@ -64,10 +64,10 @@ const PASTELS = ['#ff9ec4', '#c8b6ff', '#9fe0c8', '#ffd98a', '#a8d8ff', '#ffb8a0
 const CREAM = '#fff6ee', WOOD = '#d7a877', DARK = '#5a3a55';
 
 // Evening-reactive materials
-const lampShadeMat = new THREE.MeshToonMaterial({ color: '#fff3c9', gradientMap, emissive: '#ffb85c', emissiveIntensity: 0, side: THREE.DoubleSide });
-const bulbMat = new THREE.MeshToonMaterial({ color: '#fffbe8', gradientMap, emissive: '#ffd27a', emissiveIntensity: 0 });
+const lampShadeMat = new THREE.MeshToonMaterial({ color: '#fff3c9', gradientMap, emissive: '#ffd6c8', emissiveIntensity: 0, side: THREE.DoubleSide });
+const bulbMat = new THREE.MeshToonMaterial({ color: '#fffbe8', gradientMap, emissive: '#fff0dc', emissiveIntensity: 0 });
 const glassMat = new THREE.MeshBasicMaterial({ color: '#cdeaff' });
-const GLASS_DAY = new THREE.Color('#cdeaff'), GLASS_EVE = new THREE.Color('#ffc59e');
+const GLASS_DAY = new THREE.Color('#cdeaff'), GLASS_EVE = new THREE.Color('#8f7fd6');
 const lamps = [];
 
 // ---------------------------------------------------------------------------
@@ -133,7 +133,7 @@ function pendant(x, y, z) {
   cyl(0.008, 0.008, 0.35, 4, DARK, x, y - 0.175, z).castShadow = false;
   const shade = mesh(new THREE.ConeGeometry(0.22, 0.18, 10, 1, true), lampShadeMat, x, y - 0.42, z); shade.castShadow = false;
   ball(0.06, bulbMat, x, y - 0.48, z).castShadow = false;
-  const L = new THREE.PointLight('#ffcf8a', 0, 5, 1.5); L.position.set(x, y - 0.6, z); scene.add(L); lamps.push(L);
+  const L = new THREE.PointLight('#ffdcd2', 0, 5, 1.5); L.position.set(x, y - 0.6, z); scene.add(L); lamps.push(L);
 }
 
 function bean({ body = '#ff9ec4', skin = '#ffd9c2', hair = '#6b3e2e', style = 'bob', apron = false, s = 1 } = {}) {
@@ -337,7 +337,7 @@ for (const x of [-BW / 2 - 0.6, BW / 2 + 0.6]) {
 }
 cyl(0.05, 0.06, 2.2, 6, DARK, BW / 2 + 0.9, 0.7, D / 2 + 0.4);
 ball(0.16, bulbMat, BW / 2 + 0.9, 1.85, D / 2 + 0.4).castShadow = false;
-{ const L = new THREE.PointLight('#ffcf8a', 0, 5, 1.5); L.position.set(BW / 2 + 0.9, 1.7, D / 2 + 0.6); scene.add(L); lamps.push(L); }
+{ const L = new THREE.PointLight('#ffdcd2', 0, 5, 1.5); L.position.set(BW / 2 + 0.9, 1.7, D / 2 + 0.6); scene.add(L); lamps.push(L); }
 for (const [look, x0, dir] of [[{ body: '#a8d8ff', hair: '#2e2430', style: 'bun' }, -8, 1], [{ body: '#ffd98a', hair: '#c2563a', style: 'bob', s: 0.85 }, 6, -1]]) {
   const obj = bean(look);
   obj.position.set(x0, -0.39, D / 2 + 1.0 + dir * 0.25);
@@ -362,7 +362,9 @@ sun.target.position.set(0, 2, 0);
 scene.add(sun, sun.target);
 
 const DAY = { sky: new THREE.Color('#bfe3f5'), hs: new THREE.Color('#fff4e6'), hg: new THREE.Color('#d9b8e8'), hi: 0.8, sc: new THREE.Color('#fff3df'), si: 2.2, sp: new THREE.Vector3(-4, 8, 11) };
-const EVE = { sky: new THREE.Color('#f2a48f'), hs: new THREE.Color('#9b86d9'), hg: new THREE.Color('#f0a8a8'), hi: 0.55, sc: new THREE.Color('#ffa66b'), si: 1.1, sp: new THREE.Vector3(9, 3.5, 9) };
+// Twilight: lavender/indigo sky, cool purple key light, soft pink-white lamps.
+const EVE = { sky: new THREE.Color('#6f62b0'), hs: new THREE.Color('#8a7fe0'), hg: new THREE.Color('#c99ad8'), hi: 0.65, sc: new THREE.Color('#c9a6f0'), si: 1.0, sp: new THREE.Vector3(9, 3.5, 9) };
+const FILL_DAY = new THREE.Color('#ffe9f2'), FILL_EVE = new THREE.Color('#b8a8f0');
 scene.background = DAY.sky.clone();
 let eve = 0, eveTarget = 0;
 
@@ -374,11 +376,12 @@ function applyTimeOfDay() {
   sun.color.lerpColors(DAY.sc, EVE.sc, eve);
   sun.intensity = THREE.MathUtils.lerp(DAY.si, EVE.si, eve);
   sun.position.lerpVectors(DAY.sp, EVE.sp, eve);
-  fill.intensity = THREE.MathUtils.lerp(0.8, 0.35, eve);
-  lampShadeMat.emissiveIntensity = eve * 0.9;
+  fill.color.lerpColors(FILL_DAY, FILL_EVE, eve);
+  fill.intensity = THREE.MathUtils.lerp(0.8, 0.45, eve);
+  lampShadeMat.emissiveIntensity = eve * 0.6;
   bulbMat.emissiveIntensity = eve * 1.6;
   glassMat.color.lerpColors(GLASS_DAY, GLASS_EVE, eve);
-  for (const L of lamps) L.intensity = eve * 6;
+  for (const L of lamps) L.intensity = eve * 3;
 }
 
 // ---------------------------------------------------------------------------
