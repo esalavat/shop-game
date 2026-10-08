@@ -1,7 +1,8 @@
-// The day's controls: the toolbar day button (Open shop / clock / Summary) and the closing summary.
+// The day's controls: the toolbar day button (Open shop / clock that closes early / Summary) and
+// the closing summary.
 
 import { ITEMS } from '../data/items.js';
-import { DAY_LENGTH, openShop, startNextDay } from '../sim/day.js';
+import { DAY_LENGTH, openShop, startNextDay, closeEarly, soldOut } from '../sim/day.js';
 import { events } from '../core/events.js';
 
 const clock = (seconds) => {
@@ -9,16 +10,26 @@ const clock = (seconds) => {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 };
 
-export function createDayUI(state, thumbs, orderBook) {
+const CONFIRM_MS = 3000; // how long "Tap again to close" waits for the second tap
+
+export function createDayUI(state, thumbs, orderBook, toast) {
   const button = document.getElementById('btn-day');
   const icon = button.querySelector('.tb-ico');
   const label = button.querySelector('.tb-label');
   const sheet = document.getElementById('summary');
   let shown = '';
+  let armedUntil = 0;     // close-early confirm window
+  let toldSoldOut = 0;    // day number we last said "sold out" on
 
   button.addEventListener('click', () => {
-    if (state.day.phase === 'morning') openShop(state);
-    else if (state.day.phase === 'close') showSummary();
+    const phase = state.day.phase;
+    if (phase === 'morning') openShop(state);
+    else if (phase === 'close') showSummary();
+    else if (phase === 'open') {
+      // Sold out: one tap closes. Otherwise ask for a second tap so it can't happen by accident.
+      if (soldOut(state) || performance.now() < armedUntil) closeEarly(state);
+      else armedUntil = performance.now() + CONFIRM_MS;
+    }
   });
 
   function showSummary() {
@@ -55,7 +66,16 @@ export function createDayUI(state, thumbs, orderBook) {
       const d = state.day;
       let next;
       if (d.phase === 'morning') next = ['☀️', 'Open shop', 'primary'];
-      else if (d.phase === 'open') next = ['🕒', clock(DAY_LENGTH.open - d.time), 'passive'];
+      else if (d.phase === 'open') {
+        const out = soldOut(state);
+        if (out && toldSoldOut !== d.number) {
+          toldSoldOut = d.number;
+          toast('Sold out! 🎉 Close up early whenever you like.');
+        }
+        if (out) next = ['🌙', 'Close early', 'primary'];
+        else if (performance.now() < armedUntil) next = ['🌙', 'Tap again to close', 'primary'];
+        else next = ['🕒', `${clock(DAY_LENGTH.open - d.time)} · Close`, 'passive'];
+      }
       else if (d.phase === 'evening') next = ['🌙', 'Closing soon', 'passive'];
       else next = ['📋', 'Day summary', ''];
       const key = next.join('|');

@@ -48,7 +48,7 @@ const toast = createToaster();
 const thumbs = makeThumbnails(renderer, Object.keys(ITEMS));
 const orderBook = createOrderBook(state, thumbs);
 const overlay = createOverlay(canvas, () => rig.camera);
-const dayUI = createDayUI(state, thumbs, orderBook);
+const dayUI = createDayUI(state, thumbs, orderBook, toast);
 lighting.setTwilight(twilightFor(state.day)); // start in the right light (e.g. reopened after closing)
 
 // ---------------------------------------------------------------------------

@@ -26,6 +26,19 @@ export function openShop(state) {
   return true;
 }
 
+/** End open hours now (e.g. sold out): straight to evening; the last customers still finish. */
+export function closeEarly(state) {
+  if (state.day.phase !== 'open') return false;
+  setPhase(state, 'evening');
+  return true;
+}
+
+/** Nothing left to sell: empty shelves, no boxes waiting, nothing in the shopkeeper's hands. */
+export function soldOut(state) {
+  const shelvesEmpty = state.building.rooms.every((r) => r.fixtures.every((f) => !f.slots || f.slots.every((s) => !s)));
+  return shelvesEmpty && state.boxes.length === 0 && !state.keeper.carrying;
+}
+
 /** Advance the clock. Closing waits until the last customer has gone home. */
 export function tickDay(state, dt) {
   const d = state.day;

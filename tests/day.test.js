@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createState } from '../js/sim/state.js';
 import { buildNav } from '../js/sim/nav.js';
-import { openShop, tickDay, startNextDay, twilightFor, DAY_LENGTH } from '../js/sim/day.js';
+import { openShop, tickDay, startNextDay, twilightFor, closeEarly, soldOut, DAY_LENGTH } from '../js/sim/day.js';
 import { tickCustomers, spawnCustomer } from '../js/sim/customers.js';
 import { checkoutTap } from '../js/sim/checkout.js';
 import { events } from '../js/core/events.js';
@@ -95,4 +95,22 @@ test("the day's tally counts sales, tips, items and wish notes; a new day starts
   assert.equal(s.day.number, 2);
   assert.equal(s.day.phase, 'morning');
   assert.equal(s.day.stats.served, 0);
+});
+
+test('you can close early; it goes to evening so the last customers still finish', () => {
+  const s = createState();
+  assert.equal(closeEarly(s), false, 'not before opening');
+  openShop(s);
+  assert.ok(closeEarly(s));
+  assert.equal(s.day.phase, 'evening');
+  assert.equal(s.day.time, 0);
+});
+
+test('sold out means empty shelves, no boxes waiting, nothing being carried', () => {
+  const s = createState();
+  assert.equal(soldOut(s), false, 'starter boxes are waiting');
+  s.boxes = [];
+  assert.equal(soldOut(s), true);
+  s.building.rooms[0].fixtures.find((f) => f.slots).slots[0] = 'doll';
+  assert.equal(soldOut(s), false);
 });
