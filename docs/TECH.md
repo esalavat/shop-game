@@ -213,7 +213,7 @@ docs/                   # GDD, tech plan
 | M2 | **Shop room & shopkeeper** ✅ | Furnished room with shelves and counter; shopkeeper walks to tapped spots |
 | M3 | **Stock loop** ✅ | Order book → boxes arrive next morning → open boxes → items onto shelves |
 | M4 | **Customers & checkout** ✅ | Customers browse, pick, queue; tap-to-scan checkout; coins and tips; wish notes |
-| M5 | **Day cycle** | Morning → Open → Evening → Close with lighting changes and a day summary |
+| M5 | **Day cycle** ✅ | Morning → Open → Evening → Close with lighting changes and a day summary |
 | M6 | **Collection & Dream Dollhouse v0** | Items unlock on delivery; first expansion builds the Window Display room; dollhouse with fixed slots; Sparkle drives foot traffic |
 | M7 | **Helpers, upgrades, creator** | Hire a cashier; a few upgrades; simple shopkeeper creator |
 | M8 | **Polish pass** | Juice (pops, sparkles), first sounds, phone perf check, PWA manifest |

@@ -12,6 +12,7 @@ import { findPath } from './nav.js';
 import { stepAlong } from './walker.js';
 import { newId, shopRoomId, findFixture } from './stock.js';
 import { keeperAtCounter, startCheckout } from './checkout.js';
+import { recordWish } from './day.js';
 
 /** Just inside the shop's open front, where customers step in and out (room-local). */
 export const ENTRY = { x: 0.4, z: 1.1 };
@@ -86,6 +87,7 @@ function walk(c, nav, x, z, face = null) {
 function addWish(state, c, itemId) {
   state.wishes.push({ itemId, day: state.day.number });
   if (state.wishes.length > MAX_WISHES) state.wishes.shift();
+  recordWish(state, itemId);
   events.emit('wish', { customerId: c.id, itemId });
 }
 
@@ -173,8 +175,8 @@ function leave(state, c, nav) {
 }
 
 export function tickCustomers(state, navs, dt, rand = Math.random) {
-  state.spawnTimer -= dt;
-  if (state.spawnTimer <= 0) {
+  // New visitors only arrive while the shop is open.
+  if (state.day.phase === 'open' && (state.spawnTimer -= dt) <= 0) {
     const anyStock = stockedSlots(state, shopRoomId(state)).length > 0;
     if (state.customers.length < CUSTOMER.maxInShop) spawnCustomer(state, rand);
     state.spawnTimer = between(rand, anyStock ? CUSTOMER.spawnEvery : CUSTOMER.spawnEveryEmpty);

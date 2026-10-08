@@ -3,6 +3,7 @@
 import { createState, giveStarterBoxes, resetTransient, STATE_VERSION, TRANSIENT } from '../sim/state.js';
 import { defaultFixtures } from '../sim/building.js';
 import { createKeeper } from '../sim/keeper.js';
+import { emptyStats } from '../sim/day.js';
 
 export const SAVE_KEY = 'mdds_save';
 
@@ -45,6 +46,8 @@ const MIGRATIONS = {
     });
     return { ...d, version: 5, building: { ...d.building, rooms }, keeper: createKeeper(d.keeper.roomId) };
   },
+  // v6: real shop days with a clock and a daily tally. Old saves wake up on a fresh morning.
+  5: (d) => ({ ...d, version: 6, day: { number: d.day.number, phase: 'morning', time: 0, stats: emptyStats() } }),
 };
 
 export function migrate(data) {

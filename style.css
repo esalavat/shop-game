@@ -383,3 +383,53 @@ button {
 .floater.tip { font-size: 15px; color: var(--pink-dark); }
 .floater.heart { font-size: 15px; color: #e0507a; }
 .floater.beep { font-size: 14px; color: var(--ink); }
+
+/* ---------- Day clock & summary ---------- */
+.day-chip { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.day-bar { width: 100%; min-width: 90px; height: 4px; border-radius: 2px; background: rgba(255, 246, 238, 0.3); overflow: hidden; }
+.day-bar[hidden] { display: none; }
+#hud-day-fill { height: 100%; width: 0; background: var(--cream); border-radius: 2px; transition: width 0.3s linear; }
+
+#toolbar button.primary { background: var(--pink); color: #fff; box-shadow: 0 4px 0 var(--pink-dark); }
+#toolbar button.primary:active { box-shadow: 0 2px 0 var(--pink-dark); }
+#toolbar button.passive { opacity: 0.85; }
+.tb-label { font-variant-numeric: tabular-nums; }
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.stat {
+  padding: 10px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 3px 0 var(--shadow);
+  text-align: center;
+}
+
+.stat b { display: block; font-size: 22px; }
+.stat span { font-size: 12px; font-weight: 700; opacity: 0.7; }
+
+.summary-section { margin: 6px 0; font-size: 13px; font-weight: 700; }
+.summary-section:empty { display: none; }
+.thumb-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.thumb { position: relative; width: 48px; height: 48px; border-radius: 12px; background: #fff; box-shadow: 0 2px 0 var(--shadow); }
+.thumb img { width: 100%; height: 100%; }
+.thumb i { position: absolute; right: -4px; bottom: -4px; padding: 0 5px; border-radius: 8px; background: var(--pink); color: #fff; font-style: normal; font-size: 11px; }
+
+.summary-actions { display: flex; gap: 10px; margin-top: 12px; }
+.summary-actions button {
+  flex: 1;
+  padding: 12px 6px;
+  border: 0;
+  border-radius: 16px;
+  font-weight: 800;
+  font-size: 15px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 3px 0 var(--shadow);
+}
+.summary-actions .summary-next { background: var(--pink); color: #fff; box-shadow: 0 3px 0 var(--pink-dark); }

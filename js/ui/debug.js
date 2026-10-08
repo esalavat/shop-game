@@ -5,8 +5,9 @@ import { addRoom, hasRoom } from '../sim/building.js';
 import { ROOM_TYPES } from '../data/rooms.js';
 import { ITEMS } from '../data/items.js';
 import { spawnCustomer } from '../sim/customers.js';
+import { openShop, DAY_LENGTH } from '../sim/day.js';
 
-export function createDebug({ state, lighting, renderer, onViewAll, onReset, onStockChanged }) {
+export function createDebug({ state, renderer, onViewAll, onReset, onStockChanged }) {
   const root = document.createElement('div');
   root.id = 'debug';
   root.innerHTML = `
@@ -16,7 +17,7 @@ export function createDebug({ state, lighting, renderer, onViewAll, onReset, onS
       <button data-act="coins">+100 coins</button>
       <button data-act="fill">Fill shelves</button>
       <button data-act="customer">Spawn customer</button>
-      <button data-act="twilight">Toggle twilight</button>
+      <button data-act="skip">Skip ahead ⏩</button>
       <button data-act="right">Add room →</button>
       <button data-act="up">Add floor ↑</button>
       <button data-act="all">Whole shop</button>
@@ -42,7 +43,12 @@ export function createDebug({ state, lighting, renderer, onViewAll, onReset, onS
       onStockChanged();
     },
     customer: () => spawnCustomer(state),
-    twilight: () => lighting.setTwilight(lighting.twilight ? 0 : 1),
+    skip: () => {
+      const d = state.day;
+      if (d.phase === 'morning') openShop(state);
+      else if (d.phase === 'open') d.time = Math.max(d.time, DAY_LENGTH.open - 5);
+      else if (d.phase === 'evening') d.time = DAY_LENGTH.evening;
+    },
     right: () => {
       const col = Math.max(...cols()) + 1;
       addRoom(state, nextType(), col, 0);

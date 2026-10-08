@@ -6,6 +6,7 @@ import { useSpot } from '../data/fixtures.js';
 import { ITEMS } from '../data/items.js';
 import { CUSTOMER } from '../data/customers.js';
 import { addCoins } from './economy.js';
+import { recordSale } from './day.js';
 
 export function counterOf(state, roomId) {
   return state.building.rooms.find((r) => r.id === roomId)?.fixtures.find((f) => f.kind === 'counter') ?? null;
@@ -47,6 +48,7 @@ export function completeSale(state, rand = Math.random) {
   const tip = lo + Math.floor(rand() * (hi - lo + 1));
   addCoins(state, amount + tip);
   state.hearts += 1;
+  recordSale(state, { amount, tip, items: c.items.map((i) => i.itemId) });
   state.checkout = null;
   events.emit('sale', { amount, tip, customerId: c.customerId });
   if (customer) {

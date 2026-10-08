@@ -20,7 +20,7 @@ import { createCustomersView } from './render/views/customers.js';
 import { createCheckoutView } from './render/views/checkout.js';
 import { buildNav } from './sim/nav.js';
 import { walkTo, walkToFixture, walkToBox, tickKeeper } from './sim/keeper.js';
-import { startNextDay } from './sim/day.js';
+import { tickDay, twilightFor } from './sim/day.js';
 import { tickCustomers } from './sim/customers.js';
 import { separate } from './sim/crowd.js';
 import { checkoutTap, keeperAtCounter } from './sim/checkout.js';
@@ -31,6 +31,7 @@ import { createOrderBook } from './ui/orderbook.js';
 import { createToaster } from './ui/toast.js';
 import { createOverlay } from './ui/overlay.js';
 import { createShopBubbles } from './ui/shopBubbles.js';
+import { createDayUI } from './ui/day.js';
 
 const AUTOSAVE_SECONDS = 15;
 
@@ -47,6 +48,8 @@ const toast = createToaster();
 const thumbs = makeThumbnails(renderer, Object.keys(ITEMS));
 const orderBook = createOrderBook(state, thumbs);
 const overlay = createOverlay(canvas, () => rig.camera);
+const dayUI = createDayUI(state, thumbs, orderBook);
+lighting.setTwilight(twilightFor(state.day)); // start in the right light (e.g. reopened after closing)
 
 // ---------------------------------------------------------------------------
 // World (rebuilt whenever the building changes)
@@ -155,7 +158,6 @@ attachGestures(canvas, {
 // Toolbar & messages
 // ---------------------------------------------------------------------------
 document.getElementById('btn-order').addEventListener('click', () => orderBook.open());
-document.getElementById('btn-nextday').addEventListener('click', () => startNextDay(state));
 
 events.on('orderPlaced', ({ order }) => toast(`Ordered ${ITEMS[order.itemId].name}! Pip brings it tomorrow 📦`));
 events.on('dayStarted', ({ day, delivered }) => {
@@ -164,6 +166,10 @@ events.on('dayStarted', ({ day, delivered }) => {
   for (const id of delivered.discovered) toast(`✨ New in your Collection: ${ITEMS[id].name}`);
 });
 events.on('boxPicked', () => toast('Now tap a shelf to unpack it!'));
+events.on('phaseChanged', ({ phase }) => {
+  if (phase === 'open') toast("We're open! ☀️ Here come the customers.");
+  if (phase === 'evening') toast('The sun is setting 🌙 Last customers of the day!');
+});
 events.on('shelfFull', () => toast('That shelf is full! Try another one.'));
 let toldAboutCounter = false;
 events.on('customerArrived', () => {
@@ -192,7 +198,7 @@ const save = () => { if (!resetting) saveGame(state); };
 setInterval(save, AUTOSAVE_SECONDS * 1000);
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 addEventListener('pagehide', save);
-for (const e of ['orderPlaced', 'dayStarted', 'stocked', 'sale']) events.on(e, save);
+for (const e of ['orderPlaced', 'dayStarted', 'stocked', 'sale', 'phaseChanged', 'dayClosed']) events.on(e, save);
 
 // ---------------------------------------------------------------------------
 // Debug (?debug)
@@ -201,7 +207,7 @@ let debug = null;
 if (new URLSearchParams(location.search).has('debug')) {
   import('./ui/debug.js').then(({ createDebug }) => {
     debug = createDebug({
-      state, lighting, renderer,
+      state, renderer,
       onViewAll: focusAll,
       onStockChanged: () => shelvesView.rebuild(),
       onReset() {
@@ -216,6 +222,8 @@ if (new URLSearchParams(location.search).has('debug')) {
 // ---------------------------------------------------------------------------
 // Loop
 // ---------------------------------------------------------------------------
+dayUI.resume();
+if (state.day.number === 1 && state.day.phase === 'morning') toast('Stock your shelves, then tap Open shop ☀️');
 window.__booted = true; // tells the loading guard in index.html the game started
 
 startLoop({
@@ -226,8 +234,10 @@ startLoop({
     tickKeeper(state, dt);
     tickCustomers(state, navs, dt);
     separate(state, navs);
+    tickDay(state, dt);
   },
   frame(dt, time, alpha) {
+    lighting.setTwilight(twilightFor(state.day));
     lighting.update(dt);
     keeperView.frame(dt, alpha);
     boxesView.update(dt);
@@ -237,6 +247,7 @@ startLoop({
     fx.update(dt);
     rig.update(dt, time);
     hud.update();
+    dayUI.update();
     bubbles.update(dt);
     overlay.update(dt);
     debug?.frame(dt);

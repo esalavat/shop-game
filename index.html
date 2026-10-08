@@ -10,7 +10,7 @@
 <title>My Dream Dollhouse Shop</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="style.css?v=9">
 <script type="importmap">
 { "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
 </script>
@@ -25,7 +25,7 @@
       <div class="pill" id="hud-hearts"><span class="ico" aria-hidden="true">❤️</span><b>0</b></div>
       <div class="pill" id="hud-sparkle"><span class="ico" aria-hidden="true">✨</span><b>0</b></div>
     </div>
-    <div class="day-chip" id="hud-day"></div>
+    <div class="day-chip"><span id="hud-day"></span><div class="day-bar"><div id="hud-day-fill"></div></div></div>
   </div>
 
   <div id="overlay"></div>
@@ -33,7 +33,7 @@
 
   <div id="toolbar">
     <button id="btn-order"><span class="tb-ico" aria-hidden="true">📖</span>Order</button>
-    <button id="btn-nextday"><span class="tb-ico" aria-hidden="true">🌙</span>Next day</button>
+    <button id="btn-day"><span class="tb-ico" aria-hidden="true"></span><span class="tb-label"></span></button>
   </div>
 
   <div id="orderbook" class="sheet" hidden>
@@ -51,6 +51,22 @@
     <div class="rotate-card">Oops! The shop didn't open properly.<br><button id="boot-reload">Reload</button></div>
   </div>
 
+  <div id="summary" class="sheet" hidden>
+    <div class="sheet-body">
+      <div class="sheet-head">
+        <h2 class="summary-title"></h2>
+        <button class="close" aria-label="Close">✕</button>
+      </div>
+      <div class="summary-stats"></div>
+      <div class="summary-section summary-sold"></div>
+      <div class="summary-section summary-wishes"></div>
+      <div class="summary-actions">
+        <button class="summary-order">📖 Order for tomorrow</button>
+        <button class="summary-next"></button>
+      </div>
+    </div>
+  </div>
+
   <div id="rotate">
     <div class="rotate-card">📱<br>Turn your phone upright to play!</div>
   </div>
@@ -64,6 +80,6 @@
     location.replace(location.pathname + '?fresh=' + Date.now());
   });
 </script>
-<script type="module" src="js/main.js?v=8" onerror="showBootError()"></script>
+<script type="module" src="js/main.js?v=9" onerror="showBootError()"></script>
 </body>
 </html>

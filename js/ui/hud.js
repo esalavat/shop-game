@@ -1,4 +1,7 @@
-// Top HUD: coins, Hearts, Sparkle, and the day label. Pops a counter when it goes up.
+// Top HUD: coins, Hearts, Sparkle, and the day label with a bar showing how far through the
+// open hours (or the evening) we are. Pops a counter when it goes up.
+
+import { phaseProgress } from '../sim/day.js';
 
 const PHASE_NAMES = { morning: 'Morning', open: 'Open', evening: 'Evening', close: 'Closing time' };
 const fmt = new Intl.NumberFormat();
@@ -10,7 +13,9 @@ export function createHud(state) {
     shown: null,
   }));
   const dayEl = document.getElementById('hud-day');
-  let dayText = '';
+  const bar = document.querySelector('.day-bar');
+  const fill = document.getElementById('hud-day-fill');
+  let dayText = '', fillPct = -1;
 
   for (const c of counters) {
     c.el.parentElement.addEventListener('animationend', () => c.el.parentElement.classList.remove('pop'));
@@ -26,7 +31,12 @@ export function createHud(state) {
         c.shown = value;
       }
       const text = `Day ${state.day.number} · ${PHASE_NAMES[state.day.phase]}`;
-      if (text !== dayText) dayEl.textContent = dayText = text;
+      if (text !== dayText) {
+        dayEl.textContent = dayText = text;
+        bar.hidden = state.day.phase === 'morning' || state.day.phase === 'close';
+      }
+      const pct = Math.round(phaseProgress(state.day) * 100);
+      if (pct !== fillPct) fill.style.width = `${(fillPct = pct)}%`;
     },
   };
 }
