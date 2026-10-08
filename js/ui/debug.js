@@ -3,8 +3,10 @@
 import { addCoins } from '../sim/economy.js';
 import { addRoom, hasRoom } from '../sim/building.js';
 import { ROOM_TYPES } from '../data/rooms.js';
+import { ITEMS } from '../data/items.js';
+import { spawnCustomer } from '../sim/customers.js';
 
-export function createDebug({ state, lighting, renderer, onViewAll, onReset }) {
+export function createDebug({ state, lighting, renderer, onViewAll, onReset, onStockChanged }) {
   const root = document.createElement('div');
   root.id = 'debug';
   root.innerHTML = `
@@ -12,6 +14,8 @@ export function createDebug({ state, lighting, renderer, onViewAll, onReset }) {
     <div class="debug-panel" hidden>
       <div class="debug-stats"></div>
       <button data-act="coins">+100 coins</button>
+      <button data-act="fill">Fill shelves</button>
+      <button data-act="customer">Spawn customer</button>
       <button data-act="twilight">Toggle twilight</button>
       <button data-act="right">Add room →</button>
       <button data-act="up">Add floor ↑</button>
@@ -29,6 +33,15 @@ export function createDebug({ state, lighting, renderer, onViewAll, onReset }) {
 
   const actions = {
     coins: () => addCoins(state, 100),
+    fill: () => {
+      const ids = Object.keys(ITEMS);
+      let n = 0;
+      for (const room of state.building.rooms) {
+        for (const f of room.fixtures) f.slots?.forEach((v, i) => { if (!v) f.slots[i] = ids[n++ % ids.length]; });
+      }
+      onStockChanged();
+    },
+    customer: () => spawnCustomer(state),
     twilight: () => lighting.setTwilight(lighting.twilight ? 0 : 1),
     right: () => {
       const col = Math.max(...cols()) + 1;

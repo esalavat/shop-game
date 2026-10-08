@@ -10,7 +10,7 @@
 <title>My Dream Dollhouse Shop</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=6">
 <script type="importmap">
 { "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
 </script>
@@ -28,6 +28,7 @@
     <div class="day-chip" id="hud-day"></div>
   </div>
 
+  <div id="overlay"></div>
   <div id="toasts" aria-live="polite"></div>
 
   <div id="toolbar">
@@ -63,6 +64,6 @@
     location.replace(location.pathname + '?fresh=' + Date.now());
   });
 </script>
-<script type="module" src="js/main.js?v=5" onerror="showBootError()"></script>
+<script type="module" src="js/main.js?v=7" onerror="showBootError()"></script>
 </body>
 </html>

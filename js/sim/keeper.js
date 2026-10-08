@@ -4,11 +4,12 @@
 import { events } from '../core/events.js';
 import { FIXTURES } from '../data/fixtures.js';
 import { findPath } from './nav.js';
+import { stepAlong } from './walker.js';
 import { boxSpot } from './stock.js';
 import { performTask } from './tasks.js';
 
 export const KEEPER_SPEED = 1.7; // room units per second
-const BOX_REACH = 0.42; // she stands this far to the left of a box to pick it up
+const DOORWAY_Z = 1.1; // she leans out from the front edge of the shop to grab doorstep boxes
 
 export function createKeeper(roomId) {
   return {
@@ -37,30 +38,12 @@ export function walkToFixture(state, nav, fixture, task = null) {
 }
 
 export function walkToBox(state, nav, box) {
-  const { x, z } = boxSpot(box.spot);
-  return walkTo(state, nav, x - BOX_REACH, z, { face: Math.PI / 2, task: { type: 'pickup', boxId: box.id } });
+  const { x } = boxSpot(box.spot);
+  return walkTo(state, nav, x, DOORWAY_Z, { face: 0, task: { type: 'pickup', boxId: box.id } });
 }
 
 export function tickKeeper(state, dt) {
-  const k = state.keeper;
-  if (!k.path.length) return;
-  let step = KEEPER_SPEED * dt;
-  while (step > 0 && k.path.length) {
-    const p = k.path[0];
-    const dx = p.x - k.x, dz = p.z - k.z, d = Math.hypot(dx, dz);
-    if (d > 1e-4) k.facing = Math.atan2(dx, dz);
-    if (d <= step) {
-      k.x = p.x;
-      k.z = p.z;
-      step -= d;
-      k.path.shift();
-    } else {
-      k.x += (dx / d) * step;
-      k.z += (dz / d) * step;
-      step = 0;
-    }
-  }
-  if (!k.path.length) arrive(state);
+  if (stepAlong(state.keeper, KEEPER_SPEED, dt)) arrive(state);
 }
 
 function arrive(state) {

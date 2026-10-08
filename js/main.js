@@ -16,14 +16,20 @@ import { createFx } from './render/fx.js';
 import { createBoxesView } from './render/views/boxes.js';
 import { createShelvesView } from './render/views/shelves.js';
 import { makeThumbnails } from './render/thumbs.js';
+import { createCustomersView } from './render/views/customers.js';
+import { createCheckoutView } from './render/views/checkout.js';
 import { buildNav } from './sim/nav.js';
 import { walkTo, walkToFixture, walkToBox, tickKeeper } from './sim/keeper.js';
 import { startNextDay } from './sim/day.js';
+import { tickCustomers } from './sim/customers.js';
+import { checkoutTap, keeperAtCounter } from './sim/checkout.js';
 import { ITEMS } from './data/items.js';
 import { attachGestures } from './input/touch.js';
 import { createHud } from './ui/hud.js';
 import { createOrderBook } from './ui/orderbook.js';
 import { createToaster } from './ui/toast.js';
+import { createOverlay } from './ui/overlay.js';
+import { createShopBubbles } from './ui/shopBubbles.js';
 
 const AUTOSAVE_SECONDS = 15;
 
@@ -37,7 +43,9 @@ const rig = new CameraRig();
 const hud = createHud(state);
 const fx = createFx(scene);
 const toast = createToaster();
-const orderBook = createOrderBook(state, makeThumbnails(renderer, Object.keys(ITEMS)));
+const thumbs = makeThumbnails(renderer, Object.keys(ITEMS));
+const orderBook = createOrderBook(state, thumbs);
+const overlay = createOverlay(canvas, () => rig.camera);
 
 // ---------------------------------------------------------------------------
 // World (rebuilt whenever the building changes)
@@ -90,7 +98,10 @@ focusRoom(roomById(state.keeper.roomId), true);
 const keeperView = createKeeperView(state, roomOrigin);
 const boxesView = createBoxesView(state, roomOrigin);
 const shelvesView = createShelvesView(state, roomOrigin, () => keeperView.handPosition());
-scene.add(keeperView.object, boxesView.group, shelvesView.group);
+const customersView = createCustomersView(state, roomOrigin);
+const checkoutView = createCheckoutView(state, roomOrigin);
+const bubbles = createShopBubbles({ state, overlay, customersView, checkoutView, thumbs });
+scene.add(keeperView.object, boxesView.group, shelvesView.group, customersView.group, checkoutView.group);
 boxesView.rebuild();
 shelvesView.rebuild();
 events.on('buildingChanged', () => {
@@ -105,16 +116,25 @@ events.on('buildingChanged', () => {
 // ---------------------------------------------------------------------------
 attachGestures(canvas, {
   onTap(x, y) {
-    const hit = pickAt(rig.camera, canvas, x, y, [...world.building.hitTargets, ...boxesView.hitTargets]);
+    const targets = [...world.building.hitTargets, ...boxesView.hitTargets, ...customersView.hitTargets];
+    const hit = pickAt(rig.camera, canvas, x, y, targets);
     if (!hit) return;
-    const { roomId, fixtureId, boxId, floor } = hit.object.userData;
+    const { roomId, fixtureId, boxId, customerId, floor } = hit.object.userData;
     const room = roomById(roomId);
     // First tap on another room just looks at it.
     if (roomId !== focusedRoomId) return focusRoom(room);
     // Walking between rooms comes later; for now she stays in her room.
     if (roomId !== state.keeper.roomId) return;
     const nav = navs.get(roomId), o = roomOrigin(roomId);
-    if (boxId) {
+    const counter = room.fixtures.find((f) => f.kind === 'counter');
+    const tappedCounter = fixtureId === counter?.id || (customerId && customerId === state.queue[0]);
+    if (tappedCounter && state.checkout && keeperAtCounter(state)) {
+      checkoutTap(state);
+    } else if (tappedCounter && counter) {
+      if (walkToFixture(state, nav, counter)) tapFeedback(o, state.keeper.path.at(-1));
+    } else if (customerId) {
+      // Browsing customers: nothing to do yet.
+    } else if (boxId) {
       if (state.keeper.carrying) return toast('Hands full! Tap a shelf to unpack this box first.');
       if (walkToBox(state, nav, state.boxes.find((b) => b.id === boxId))) tapFeedback(o, state.keeper.path.at(-1));
     } else if (fixtureId) {
@@ -144,6 +164,12 @@ events.on('dayStarted', ({ day, delivered }) => {
 });
 events.on('boxPicked', () => toast('Now tap a shelf to unpack it!'));
 events.on('shelfFull', () => toast('That shelf is full! Try another one.'));
+let toldAboutCounter = false;
+events.on('customerArrived', () => {
+  if (toldAboutCounter) return;
+  toldAboutCounter = true;
+  toast('A customer! Stand behind the counter to ring them up 🛎️');
+});
 
 function tapFeedback(origin, spot) {
   if (spot) fx.tapRing(new THREE.Vector3(origin.x + spot.x, origin.y, origin.z + spot.z));
@@ -165,7 +191,7 @@ const save = () => { if (!resetting) saveGame(state); };
 setInterval(save, AUTOSAVE_SECONDS * 1000);
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 addEventListener('pagehide', save);
-for (const e of ['orderPlaced', 'dayStarted', 'stocked']) events.on(e, save);
+for (const e of ['orderPlaced', 'dayStarted', 'stocked', 'sale']) events.on(e, save);
 
 // ---------------------------------------------------------------------------
 // Debug (?debug)
@@ -176,6 +202,7 @@ if (new URLSearchParams(location.search).has('debug')) {
     debug = createDebug({
       state, lighting, renderer,
       onViewAll: focusAll,
+      onStockChanged: () => shelvesView.rebuild(),
       onReset() {
         resetting = true;
         clearSave();
@@ -194,16 +221,22 @@ startLoop({
   tickRate: 10,
   tick(dt) {
     keeperView.beforeTick();
+    customersView.beforeTick();
     tickKeeper(state, dt);
+    tickCustomers(state, navs, dt);
   },
   frame(dt, time, alpha) {
     lighting.update(dt);
     keeperView.frame(dt, alpha);
     boxesView.update(dt);
     shelvesView.update(dt);
+    customersView.frame(dt, alpha);
+    checkoutView.update(dt);
     fx.update(dt);
     rig.update(dt, time);
     hud.update();
+    bubbles.update(dt);
+    overlay.update(dt);
     debug?.frame(dt);
     renderer.render(scene, rig.camera);
   },

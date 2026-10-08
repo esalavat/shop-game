@@ -328,3 +328,58 @@ button {
 
 @keyframes fade-in { from { opacity: 0; } }
 @keyframes slide-up { from { transform: translateY(40%); } }
+
+/* ---------- World-pinned bubbles & pop-ups ---------- */
+#overlay {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bubble,
+.floater {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  font-weight: 800;
+  will-change: transform;
+}
+
+.bubble {
+  padding: 4px 8px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 3px 0 rgba(90, 58, 85, 0.18);
+  font-size: 14px;
+}
+
+.bubble::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  margin-left: -6px;
+  border: 6px solid transparent;
+  border-bottom: 0;
+  border-top-color: #fff;
+}
+
+.bubble.wish img { display: block; width: 40px; height: 40px; }
+.bubble.wish { padding: 2px 4px; border-radius: 50%; }
+.bubble.waiting { font-size: 18px; animation: wiggle 1s ease-in-out infinite; }
+.bubble.prompt { background: var(--pink); color: #fff; }
+.bubble.prompt::after { border-top-color: var(--pink); }
+
+@keyframes wiggle {
+  0%, 100% { rotate: 0deg; }
+  25% { rotate: -10deg; }
+  75% { rotate: 10deg; }
+}
+
+.floater { font-size: 18px; text-shadow: 0 2px 0 #fff, 0 0 6px #fff; }
+.floater.coins { font-size: 22px; color: #c98a1c; }
+.floater.tip { font-size: 15px; color: var(--pink-dark); }
+.floater.heart { font-size: 15px; color: #e0507a; }
+.floater.beep { font-size: 14px; color: var(--ink); }

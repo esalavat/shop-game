@@ -15,7 +15,7 @@ export function createBoxesView(state, roomOrigin) {
   function place(entry, box) {
     const o = roomOrigin(box.roomId);
     const s = boxSpot(box.spot);
-    entry.obj.position.set(o.x + s.x, o.y + s.layer * BOX_SIZE, o.z + s.z);
+    entry.obj.position.set(o.x + s.x, o.y + s.y + s.layer * BOX_SIZE, o.z + s.z);
     entry.hit.position.copy(entry.obj.position);
     entry.hit.position.y += BOX_SIZE / 2;
   }

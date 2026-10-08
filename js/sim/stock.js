@@ -4,10 +4,12 @@
 import { events } from '../core/events.js';
 import { FIXTURES } from '../data/fixtures.js';
 
-/** Where delivery boxes land in the shop room (room-local). Extra boxes stack on top. */
-export const BOX_SPOTS = [
-  { x: -0.9, z: 0.95 }, { x: -0.5, z: 0.95 }, { x: -0.1, z: 0.95 }, { x: 0.3, z: 0.95 }, { x: 0.1, z: 0.55 },
-];
+/**
+ * Where Pip leaves delivery boxes: on the doorstep (the sidewalk just in front of the shop room,
+ * room-local coordinates, below floor level). Extra boxes stack on top.
+ */
+export const BOX_SPOTS = [{ x: -1.2, z: 1.72 }, { x: -0.78, z: 1.72 }, { x: -0.36, z: 1.72 }];
+export const DOORSTEP_Y = -0.4; // sidewalk height relative to the shop floor
 export const BOX_SIZE = 0.36;
 
 export function newId(state, prefix) {
@@ -18,7 +20,7 @@ export function newId(state, prefix) {
 /** Spot index i maps to BOX_SPOTS[i % n], stacked layer floor(i / n). */
 export function boxSpot(i) {
   const s = BOX_SPOTS[i % BOX_SPOTS.length];
-  return { x: s.x, z: s.z, layer: Math.floor(i / BOX_SPOTS.length) };
+  return { x: s.x, z: s.z, layer: Math.floor(i / BOX_SPOTS.length), y: DOORSTEP_Y };
 }
 
 export function shopRoomId(state) {

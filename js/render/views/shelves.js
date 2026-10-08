@@ -47,6 +47,12 @@ export function createShelvesView(state, roomOrigin, handPosition) {
     });
   });
 
+  events.on('itemTaken', ({ fixtureId, slot }) => {
+    const key = `${fixtureId}:${slot}`;
+    group.remove(meshes.get(key));
+    meshes.delete(key);
+  });
+
   return {
     group,
     rebuild() {

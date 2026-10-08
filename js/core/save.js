@@ -1,6 +1,6 @@
 // Save/load with versioned migrations. Storage is injectable so this runs under node --test.
 
-import { createState, giveStarterBoxes, STATE_VERSION } from '../sim/state.js';
+import { createState, giveStarterBoxes, resetTransient, STATE_VERSION, TRANSIENT } from '../sim/state.js';
 import { defaultFixtures } from '../sim/building.js';
 import { createKeeper } from '../sim/keeper.js';
 
@@ -31,6 +31,8 @@ const MIGRATIONS = {
     giveStarterBoxes(next);
     return next;
   },
+  // v4: customers can leave wish notes.
+  3: (d) => ({ ...d, version: 4, wishes: [] }),
 };
 
 export function migrate(data) {
@@ -51,7 +53,7 @@ export function loadGame(storage = defaultStorage()) {
     if (!raw) return createState();
     const data = JSON.parse(raw);
     if (typeof data?.version !== 'number' || data.version > STATE_VERSION) return createState();
-    return migrate(data);
+    return resetTransient(migrate(data));
   } catch {
     return createState(); // corrupted save -> fresh start
   }
@@ -60,7 +62,9 @@ export function loadGame(storage = defaultStorage()) {
 export function saveGame(state, storage = defaultStorage(), now = Date.now()) {
   state.lastSeen = now;
   try {
-    storage?.setItem(SAVE_KEY, JSON.stringify(state));
+    const saved = { ...state };
+    for (const key of TRANSIENT) delete saved[key];
+    storage?.setItem(SAVE_KEY, JSON.stringify(saved));
     return true;
   } catch {
     return false; // private mode / quota: keep playing without saving
