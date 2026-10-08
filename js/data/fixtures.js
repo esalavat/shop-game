@@ -7,7 +7,7 @@
 
 export const FIXTURES = {
   shelf: { name: 'Shelf', size: { w: 1.1, d: 0.42, h: 1.65 }, use: { dx: 0, dz: 0.62, face: Math.PI } },
-  counter: { name: 'Counter', size: { w: 0.95, d: 0.5, h: 1.1 }, use: { dx: 0, dz: -0.58, face: 0 } },
+  counter: { name: 'Counter', size: { w: 0.95, d: 0.5, h: 0.85 }, use: { dx: 0, dz: -0.52, face: 0 } },
   pedestal: { name: 'Dream Dollhouse', size: { w: 0.92, d: 0.92, h: 1.5 }, use: { dx: 0.72, dz: 0, face: -Math.PI / 2 } },
   plant: { name: 'Plant', size: { w: 0.45, d: 0.45, h: 0.95 }, use: { dx: 0, dz: 0.55, face: Math.PI } },
   rug: { name: 'Rug', size: { w: 1.4, d: 1.4, h: 0.02 }, walkable: true },

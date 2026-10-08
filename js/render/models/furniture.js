@@ -21,17 +21,19 @@ const BUILDERS = {
   },
 
   counter(g) {
+    // Kept low so the shopkeeper's head and shoulders show above it.
     const { w, d } = FIXTURES.counter.size;
-    box(g, w, 0.75, d, P.wood, 0, 0.375, 0);
-    box(g, w - 0.12, 0.5, 0.02, '#e4b98e', 0, 0.4, d / 2 + 0.005);
-    box(g, w + 0.1, 0.06, d + 0.08, P.cream, 0, 0.78, 0);
+    const top = 0.48;
+    box(g, w, top - 0.03, d, P.wood, 0, (top - 0.03) / 2, 0);
+    box(g, w - 0.12, 0.28, 0.02, '#e4b98e', 0, 0.23, d / 2 + 0.005);
+    box(g, w + 0.1, 0.06, d + 0.08, P.cream, 0, top, 0);
     // register
-    box(g, 0.26, 0.2, 0.25, P.pink, 0.33, 0.91, -0.02);
-    const screen = box(g, 0.2, 0.12, 0.03, P.sky, 0.33, 1.05, -0.12);
+    box(g, 0.26, 0.2, 0.25, P.pink, 0.33, top + 0.13, -0.02);
+    const screen = box(g, 0.2, 0.12, 0.03, P.sky, 0.33, top + 0.27, -0.12);
     screen.rotation.x = -0.3;
-    box(g, 0.18, 0.03, 0.12, P.cream, 0.33, 1.02, 0.08);
+    box(g, 0.18, 0.03, 0.12, P.cream, 0.33, top + 0.24, 0.08);
     // little bell
-    cyl(g, 0.05, 0.07, 0.06, 8, P.butter, -0.32, 0.84, 0.08);
+    cyl(g, 0.05, 0.07, 0.06, 8, P.butter, -0.32, top + 0.06, 0.08);
   },
 
   pedestal(g) {

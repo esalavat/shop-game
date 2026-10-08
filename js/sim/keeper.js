@@ -7,7 +7,7 @@ import { findPath } from './nav.js';
 export const KEEPER_SPEED = 1.7; // room units per second
 
 export function createKeeper(roomId) {
-  return { roomId, x: 1.05, z: -0.48, facing: 0, path: [], fixtureId: null, arriveFacing: null };
+  return { roomId, x: 1.05, z: -0.52, facing: 0, path: [], fixtureId: null, arriveFacing: null };
 }
 
 export function walkTo(state, nav, x, z, { fixtureId = null, face = null } = {}) {

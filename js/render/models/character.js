@@ -7,7 +7,10 @@ import { PALETTE as P } from '../toon.js';
 
 const EYE = '#3a2a3a', CHEEK = '#ff9fb0', SHOE = '#5a3a55';
 
-export function createCharacter({ hair = 'bob', hairColor = '#6b3e2e', skin = '#ffd9c2', outfit = '#ff9ec4', apron = false, scale = 1 } = {}) {
+/** Grown-up size relative to the room; kids can pass a smaller scale. */
+export const CHARACTER_SCALE = 1.15;
+
+export function createCharacter({ hair = 'bob', hairColor = '#6b3e2e', skin = '#ffd9c2', outfit = '#ff9ec4', apron = false, scale = CHARACTER_SCALE } = {}) {
   const root = new THREE.Group();
   const inner = new THREE.Group();
   root.add(inner);
