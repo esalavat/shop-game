@@ -1,6 +1,6 @@
-# Shop Game
+# Dream Doll Shop
 
-A mobile-first, low-poly 3D shopkeeper game. Run a small shop, sell products, and grow it into something bigger.
+A cozy, mobile-first, low-poly 3D game about running a dollhouse shop and building your own dream dollhouse.
 
 - **Platform:** web (mobile browsers) now; iOS / Android store builds later
 - **Controls:** simple touch
