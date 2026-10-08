@@ -1,149 +1,197 @@
 # Shop Game — Game Design Document
 
-> **Status:** Draft v0.1 — for iteration. Nothing here is locked.
-> Items marked **❓** are open questions to decide together.
+> **Status:** Draft v0.2 — for iteration. Nothing here is locked.
+> Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
+
+## Decisions Log
+
+| # | Decision | Version |
+|---|---|---|
+| 1 | Shop theme: **dollhouse shop** (dollhouses, dolls, miniature furniture & accessories) | v0.2 |
+| 2 | **Mostly active** play, with modest offline earnings | v0.2 |
+| 3 | **Tap directly**; a shopkeeper character moves around for charm | v0.2 |
+| 4 | **Portrait** orientation | v0.2 |
+| 5 | Start small, grow big through **expansions and/or new locations** | v0.2 |
+| 6 | **No failure states.** Cozy, not stressful | v0.2 |
+| 7 | Player does real shop jobs: **inventory, stocking, marketing, checkout** | v0.2 |
+| 8 | Touchstones: *Eatventure*, *TCG Card Shop Simulator / Tycoon* (for feel, not for copying mechanics) | v0.2 |
 
 ## 1. Pitch
 
-You inherit a tiny, run-down corner shop. Stock the shelves, serve the customers, and reinvest your earnings to grow it into a bustling store — and eventually a whole little chain. Cozy, readable, and playable one-handed in short sessions.
+You open a tiny dollhouse shop: a few shelves of miniature chairs, a couple of dolls, and one beautiful dollhouse in the window. Order stock, unpack it onto the shelves, put up flyers, and ring up the delighted collectors and kids who wander in. Over time your little shop grows into a beloved destination, with more rooms, rarer pieces, and maybe a second shop across town.
 
-**Working title:** ❓ (placeholder: *Shop Game*)
+**The twist that fits the theme 💡:** the shop itself is shown like a dollhouse, as a cutaway 3D room viewed from the front with the wall removed. Expanding the shop feels like adding rooms to a dollhouse: a new floor on top, a wing to the side. The game becomes a dollhouse you're building, too.
+
+**Working title ❓:** ideas: *Tiny Rooms*, *Little Shop of Littles*, *The Dollhouse Shop*, *Miniature Lane*, *Small Wonders*.
 
 ## 2. Pillars
 
-1. **Satisfying loop in seconds.** Tap → something happens → coins come in. Every session, even 60 seconds, ends with visible progress.
-2. **Watch it grow.** The shop physically expands on screen: new shelves, new rooms, more customers, nicer decor.
-3. **Cozy, not stressful.** Mild pressure (customers waiting) but no harsh fail states.
-4. **One thumb.** Every action reachable with taps and drags in portrait mode.
+1. **Cozy over clicky.** The joy is in the shop looking lovely and customers being happy, not in watching numbers climb. Progress is shown *in the world* first, in numbers second.
+2. **Real shopkeeping, light touch.** You do the actual jobs of running a shop, each as a short, tactile interaction that's satisfying on its own.
+3. **Your choice of jobs.** You're never forced to do a job you're tired of. Hire help for the jobs you don't enjoy and keep the ones you do.
+4. **Nothing goes wrong.** No failure, no lost progress, no angry customers. The worst outcome is "a little slower."
+5. **One thumb, portrait.** Every action is a tap or a short drag.
 
 ## 3. Platform & Tech Targets
 
 | | |
 |---|---|
-| Platform now | Mobile web, hosted on GitHub Pages (`esalavat.github.io/shop-game`) |
-| Platform later | iOS App Store + Google Play, by wrapping the web build (e.g. Capacitor, as with *migration*) |
-| Orientation | Portrait ❓ (portrait suits one-handed play; landscape shows more of the shop) |
-| Input | Touch only: tap, drag, pinch/two-finger pan for camera ❓ |
-| Rendering | Three.js, vendored (no build step required), low-poly meshes, toon/flat shading |
-| Performance | Target 60 fps on a mid-range phone from ~2021; cap draw calls, small textures |
-| Saves | Local storage now; cloud save is a store-release question |
-| Offline | Installable PWA with offline play ❓ |
+| Platform now | Mobile web on GitHub Pages (`esalavat.github.io/shop-game`) |
+| Platform later | iOS + Google Play by wrapping the web build (Capacitor, like *migration*) |
+| Orientation | **Portrait**, locked |
+| Input | Touch only: tap, short drags, vertical pan as the shop grows taller |
+| Rendering | Three.js, vendored (no build step), low-poly meshes, toon shading |
+| Performance | 60 fps on a mid-range ~2021 phone |
+| Saves | Local storage now; cloud save considered for store builds |
+| Offline | Installable PWA ❓ |
 
-## 4. Core Loop
+Portrait plus a dollhouse cutaway works well: dollhouses are tall, so the shop can **grow upward** (new floors) and the camera pans vertically, which suits a portrait screen.
 
-```
- Restock shelves ──► Customers browse & pick items ──► Checkout (earn coins)
-       ▲                                                       │
-       └──── Buy stock / upgrades / expansions ◄───────────────┘
-```
+## 4. The Shopkeeping Jobs
 
-**Moment-to-moment (seconds):** tap a stockroom crate to restock a shelf; tap the register to ring up a waiting customer; tap coins/tips to collect.
+The heart of the game. Each job is a small, self-contained interaction. Early on, you do all of them. As the shop grows, you can **hire staff** for any job, but you can always step in and do a job yourself (usually faster, plus a small bonus like tips or happiness).
 
-**Session (minutes):** spend earnings on more stock, better shelves, a new product line, or a hire. Hit a goal ("Serve 20 customers", "Earn 500 coins") to unlock the next milestone.
+### 4.1 Inventory: ordering stock
+- Open the **catalog** (a cute supplier book or tablet) and order products.
+- Orders arrive as **boxes** delivered to the back room or doorstep after a short wait (real-time seconds, not hours).
+- Budget is the main decision: which items, how many. Rarer items cost more and sell for more.
+- 💡 Supplier catalogs unlock over time (e.g. "Victorian Miniatures Co.", "Woodland Critter Dolls").
 
-**Long term (days/weeks):** expand the floor plan, unlock new product categories, open themed sections, and eventually additional shops. ❓
+### 4.2 Stocking shelves
+- Tap a box to open it, then tap or drag items onto shelves. Items visibly fill the shelves.
+- Shelves have types (small-items rack, doll display case, furniture shelf, dollhouse plinth).
+- 💡 Arranging items nicely (matching sets together, e.g. a full bedroom set) gives a **display bonus**: customers linger and buy more. This rewards care without punishing anyone.
 
-## 5. Gameplay Systems
+### 4.3 Ringing up customers
+- A customer brings items to the counter. Tap each item to scan it (*beep*), tap the register to finish (*cha-ching*), and they leave happy.
+- Kept short (2–4 taps) so it doesn't get tedious.
+- **The tedium fix:** hire a cashier any time. But checkout done by you earns **tips** and occasionally triggers a little moment (a kid hugging a new doll, a collector's thank-you note). That makes doing it yourself rewarding without making it mandatory.
+- ❓ Should we include giving change (like TCG Card Shop)? 💡 Not by default. Maybe as an optional "precise change" tip bonus later.
 
-### 5.1 Products
-- Each product has: cost price, sell price, shelf type, restock size, demand.
-- Start with one category (e.g. snacks), unlock more (drinks, produce, toys, electronics…).
-- ❓ Does the player set prices, or are prices fixed and upgraded? (Setting prices adds depth but is fiddly on touch. Proposal: fixed prices with upgrades early, optional price tweaking unlocked later.)
+### 4.4 Marketing
+- Choose a campaign: **flyers** (cheap, short), **window display** (arrange a showpiece in the front window), **newspaper ad**, **social post**, **events** (e.g. "Tea Party Saturday", "Collector's Night").
+- Marketing increases customer flow and can attract specific **customer types** (collectors, families, decorators).
+- 💡 The window display is the hero marketing feature: put your nicest dollhouse in the window and passersby stop to look. Purely visual and cozy, with a real effect.
 
-### 5.2 Customers
-- Walk in, browse shelves, pick 1–N items, queue at the register, pay, leave.
-- Patience meter: if they wait too long or the item they want is out of stock, they leave unhappy (lost sale, small reputation hit).
-- Customer types with different wants and budgets ❓ (e.g. kids, shoppers in a hurry, big spenders, VIPs with special requests).
+### 4.5 Pricing ❓
+- Option A: fixed prices, raised via upgrades.
+- Option B: you set prices from a few simple presets (Bargain / Fair / Premium) that trade customer happiness against margin.
+- 💡 Start with A in the MVP; consider B later.
 
-### 5.3 Staff (automation)
-- Early game: the player does everything by tapping.
-- Hire a **cashier** to auto-checkout, a **stocker** to auto-restock, etc.
-- Staff have upgradable speed. This is the main "idle" progression lever.
-- ❓ How idle should the game be? Options:
-  - **A. Active-first** — staff help, but the player is always busy (like *Overcooked*-lite).
-  - **B. Hybrid idle** — active early, increasingly automated; earn while away (like many mobile tycoon games).
-  - Proposal: **B**, with offline earnings capped to a few hours.
+### 4.6 Workshop (later, optional) 💡
+- Build or furnish a dollhouse from parts you've stocked, then sell it as a premium item or put it in the window.
+- A creative, cozy "decorate" mode that ties back to the theme. Possibly the game's long-term creative outlet.
 
-### 5.4 Shop Growth
-- **Upgrades:** faster register, bigger shelves, more stock capacity.
-- **Expansions:** knock out walls to add floor space; new rooms/sections.
-- **Decor:** cosmetic + small reputation bonus (cozy factor).
-- **Reputation / star rating:** drives customer volume and unlocks.
+## 5. Customers
 
-### 5.5 Economy
-- Single soft currency: coins.
-- ❓ Second currency (gems) for later monetization? Proposal: none for v1 — keep it clean.
-- Costs scale geometrically; tuned so a new upgrade is always within ~1–3 minutes of play early on.
+- Customers walk in, browse, pick items, bring them to the counter, pay, and leave. All are chunky, cute low-poly characters.
+- **Types** with different wants: kids (dolls, cheap accessories), collectors (rare pieces, pay well), families (dollhouses), decorators (furniture sets), regulars (named characters who return).
+- **No failure:**
+  - Customers never leave angry. If something's out of stock, they leave a **wish note** ("I was hoping for a tiny piano!"). That's a gentle hint about what to order, not a penalty.
+  - If the counter's busy, customers browse longer (and might pick up another item) instead of losing patience.
+- **Regulars 💡:** a handful of named recurring customers with small story arcs (a girl building her first dollhouse, a retired collector, a set designer). Serving them unlocks items, decor, or new suppliers. This brings the "cozy, not numbers" feeling.
 
-### 5.6 Progression & Goals
-- Milestone checklist per level ("Stock 3 product types", "Reach 3 stars").
-- Completing milestones unlocks the next expansion / category.
-- ❓ Single shop that grows forever, or multiple shops/locations (prestige-like reset with bonuses)?
+## 6. Staff
 
-### 5.7 Fail States
-- No game over. Worst case: unhappy customers, slower income, lower rating.
+- Hire for any job: **Stocker**, **Cashier**, **Buyer** (auto-reorders best-sellers), **Marketer**.
+- Staff are characters with names and looks; they work at a steady pace and can be upgraded.
+- Hiring is about **choosing what you want to do**, not just efficiency.
+- The player-shopkeeper is always present and animates to whatever you tap ("walks over and opens the box").
 
-## 6. Controls (Touch)
+## 7. Progression & Growth
+
+### 7.1 What grows
+- **Stock variety:** new product lines and suppliers.
+- **Shop space:** new shelves, then new rooms/floors (dollhouse-style expansions).
+- **Decor:** wallpaper, flooring, lighting, plants, signage. Mostly cosmetic, with small "coziness" bonuses.
+- **Reputation:** a warm rating ("Hearts"?) that grows from happy customers and nice displays, and unlocks milestones.
+
+### 7.2 How it grows: expansions and locations
+- **Phase 1: The Corner Shop.** One small room.
+- **Phase 2: Expansions.** Add rooms and floors to the same building. The shop literally becomes a bigger dollhouse.
+- **Phase 3: New locations ❓.** Open a second shop with a different theme (e.g. a seaside shop with nautical miniatures, a city boutique for collectors). The first shop keeps running and earning at a relaxed pace.
+- 💡 No prestige reset. Your shops are never taken away from you.
+
+### 7.3 Goals
+- Gentle milestone list per phase ("Sell your first dollhouse", "Fill the furniture shelf", "Make 3 regulars happy").
+- Regulars' little stories act as narrative goals.
+
+### 7.4 Offline earnings
+- While you're away, your staff keep the shop ticking over at a **reduced rate**, capped at a few hours.
+- On return, a cozy summary: "While you were away: 12 customers visited, 3 wish notes left."
+- Kept modest so the game stays **mostly active**.
+
+## 8. Economy
+
+- One currency: **coins**.
+- Costs scale gently; early on, something new should be affordable every 1–3 minutes.
+- No second/premium currency for now.
+- Since there's no failure, there's no debt and you can't go broke. Stock you've bought just sits on the shelf until it sells.
+
+## 9. Controls (Portrait, Touch)
 
 | Gesture | Action |
 |---|---|
-| Tap object | Interact (restock, checkout, collect coins, open upgrade panel) |
-| Drag on floor | Pan camera ❓ |
-| Pinch | Zoom ❓ |
-| Tap & hold | Show info tooltip |
-| Build mode drag | Place/move shelves and decor ❓ |
+| Tap object | Interact: open box, scan item, finish sale, open panel |
+| Tap/drag item onto shelf | Stock a shelf |
+| Vertical swipe | Pan between floors (once the shop has more than one) |
+| Pinch | Zoom ❓ (maybe just two fixed zoom levels) |
+| Tap & hold | Info tooltip |
 
-❓ **Player avatar or god view?**
-- **A. God view:** tap things directly; no character. Simplest, best for one thumb.
-- **B. Shopkeeper avatar:** tap where to walk, character carries boxes. More charming, slower.
-- Proposal: **A** to start, with the shopkeeper as a visible character who auto-animates to where you tap (charm without the control cost).
+UI lives at the **bottom of the screen** within thumb reach: catalog, marketing, staff, decor. The top shows coins and reputation.
 
-## 7. Camera
+## 10. Camera
 
-- Fixed isometric-ish 3/4 view looking into the shop, slightly tilted, orthographic or low-FOV perspective ❓.
-- Shop fits the screen early; camera pans/zooms as the shop grows.
+- Front-on **dollhouse cutaway** view with a slight top-down tilt, so you see into the room like peering into a dollhouse.
+- Orthographic or low-FOV perspective ❓ (orthographic reads more "diorama"; perspective feels warmer).
+- Gentle idle camera sway / parallax for life.
+- As the shop grows, the camera pans between rooms/floors.
 
-## 8. Art Direction
+## 11. Art Direction
 
-- **Style:** low-poly 3D, chunky proportions, soft rounded silhouettes, bright saturated palette.
-- **Shading:** toon/cel shading (stepped lighting via `MeshToonMaterial` or flat shading), soft colored shadows, optional outline pass ❓ (outlines look great but cost performance).
-- **Lighting:** warm key light + cool ambient/hemisphere fill, baked-looking blob or simple shadow maps.
-- **Characters:** simple capsule/bean-shaped customers with big heads, few polys, color variations — cheap to render in crowds.
-- **UI:** big rounded buttons, chunky font, coin pop-ups and bouncy juice.
-- **Asset pipeline ❓:** hand-built geometry in code at first (boxes/cylinders) → later free CC0 low-poly packs (e.g. Kenney, Quaternius) or custom models in Blender exported as glTF.
+- **Style:** low-poly 3D, chunky cartoony proportions, rounded silhouettes, warm saturated palette (cream, rose, sage, butter yellow, wood tones).
+- **Shading:** toon/cel shading (`MeshToonMaterial` with a stepped gradient), soft colored shadows. Optional outline pass ❓ (performance cost).
+- **Lighting:** warm key light from the shop windows, soft hemisphere fill, little lamps that glow. Possibly a day→evening light shift over a "shop day" 💡.
+- **Characters:** bean/capsule bodies, big heads, few polys, color variations for crowds.
+- **Products:** miniatures look like miniatures: tiny chairs, beds, teapots, dolls, and dollhouses (each a little house!).
+- **UI:** rounded, chunky, playful; wooden/paper textures; bouncy juice on coin and heart pop-ups.
+- **Assets:** placeholder geometry built in code first → CC0 low-poly packs (Kenney, Quaternius) → custom Blender glTF later.
 
-## 9. Audio
+## 12. Audio
 
-- Light, upbeat loop; cash-register "cha-ching"; soft UI pops.
-- Respect the mute switch / provide a mute toggle. ❓ priority for v1.
+- Soft acoustic/music-box loop, register *cha-ching*, scanner *beep*, box-opening rustle, door chime when customers enter.
+- Mute toggle from day one.
 
-## 10. Monetization (future store builds)
+## 13. Monetization (future store builds)
 
-❓ Undecided. Options: paid up-front, free + rewarded ads (e.g. "double offline earnings"), small IAP. Not in scope for the web build.
+❓ Undecided and out of scope for the web build. If any, it should fit the cozy tone (e.g. paid up-front, or optional cosmetic packs). No pay-to-skip pressure.
 
-## 11. MVP Scope (first playable on GitHub Pages)
+## 14. MVP Scope (first playable on GitHub Pages)
 
-The smallest version that proves the loop is fun:
+Goal: prove that the four jobs feel good and that the shop feels cozy.
 
-- [ ] One room shop, fixed camera
-- [ ] 2–3 products, 2–3 shelves, 1 register
-- [ ] Customers spawn, browse, queue, pay, leave
-- [ ] Tap to restock and tap to checkout
-- [ ] Coins + 3–5 upgrades (shelf capacity, register speed, hire cashier)
-- [ ] Local save
-- [ ] Toon-shaded low-poly look with placeholder geometry
+- [ ] One-room dollhouse-cutaway shop, portrait, fixed camera
+- [ ] Shopkeeper character who walks to what you tap
+- [ ] **Inventory:** catalog with ~5 products; orders arrive as boxes
+- [ ] **Stocking:** open boxes, place items on 3–4 shelves
+- [ ] **Checkout:** scan items + ring up, with tips
+- [ ] **Marketing:** one option (flyers or window display)
+- [ ] Customers browse, buy, leave wish notes when something's missing
+- [ ] Hire one staff member (cashier) to show the "choose your jobs" idea
+- [ ] Coins, a few upgrades, local save
+- [ ] Toon-shaded low-poly placeholder art
 - [ ] Deployed and playable on a phone browser
 
-**Out of scope for MVP:** expansions, multiple shops, decor, audio, monetization, store builds.
+**Out of scope for MVP:** expansions/floors, new locations, decor, regulars' stories, workshop, offline earnings, audio polish, store builds.
 
-## 12. Open Questions (summary)
+## 15. Open Questions
 
-1. Working title?
-2. Portrait or landscape?
-3. Active-first vs hybrid idle?
-4. Avatar vs god view?
-5. Player-set prices or fixed?
-6. One shop forever vs multiple locations?
-7. What kind of shop — general store, or a themed one (bakery, toy shop, plant shop, magic shop…)?
-8. Outline shading: yes/no?
-9. Any reference games you love (or want to avoid)?
+1. Working title? (ideas in §1)
+2. Do you like the **shop-as-a-dollhouse cutaway** presentation and growing **upward with new floors**?
+3. Pricing: fixed, or simple presets (Bargain / Fair / Premium)?
+4. Include giving change at checkout, or keep it tap-tap-done?
+5. Do **regulars with little stories** appeal, or keep customers anonymous?
+6. **Workshop** (building/decorating dollhouses to sell): want it on the roadmap?
+7. Expansions only, or also new locations? (§7.2)
+8. Orthographic (diorama) or perspective camera?
+9. Should there be a "shop day" structure (open → evening → close, with a daily summary) or continuous play? 💡 A day cycle gives sessions a natural rhythm and a cozy end-of-day moment.
