@@ -1,6 +1,6 @@
 // Save/load with versioned migrations. Storage is injectable so this runs under node --test.
 
-import { createState, STATE_VERSION } from '../sim/state.js';
+import { createState, giveStarterBoxes, STATE_VERSION } from '../sim/state.js';
 import { defaultFixtures } from '../sim/building.js';
 import { createKeeper } from '../sim/keeper.js';
 
@@ -15,6 +15,22 @@ const MIGRATIONS = {
     building: { ...d.building, rooms: d.building.rooms.map((r) => ({ ...r, fixtures: defaultFixtures(r.type, r.id) })) },
     keeper: createKeeper(d.building.rooms[0].id),
   }),
+  // v3: shelves hold items; orders, delivery boxes and the Collection exist.
+  // Furniture resets to the new layout (counter left, Dream Dollhouse by the window); nothing was stocked yet.
+  2: (d) => {
+    const next = {
+      ...d,
+      version: 3,
+      nextId: 1,
+      building: { ...d.building, rooms: d.building.rooms.map((r) => ({ ...r, fixtures: defaultFixtures(r.type, r.id) })) },
+      keeper: createKeeper(d.keeper.roomId),
+      orders: [],
+      boxes: [],
+      collection: {},
+    };
+    giveStarterBoxes(next);
+    return next;
+  },
 };
 
 export function migrate(data) {

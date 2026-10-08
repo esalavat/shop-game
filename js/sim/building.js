@@ -2,13 +2,20 @@
 
 import { events } from '../core/events.js';
 import { ROOM_TYPES } from '../data/rooms.js';
+import { FIXTURES } from '../data/fixtures.js';
 
 export const hasRoom = (state, col, floor) =>
   state.building.rooms.some((r) => r.col === col && r.floor === floor);
 
 /** The starting furniture for a room type, with ids unique to the room. */
 export function defaultFixtures(type, roomId) {
-  return ROOM_TYPES[type].fixtures.map((f, i) => ({ id: `${roomId}-f${i}`, ...f }));
+  return ROOM_TYPES[type].fixtures.map((f, i) => withSlots({ id: `${roomId}-f${i}`, ...f }));
+}
+
+/** Give a fixture empty item slots if its kind has any (shelves). */
+export function withSlots(f) {
+  const n = FIXTURES[f.kind].slots;
+  return n && !f.slots ? { ...f, slots: Array(n).fill(null) } : f;
 }
 
 export function makeRoom(id, type, col, floor) {

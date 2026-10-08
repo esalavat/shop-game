@@ -10,7 +10,7 @@
 <title>My Dream Dollhouse Shop</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=2">
+<link rel="stylesheet" href="style.css?v=4">
 <script type="importmap">
 { "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
 </script>
@@ -28,10 +28,28 @@
     <div class="day-chip" id="hud-day"></div>
   </div>
 
+  <div id="toasts" aria-live="polite"></div>
+
+  <div id="toolbar">
+    <button id="btn-order"><span class="tb-ico" aria-hidden="true">📖</span>Order</button>
+    <button id="btn-nextday"><span class="tb-ico" aria-hidden="true">🌙</span>Next day</button>
+  </div>
+
+  <div id="orderbook" class="sheet" hidden>
+    <div class="sheet-body">
+      <div class="sheet-head">
+        <h2>Order Book</h2>
+        <button class="close" aria-label="Close">✕</button>
+      </div>
+      <div class="pending"></div>
+      <div class="cards"></div>
+    </div>
+  </div>
+
   <div id="rotate">
     <div class="rotate-card">📱<br>Turn your phone upright to play!</div>
   </div>
 </div>
-<script type="module" src="js/main.js?v=3"></script>
+<script type="module" src="js/main.js?v=5"></script>
 </body>
 </html>

@@ -12,8 +12,8 @@ export const ROOM_TYPES = {
       { kind: 'rug', x: -0.3, z: 0.1 },
       { kind: 'shelf', x: -0.95, z: -1.06 },
       { kind: 'shelf', x: 0.25, z: -1.06 },
-      { kind: 'counter', x: 1.05, z: 0.1 },
-      { kind: 'pedestal', x: -1.1, z: 0.75 },
+      { kind: 'counter', x: -1.05, z: 0.1 },
+      { kind: 'pedestal', x: 1.15, z: 0.85 }, // the Dream Dollhouse, in front of the window
       { kind: 'plant', x: 1.42, z: -1.02 },
     ],
   },

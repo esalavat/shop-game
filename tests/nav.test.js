@@ -20,7 +20,7 @@ test('every fixture use-spot is reachable from the shopkeeper start', () => {
     if (!use) continue;
     const to = { x: f.x + use.dx, z: f.z + use.dz };
     assert.ok(isFree(nav, to.x, to.z), `${f.kind} use spot is blocked`);
-    const path = findPath(nav, { x: 1.05, z: -0.48 }, to);
+    const path = findPath(nav, { x: -1.05, z: -0.48 }, to);
     assert.ok(path, `${f.kind} unreachable`);
     const end = path.at(-1);
     assert.ok(Math.hypot(end.x - to.x, end.z - to.z) < 1e-6);
@@ -28,8 +28,8 @@ test('every fixture use-spot is reachable from the shopkeeper start', () => {
 });
 
 test('paths never pass through furniture', () => {
-  const path = findPath(nav, { x: 1.05, z: -0.48 }, { x: -1.3, z: -0.3 });
-  let prev = { x: 1.05, z: -0.48 };
+  const path = findPath(nav, { x: -1.05, z: -0.48 }, { x: -1.3, z: -0.3 });
+  let prev = { x: -1.05, z: -0.48 };
   for (const p of path) {
     for (let t = 0; t <= 1; t += 0.02) {
       assert.ok(isFree(nav, prev.x + (p.x - prev.x) * t, prev.z + (p.z - prev.z) * t));
