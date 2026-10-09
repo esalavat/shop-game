@@ -388,10 +388,13 @@ Each milestone ends with a push so it's playable on your phone.
 |---|---|
 | Public game from releases, test build at `/dev/`, save safety (GDD #56, §9) | ✅ |
 | First-day guide and morning Open-shop nudge (#57) | ✅ built, on /dev/ |
-| Theme rooms on the ground floor + Sorting Smarts (#58 step 1, #60) | ✅ built, on /dev/ (user: works, signs look good) |
-| Crowd deadlock fix (customers stuck behind the line) | ✅ on /dev/ |
-| Stairwell and upstairs rooms (#58 step 2, #61) | ✅ built, on /dev/ (waiting for the user's feedback); see §4.3.3, §11.1 |
-| **More items, color variants, catalog pages, Collection bonus and page rewards (#59)** | ⏭ next |
+| Theme rooms on the ground floor + Sorting Smarts (#58 step 1, #60) | ✅ built, then replaced by plain shelf rooms (#65) |
+| Crowd deadlock fix (customers stuck behind the line) | ✅ |
+| Stairwell and upstairs rooms (#58 step 2, #61, #64) | ✅ built (waiting for the user's feedback); see §4.3.3, §11.1 |
+| Quick evenings and Close now (#62, #63) | ✅ built (waiting for the user's feedback) |
+| Plain shelf rooms, more floors, prices by distance (#65) | ✅ built (waiting for the user's feedback) |
+| **Decoration shop** (GDD §18 #9) | ⏭ next to design |
+| More items, color variants, catalog pages, Collection bonus and page rewards (#59) | after the decoration shop |
 
 ### 11.1 Plan: Stairwell and upstairs (#58 step 2) — ✅ built 2026-10-09
 The plan as worked out; it was built this way (GDD #61, §4.3.3). Differences: the upstairs half is its own room

@@ -76,36 +76,38 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 - **First-day guide, built 2026-10-09, waiting for the user's feedback** (GDD v0.22 #57): arrows over a box →
   a shelf → Open shop → the register, once per new game (`js/sim/tutorial.js`, `js/ui/guide.js`;
   `state.tutorial`, save version 13, existing saves skip it). Plus an "Open your shop!" arrow any morning after
-  5 s of nothing happening. On `/dev/` only until the user releases it.
+  5 s of nothing happening.
 
 - **Stairwell and upstairs rooms, built 2026-10-09, waiting for the user's feedback** (GDD v0.24 #58, #61, #64):
   Grow → Stairwell (🪙 350, after the first room); it always goes right next to the shop (rooms on that side move
   over) and builds two floors (spiral stairs, a shelf on each). Upstairs rooms connect through side doorways. Tap the
   stairs to send your shopkeeper up (the railing round the hole to come down). Customers and Bea climb too; everyone
   pays downstairs. Routes come in legs (`sim/route.js`, `docs/TECH.md` §4.3.3). `tests/stairs.test.js`. (Theme rooms,
-  v0.23 #58, came first and were replaced by plain shelf rooms in #65.) On `/dev/` only.
+  v0.23 #58, came first and were replaced by plain shelf rooms in #65.)
 - **Quick evenings, built 2026-10-09, waiting for the user's feedback** (GDD v0.25 #62): 10 s of twilight, then
   shoppers pay for what they have or go home; the day closes once the last one has paid, while they're still walking
   away. **Close now** (#63, v0.26): in the evening the day button closes on the spot (two taps); customers put their
   things back on the shelves and go home (`sendEveryoneHome` in `sim/customers.js`, `closeNow` in `sim/day.js`).
-  On `/dev/` only.
 - **Plain shelf rooms, more floors, prices by distance, built 2026-10-09, waiting for the user's feedback** (GDD v0.28
   #65): theme rooms and Sorting Smarts are gone (save v16 turns built theme rooms into shelf rooms and refunds
   Sorting Smarts). Grow → Build a room → tap a ＋ (each shows its price: by ring around the middle, sideways or up,
   +15% per floor, so a squarish house is cheapest). Grow → Another floor raises the Stairwell (each staircase costs
-  more). Routes climb floor by floor. Prices are first guesses (`js/data/rooms.js`). On `/dev/` only.
+  more). Routes climb floor by floor. Prices are first guesses (`js/data/rooms.js`).
 - **Next to design:** the **decoration shop** (its own currency) to restyle rooms (GDD #65).
 - **Planned next, in order:** (#59) **more items** (toward 100+, color variants, catalog pages that open as you
   collect), the **Collection bonus** and page rewards (coins, confetti, a shopkeeper style). Later: more stockers
   (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issue: delivery boxes stack too
   high (delivery-bin idea, docs/ISSUES.md).
 
-**Next:** hear back on shelf rooms / floors / prices (#65), the Stairwell, quick evenings and Close now on `/dev/`;
-then design the decoration shop or #59 (more items), whichever the user picks; hear back about quick evenings
-and Close now on `/dev/`; then #59 (more items). Still waiting on: M8 feedback (home-screen install, fps on the Pixel), Bea and
-first-day-guide feedback. Nothing new has been released since **v2026.10.9.2** (first-day guide); theme rooms, the
-crowd fix, the Stairwell and shelf rooms are on `/dev/` only, and releasing them changes the save version (v13 → v16). The MVP list
-in GDD §17 is complete.
+**Next:** design the **decoration shop** (GDD §18 #9) with the user in a new session: discuss, update the GDD, then
+build. After that, #59 (more items). Still waiting on feedback: everything built 2026-10-09 (Stairwell, shelf rooms,
+floors and prices, quick evenings, Close now), M8 (home-screen install, fps on the Pixel), Bea, the first-day guide.
+
+**Releases:** the last one before this session was **v2026.10.9.2** (first-day guide). On 2026-10-09 the user asked
+to release everything on `main` as **v2026.10.9.3** (theme rooms → shelf rooms, crowd fix, Stairwell and
+floors, quick evenings, Close now; save version v13 → v16). Claude's own run of `npm run release -- --yes` was blocked,
+so the user publishes it with `npm run release` (it asks to confirm). Check with `gh release view`: if the latest
+isn't v2026.10.9.3 or later, those features are still on `/dev/` only. The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).
