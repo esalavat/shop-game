@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.16 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.17 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -58,6 +58,7 @@
 | 49 | **Bouncy UI:** buttons squish when pressed, sheets and panels spring open, toasts pop in, with a soft tap sound | v0.15 |
 | 50 | **Installable and playable offline** (PWA): "Add to Home screen" gives a proper app icon, and the game opens without a connection. Online, it always loads the newest version | v0.15 |
 | 51 | **Stocker helper** (planned, not built yet): a second one-time hire who carries delivery boxes from the doorstep to the shelves and unpacks them, so stocking can run on its own like checkout does with Mia. Details are a proposal in §10, open for feedback | v0.16 |
+| 52 | **Midday mark on the day bar** (user request): with Lunchtime Delivery owned, a small mark sits halfway along the HUD's day bar during open hours. It **glows butter yellow and pulses** while a lunch order is on its way, and fades once midday has passed. Without the upgrade, no mark. (A mark, not a countdown, so it keeps #34) | v0.17 |
 
 ## 1. Pitch
 
@@ -122,7 +123,7 @@ Each job is a short, playful interaction. Early on, you do them all. As the shop
 
 ### 5.1 Ordering stock
 - Open the **order book**, a picture catalog of cute items, and tap what you'd like.
-- **Pip the delivery bunny** 💡 brings the boxes the **next morning**. The **Lunchtime delivery** upgrade (#37) lets Pip come at midday too: orders placed in the morning or the first half of open hours arrive when the day bar reaches halfway.
+- **Pip the delivery bunny** 💡 brings the boxes the **next morning**. The **Lunchtime delivery** upgrade (#37) lets Pip come at midday too: orders placed in the morning or the first half of open hours arrive when the day bar reaches halfway. A mark at the halfway point of the day bar shows when, and glows while a lunch order is on its way (#52).
 - The main choice is what to get with your coins. Fancier items cost more and earn more.
 - New catalog pages unlock as you grow and through story events.
 
