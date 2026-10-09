@@ -13,7 +13,7 @@ const args = process.argv.slice(2);
 const yes = args.includes('--yes');
 const target = args.find((a) => !a.startsWith('--')) ?? 'origin/main';
 
-const run = (cmd, ...a) => execFileSync(cmd, a, { encoding: 'utf8' }).trim();
+const run = (cmd, ...a) => execFileSync(cmd, a, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 const tryRun = (cmd, ...a) => { try { return run(cmd, ...a); } catch { return ''; } };
 const saveVersion = (ref) => Number(/STATE_VERSION = (\d+)/.exec(tryRun('git', 'show', `${ref}:js/sim/state.js`))?.[1]);
 

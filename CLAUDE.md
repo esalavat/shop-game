@@ -69,7 +69,7 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   deploy `/dev/`; `npm run release` publishes a GitHub Release, which deploys the public link. Separate saves
   per build (dev starts from a copy of the real save), a newer save is never overwritten, backups before
   migrating, and sample saves in `tests/fixtures/saves/` that every release must load. Repo settings: the
-  `github-pages` environment must allow `v*` tags. Still to check: the user's first release.
+  `github-pages` environment allows `v*` tags. First release **v2026.10.9** is out (2026-10-09).
 
 **Next:** the user's M8 feedback, then pick from "Not scheduled yet" below or the GDD §17 "Next" list.
 The MVP list in GDD §17 is complete.
