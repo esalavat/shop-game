@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.12 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.13 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -46,6 +46,7 @@
 | 37 | **First upgrades** (one-time buys in the Grow sheet): **Lunchtime delivery** (🪙 100; orders placed before midday arrive when the day bar reaches halfway), **Stock cart** (🪙 60; carry **2 boxes** per trip), **Comfy shoes** (🪙 80; your shopkeeper walks faster). More shelf space waits for a new shop room (a third shelf would hide things in the straight-on view) | v0.12 |
 | 38 | **Shopkeeper creator:** hair style, hair color, skin tone, outfit color, and one accessory (none, bow, glasses, or hat). Shown on a new game and once for existing saves; tap your shopkeeper in the morning to change it any time | v0.12 |
 | 39 | **Early economy stays as it is.** Selling out on Day 1 is fine now that you can close early (#25, #33); early progress feels good (playtest) | v0.12 |
+| 40 | **Pip's rescue box:** if a morning starts with nothing to sell (empty shelves, no boxes, nothing ordered) and not enough coins for the cheapest box, Pip brings a free box of the cheapest item, "just because". You can never get stuck (#6, §11) | v0.13 |
 
 ## 1. Pitch
 
@@ -268,7 +269,7 @@ Your very own dollhouse, displayed in the shop's front window.
 
 - One currency: **coins**. Two progress meters that are never spent: **Hearts ❤️** and **Sparkle ✨**.
 - Costs scale gently; early on, something new should be affordable every day or so.
-- You can't go broke. Unsold stock just waits on the shelf.
+- You can't go broke. Unsold stock just waits on the shelf. If you ever spend everything with nothing left to sell, Pip brings a free box the next morning (#40).
 - Goals: gentle milestone lists, Collection pages, regulars' stories, and room unlocks.
 - **Upgrades (v0.12, #37)** are one-time buys in the Grow sheet: Lunchtime delivery (🪙 100), Stock cart (🪙 60, carry 2 boxes), Comfy shoes (🪙 80, walk faster). Costs to tune with feedback (`js/data/upgrades.js`).
 

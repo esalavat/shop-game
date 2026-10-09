@@ -4,6 +4,7 @@
 
 import { events } from '../core/events.js';
 import { dropBox } from './stock.js';
+import { ITEMS, boxCost } from '../data/items.js';
 
 export const DAY_LENGTH = {
   open: 180,    // seconds of open hours
@@ -77,7 +78,21 @@ export function startNextDay(state) {
   state.day.stats = emptyStats();
   setPhase(state, 'morning');
   const delivered = deliverOrders(state);
-  events.emit('dayStarted', { day: state.day.number, delivered });
+  const rescued = rescueIfStuck(state);
+  events.emit('dayStarted', { day: state.day.number, delivered, rescued });
+}
+
+/**
+ * Nothing to sell, nothing on the way, and too few coins for even the cheapest box: the shop could
+ * never earn again. Pip brings a free box of the cheapest item, "just because" (GDD #40).
+ * Returns the item id, or null if the shop wasn't stuck.
+ */
+export function rescueIfStuck(state) {
+  const cheapest = Object.keys(ITEMS).reduce((a, b) => (boxCost(b) < boxCost(a) ? b : a));
+  if (!soldOut(state) || state.orders.length || state.coins >= boxCost(cheapest)) return null;
+  dropBox(state, cheapest, ITEMS[cheapest].perBox);
+  events.emit('boxesChanged');
+  return cheapest;
 }
 
 /** Lunch orders that missed midday (the shop closed early) come the next morning instead. */

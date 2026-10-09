@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createState } from '../js/sim/state.js';
 import { buildNav } from '../js/sim/nav.js';
-import { openShop, tickDay, startNextDay, twilightFor, closeEarly, soldOut, DAY_LENGTH } from '../js/sim/day.js';
+import { openShop, tickDay, startNextDay, twilightFor, closeEarly, soldOut, rescueIfStuck, DAY_LENGTH } from '../js/sim/day.js';
 import { tickCustomers, spawnCustomer } from '../js/sim/customers.js';
 import { checkoutTap } from '../js/sim/checkout.js';
 import { events } from '../js/core/events.js';
@@ -125,4 +125,32 @@ test('sold out means empty shelves, no boxes waiting, nothing being carried', ()
   assert.equal(soldOut(s), true);
   s.building.rooms[0].fixtures.find((f) => f.slots).slots[0] = 'doll';
   assert.equal(soldOut(s), false);
+});
+
+test("Pip's rescue box: stuck with nothing to sell and no coins, a free box arrives next morning", () => {
+  const s = createState();
+  s.boxes = [];
+  s.coins = 5;
+  s.day.phase = 'close';
+  startNextDay(s);
+  assert.equal(s.boxes.length, 1);
+  assert.equal(s.boxes[0].itemId, 'teaset');
+  assert.equal(s.boxes[0].qty, 3);
+});
+
+test('no rescue box when there is stock, an order, or enough coins', () => {
+  const s = createState();
+  s.coins = 0;
+  assert.equal(rescueIfStuck(s), null); // starter boxes still waiting
+  s.boxes = [];
+  s.building.rooms[0].fixtures.find((f) => f.slots).slots[0] = 'doll';
+  assert.equal(rescueIfStuck(s), null); // something on the shelf
+  s.building.rooms[0].fixtures.find((f) => f.slots).slots[0] = null;
+  s.orders = [{ id: 'o1', itemId: 'doll', qty: 3, arrivesDay: 2 }];
+  assert.equal(rescueIfStuck(s), null); // on the way
+  s.orders = [];
+  s.coins = 18;
+  assert.equal(rescueIfStuck(s), null); // can afford a tea set box
+  s.coins = 17;
+  assert.equal(rescueIfStuck(s), 'teaset');
 });

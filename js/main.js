@@ -246,9 +246,10 @@ events.on('lunchDelivery', ({ delivered }) => {
 });
 events.on('upgradeBought', ({ id }) => toast(`${UPGRADES[id].icon} ${UPGRADES[id].name}: yours!`));
 events.on('helperHired', ({ id }) => toast(`${HELPERS[id].name} joined your shop! 💖 She'll mind the register.`));
-events.on('dayStarted', ({ day, delivered }) => {
+events.on('dayStarted', ({ day, delivered, rescued }) => {
   const boxes = delivered.boxes ? ` Pip delivered ${delivered.boxes} box${delivered.boxes > 1 ? 'es' : ''} 📦` : '';
   toast(`Good morning! Day ${day}.${boxes}`);
+  if (rescued) toast(`Pip left you a free box of ${ITEMS[rescued].name}, just because 🎁`);
   for (const id of delivered.discovered) toast(`✨ New in your Collection: ${ITEMS[id].name}`);
 });
 events.on('boxPicked', ({ spare }) => {

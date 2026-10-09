@@ -46,6 +46,8 @@ Dream Dollhouse v0 (M6, approved), and M7:
   - **Fixed:** delivery boxes no longer block the register; they sit on the right of the doorstep.
   - Numbers to tune with feedback are in `js/data/upgrades.js`.
 - The early economy stays as it is (decision #39): closing early covers selling out.
+- **Pip's rescue box (GDD v0.13 #40), built 2026-10-09:** if a morning starts with nothing to sell,
+  nothing ordered, and too few coins for the cheapest box, Pip brings a free one, so you can never get stuck.
 
 **Next:** get the user's feedback on M7, then M8 (Polish pass: juice, first sounds, phone perf, PWA
 manifest). Open design questions from the user are in GDD §18 #4 (show sell price / profit in the order
