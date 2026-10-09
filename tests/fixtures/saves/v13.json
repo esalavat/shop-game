@@ -1,0 +1,211 @@
+{
+ "version": 13,
+ "nextId": 5,
+ "day": {
+  "number": 9,
+  "phase": "morning",
+  "time": 0,
+  "stats": {
+   "coins": 0,
+   "tips": 0,
+   "served": 0,
+   "hearts": 0,
+   "sold": {},
+   "wishes": [],
+   "record": false
+  }
+ },
+ "coins": 777,
+ "hearts": 42,
+ "sparkle": 12,
+ "building": {
+  "rooms": [
+   {
+    "id": "r1",
+    "type": "shop",
+    "col": 0,
+    "floor": 0,
+    "fixtures": [
+     {
+      "id": "r1-f0",
+      "kind": "rug",
+      "x": 0.3,
+      "z": 0.15
+     },
+     {
+      "id": "r1-f1",
+      "kind": "shelf",
+      "x": -0.05,
+      "z": -1.06,
+      "slots": [
+       "doll",
+       "doll",
+       "doll",
+       null,
+       null,
+       null,
+       null,
+       null,
+       null
+      ]
+     },
+     {
+      "id": "r1-f2",
+      "kind": "shelf",
+      "x": 1.1,
+      "z": -1.06,
+      "slots": [
+       "lamp",
+       "lamp",
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null
+      ]
+     },
+     {
+      "id": "r1-f3",
+      "kind": "counter",
+      "x": -1.05,
+      "z": 0.1
+     },
+     {
+      "id": "r1-f4",
+      "kind": "plant",
+      "x": -1.45,
+      "z": -1.05
+     }
+    ]
+   },
+   {
+    "id": "r4",
+    "type": "display",
+    "col": 1,
+    "floor": 0,
+    "fixtures": [
+     {
+      "id": "r4-f0",
+      "kind": "rug",
+      "x": 0,
+      "z": 0.35
+     },
+     {
+      "id": "r4-f1",
+      "kind": "pedestal",
+      "x": 0,
+      "z": 0.35
+     },
+     {
+      "id": "r4-f2",
+      "kind": "plant",
+      "x": -1.2,
+      "z": 0.6
+     },
+     {
+      "id": "r4-f3",
+      "kind": "plant",
+      "x": 1.2,
+      "z": 0.6
+     }
+    ]
+   }
+  ]
+ },
+ "keeper": {
+  "roomId": "r1",
+  "x": -1.05,
+  "z": -0.42,
+  "facing": 0.5235987755982988,
+  "path": [],
+  "fixtureId": null,
+  "arriveFacing": null,
+  "task": null,
+  "carrying": null,
+  "spare": null,
+  "arriveRoom": null
+ },
+ "orders": [
+  {
+   "id": "o5",
+   "itemId": "cottage",
+   "qty": 2,
+   "arrivesDay": 1,
+   "lunch": true
+  }
+ ],
+ "boxes": [
+  {
+   "id": "b2",
+   "itemId": "teaset",
+   "qty": 3,
+   "roomId": "r1",
+   "spot": 0
+  },
+  {
+   "id": "b3",
+   "itemId": "chair",
+   "qty": 3,
+   "roomId": "r1",
+   "spot": 1
+  }
+ ],
+ "collection": {
+  "teaset": true,
+  "chair": true,
+  "lamp": true,
+  "bed": true,
+  "doll": true,
+  "cottage": true
+ },
+ "dollhouse": {
+  "slots": {
+   "bedroom": "bed",
+   "parlor": "chair",
+   "tearoom": "teaset"
+  }
+ },
+ "wishes": [
+  "cottage"
+ ],
+ "shopkeeper": {
+  "body": "girl",
+  "hair": "pigtails",
+  "hairColor": "#6b3e2e",
+  "skin": "#ffd9c2",
+  "outfit": "#ff9ec4",
+  "accessory": "bow",
+  "created": true
+ },
+ "upgrades": {
+  "cart": true,
+  "shoes": true,
+  "lunch": true
+ },
+ "helpers": {
+  "cashier": true,
+  "stocker": true
+ },
+ "stocker": {
+  "roomId": "r1",
+  "x": 1.4,
+  "z": 0.7,
+  "facing": 0,
+  "path": [],
+  "arriveFacing": null,
+  "carrying": null,
+  "spare": null,
+  "job": null,
+  "timer": 0
+ },
+ "settings": {
+  "muted": true
+ },
+ "best": {
+  "coins": 321
+ },
+ "tutorial": "done",
+ "lastSeen": 1791504000000
+}

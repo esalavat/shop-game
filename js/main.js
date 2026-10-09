@@ -43,6 +43,8 @@ import { createOrderBook } from './ui/orderbook.js';
 import { createToaster } from './ui/toast.js';
 import { createOverlay } from './ui/overlay.js';
 import { createShopBubbles } from './ui/shopBubbles.js';
+import { createGuide } from './ui/guide.js';
+import { advanceTutorial } from './sim/tutorial.js';
 import { createDayUI } from './ui/day.js';
 import { createAlbum } from './ui/album.js';
 import { createGrow } from './ui/grow.js';
@@ -149,6 +151,10 @@ const dollhouseView = createDollhouseView(state, roomOrigin);
 const helpersView = createHelpersView(state, roomOrigin);
 const spotsView = createSpotsView(state, roomOrigin);
 const bubbles = createShopBubbles({ state, overlay, customersView, checkoutView, thumbs });
+const guide = createGuide({
+  state, overlay, roomOrigin,
+  isBlocked: () => creator.isOpen || decorate.isOpen || !state.shopkeeper.created || !!document.querySelector('.sheet:not([hidden])'),
+});
 const juice = createJuice({ audio, fx, overlay, keeperView, helpersView, customersView, dollhouseView, checkoutView });
 scene.add(keeperView.object, helpersView.group, spotsView.group, boxesView.group, shelvesView.group, customersView.group, checkoutView.group, dollhouseView.group);
 boxesView.rebuild();
@@ -433,6 +439,7 @@ startLoop({
     tickCustomers(state, navs, dt);
     separate(state, navs);
     tickDay(state, dt);
+    advanceTutorial(state);
   },
   frame(dt, time, alpha) {
     lighting.setTwilight(twilightFor(state.day));
@@ -452,6 +459,7 @@ startLoop({
     dayUI.update();
     grow.update();
     bubbles.update(dt);
+    guide.update(dt);
     overlay.update(dt);
     quality.frame(dt);
     debug?.frame(dt);

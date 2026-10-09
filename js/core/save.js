@@ -79,6 +79,8 @@ const MIGRATIONS = {
   10: (d) => ({ ...d, version: 11, stocker: null }),
   // v12: girl or boy shopkeeper (GDD #43); everyone so far made a girl.
   11: (d) => ({ ...d, version: 12, shopkeeper: { body: 'girl', ...d.shopkeeper } }),
+  // v13: the first-day guide (GDD #57), for new games only: existing shops already know the way.
+  12: (d) => ({ ...d, version: 13, tutorial: 'done' }),
 };
 
 export function migrate(data) {

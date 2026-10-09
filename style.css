@@ -421,6 +421,13 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 .bubble.spot::after { display: none; }
 .bubble.spot-showoff { border-color: #e8b64a; }
 @keyframes bob { 50% { margin-top: -5px; } }
+/* First-day guide (ui/guide.js): a bouncing pink label with a big arrow underneath. */
+.bubble.guide { background: var(--pink); color: #fff; font-size: 15px; animation: bob 0.9s ease-in-out infinite; }
+.bubble.guide::after { bottom: -14px; margin-left: -12px; border-width: 14px 12px 0; border-top-color: var(--pink); }
+.guide-btn { position: absolute; transform: translate(-50%, -100%); pointer-events: none; animation: bob 0.9s ease-in-out infinite; }
+.guide-btn[hidden] { display: none; }
+.guide-btn span { position: relative; display: block; padding: 4px 8px; border-radius: 14px; background: var(--pink); color: #fff; font-weight: 800; font-size: 15px; white-space: nowrap; margin-bottom: 14px; }
+.guide-btn span::after { content: ''; position: absolute; left: 50%; bottom: -14px; margin-left: -12px; border: solid transparent; border-width: 14px 12px 0; border-top-color: var(--pink); }
 
 @keyframes wiggle {
   0%, 100% { rotate: 0deg; }

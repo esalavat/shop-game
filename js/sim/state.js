@@ -6,7 +6,7 @@ import { createKeeper } from './keeper.js';
 import { dropBox } from './stock.js';
 import { emptyStats } from './day.js';
 
-export const STATE_VERSION = 12;
+export const STATE_VERSION = 13;
 
 /** Live-only fields: never saved, reset on every load (customers just walk in again). */
 export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer', 'cashier'];
@@ -54,6 +54,7 @@ export function createState(now = Date.now()) {
     stocker: null, // Bea, once hired (sim/stocker.js); saved, so boxes in her hands are never lost
     settings: { muted: false }, // sounds and vibration (audio/audio.js)
     best: { coins: 0 },          // best day so far (sim/day.js recordBest)
+    tutorial: 'box',             // the first-day guide's step (sim/tutorial.js); 'done' once finished
     lastSeen: now,
   };
   giveStarterBoxes(state);

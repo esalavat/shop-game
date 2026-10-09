@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.21 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.22 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -63,6 +63,7 @@
 | 54 | **Order book shows what you'll earn** (user, resolves §18 #4): each card shows the **sell price per item** ("Sells for 🪙 10 each") and the **profit for the whole box** as a mint tag ("+🪙 12 profit"), so you can see which items earn the most. Tips aren't counted | v0.19 |
 | 55 | **Boy or girl shopkeeper built** (#43): the creator's first row is **Girl 👧 / Boy 👦**. Boys' hair: **short, spiky, curly, swoop**; boys' accessories: **bow tie, glasses, cap** (girls keep bob / bun / pigtails / ponytail and bow / glasses / sun hat). Switching keeps whatever fits both (colors, glasses). Outfit colors are the same for both. 🎲 randomizes within your choice. Existing shops keep a girl | v0.20 |
 | 56 | **Public game and test build** (user): the game is shared at the main link, which only changes on a **release** (about once a day, `npm run release`). Every change goes to the **test build at `/dev/`** first. The test build has a DEV badge, installs as its own app ("Dollhouse Shop DEV"), and plays on a **copy** of your real save, so testing never touches real progress. **Saves are never lost**: a save from a newer version is never overwritten (the game asks you to update instead), and every release must still load sample saves from all earlier versions (docs/TECH.md §9.1, §9.4) | v0.21 |
+| 57 | **First-day guide** (user): in a brand-new game, once the creator closes, a bouncing pink arrow with a short label points at the next thing to do: **a doorstep box** ("Tap a box!") → **a shelf** ("Tap a shelf to unpack!") → **Open shop** ("Open your shop!") → **the counter** when the first customer lines up ("Tap the register!"; the "Tap to scan" prompt takes over once you're there). It ends with the first sale and never comes back; it only moves forward and skips ahead if you do. Existing shops don't see it. **Morning nudge:** any morning, if nothing has happened for **5 seconds** (no taps, shopkeeper standing still), the "Open your shop!" arrow appears until the next tap | v0.22 |
 
 ## 1. Pitch
 
@@ -360,6 +361,7 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - [x] Toon-shaded low-poly placeholder art in the pastel palette
 - [x] Playable on a phone browser
 - [x] **Polish pass:** juice, sound effects, haptics, bouncy UI, end-of-day celebration, installable offline PWA (#45-50)
+- [x] **First-day guide** arrows and the morning Open-shop nudge (#57)
 
 ### Next
 - Building grid expansion (X and Y), room types, pan/zoom

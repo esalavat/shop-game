@@ -60,6 +60,7 @@ js/
     marketing.js        # Morning picks, special days, Sparkle → foot traffic
     collection.js       # Dream Dollhouse placing, Sparkle, foot-traffic boost, window spot (unlocks happen in day.js)
     helpers.js          # Hired helpers doing jobs: Mia the cashier (state.cashier, live-only)
+    tutorial.js         # First-day guide steps (state.tutorial: box → shelf → open → register → done), advanced each tick
     stocker.js          # Bea the stocker: fetches doorstep boxes and unpacks them (state.stocker, saved so held boxes survive a reload)
     upgrades.js         # Buying upgrades / hiring helpers (one-time; state.upgrades, state.helpers)
     route.js            # Walking between rooms and onto the street (sidewalk lane, doors, greeter spot)
@@ -80,6 +81,7 @@ js/
     quality.js          # Adaptive pixel ratio: steps down (2 → 1.5 → 1.25) if fps stays under 50
   ui/                   # DOM overlay
     hud.js              # Coins / Hearts / Sparkle / day progress bar (no digital timers)
+    guide.js            # First-day guide arrows (3D-pinned bubbles + one over Open shop) and the idle morning nudge
     toolbar.js          # Bottom buttons
     orderbook.js, album.js, grow.js (Grow sheet: rooms, helpers, upgrades; Dollhouse button), decorate.js, day.js (summary)
     story.js            # Dialogue cards for story moments

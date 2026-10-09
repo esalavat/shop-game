@@ -71,6 +71,11 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   migrating, and sample saves in `tests/fixtures/saves/` that every release must load. Repo settings: the
   `github-pages` environment allows `v*` tags. First release **v2026.10.9** is out (2026-10-09).
 
+- **First-day guide, built 2026-10-09, waiting for the user's feedback** (GDD v0.22 #57): arrows over a box →
+  a shelf → Open shop → the register, once per new game (`js/sim/tutorial.js`, `js/ui/guide.js`;
+  `state.tutorial`, save version 13, existing saves skip it). Plus an "Open your shop!" arrow any morning after
+  5 s of nothing happening. On `/dev/` only until the user releases it.
+
 **Next:** the user's M8 feedback, then pick from "Not scheduled yet" below or the GDD §17 "Next" list.
 The MVP list in GDD §17 is complete.
 

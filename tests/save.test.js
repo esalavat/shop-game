@@ -215,3 +215,13 @@ test('a v11 save keeps its shopkeeper as a girl', () => {
   assert.equal(s.shopkeeper.body, 'girl');
   assert.equal(s.shopkeeper.hair, 'pigtails');
 });
+
+test('a v12 save skips the first-day guide', () => {
+  const store = memoryStorage();
+  const v12 = { ...createState(0), version: 12 };
+  delete v12.tutorial;
+  store.setItem(SAVE_KEY, JSON.stringify(v12));
+  const s = loadGame(store);
+  assert.equal(s.version, STATE_VERSION);
+  assert.equal(s.tutorial, 'done');
+});
