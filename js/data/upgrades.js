@@ -17,4 +17,11 @@ export const HELPERS = {
     scanTime: 0.9,  // seconds per item she scans
     ringTime: 0.8,  // seconds to ring up once everything is scanned
   },
+  stocker: {
+    name: 'Bea', job: 'Stocker', icon: '📦', cost: 200,
+    desc: 'Bea carries boxes from the doorstep and fills the shelves, wished-for items first. Grab a box yourself any time.',
+    look: { hair: 'ponytail', hairColor: '#e0a84a', skin: '#f1c7a5', outfit: '#ffb38a', accessory: 'glasses' },
+    speed: 1.2,      // walking speed (the shopkeeper's is 1.7)
+    pause: 0.45,     // seconds she takes to pick up a box or start unpacking
+  },
 };

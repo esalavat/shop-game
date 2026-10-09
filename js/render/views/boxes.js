@@ -1,4 +1,5 @@
-// Delivery boxes on the shop floor. Reconciles meshes with state.boxes; new boxes pop in.
+// Delivery boxes on the shop floor. Reconciles meshes with state.boxes; new boxes pop in, and boxes
+// whose stack shrank below them drop down (sim/stock.js settleBoxes).
 
 import * as THREE from 'three';
 import { buildBox } from '../models/items.js';
@@ -6,18 +7,22 @@ import { boxSpot, BOX_SIZE } from '../../sim/stock.js';
 import { events } from '../../core/events.js';
 
 const POP_TIME = 0.4;
+const FALL_SPEED = 3; // units per second
 
 export function createBoxesView(state, roomOrigin) {
   const group = new THREE.Group();
   const shown = new Map(); // boxId -> { obj, hit, t }
   const hitTargets = [];
 
-  function place(entry, box) {
+  function place(entry, box, animate) {
     const o = roomOrigin(box.roomId);
     const s = boxSpot(box.spot);
-    entry.obj.position.set(o.x + s.x, o.y + s.y + s.layer * BOX_SIZE, o.z + s.z);
-    entry.hit.position.copy(entry.obj.position);
-    entry.hit.position.y += BOX_SIZE / 2;
+    const y = o.y + s.y + s.layer * BOX_SIZE;
+    const fallFrom = animate && entry.placed ? entry.obj.position.y : y;
+    entry.obj.position.set(o.x + s.x, Math.max(y, fallFrom), o.z + s.z);
+    entry.targetY = y;
+    entry.placed = true;
+    entry.hit.position.set(o.x + s.x, y + BOX_SIZE / 2, o.z + s.z);
   }
 
   function sync(animate = true) {
@@ -39,7 +44,7 @@ export function createBoxesView(state, roomOrigin) {
         hitTargets.push(hit);
         shown.set(box.id, entry);
       }
-      place(entry, box);
+      place(entry, box, animate);
     }
   }
 
@@ -52,6 +57,7 @@ export function createBoxesView(state, roomOrigin) {
     rebuild: () => sync(false),
     update(dt) {
       for (const e of shown.values()) {
+        if (e.obj.position.y > e.targetY) e.obj.position.y = Math.max(e.targetY, e.obj.position.y - FALL_SPEED * dt);
         if (e.t >= POP_TIME) continue;
         e.t = Math.min(POP_TIME, e.t + dt);
         const p = e.t / POP_TIME;

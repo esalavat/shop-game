@@ -154,3 +154,15 @@ test('a v9 save gets a best day of zero and keeps its mute setting', () => {
   assert.deepEqual(s.best, { coins: 0 });
   assert.equal(s.settings.muted, true);
 });
+
+test('a v10 save has no stocker yet, and floating boxes settle on load', () => {
+  const store = memoryStorage();
+  const v10 = { ...createState(0), version: 10 };
+  delete v10.stocker;
+  v10.boxes = [{ id: 'b1', itemId: 'chair', qty: 3, roomId: v10.building.rooms[0].id, spot: 4 }];
+  store.setItem(SAVE_KEY, JSON.stringify(v10));
+  const s = loadGame(store);
+  assert.equal(s.version, STATE_VERSION);
+  assert.equal(s.stocker, null);
+  assert.equal(s.boxes[0].spot, 0);
+});

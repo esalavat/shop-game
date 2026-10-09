@@ -8,7 +8,7 @@ import { confetti } from './confetti.js';
 const UP = new THREE.Vector3(0, 0.15, 0);
 const HEARTS = ['💖', '❤️', '💕'];
 
-export function createJuice({ audio, fx, overlay, keeperView, customersView, dollhouseView, checkoutView }) {
+export function createJuice({ audio, fx, overlay, keeperView, helpersView, customersView, dollhouseView, checkoutView }) {
   const celebrate = () => {
     confetti();
     audio.play('fanfare');
@@ -41,10 +41,10 @@ export function createJuice({ audio, fx, overlay, keeperView, customersView, dol
   // Stock
   events.on('orderPlaced', () => audio.play('pop', 1.3));
   events.on('boxPicked', () => audio.play('lift'));
-  events.on('stocked', () => audio.buzz(10));
-  events.on('boxEmptied', () => {
+  events.on('stocked', ({ by }) => { if (by === 'keeper') audio.buzz(10); }); // only buzz for your own work
+  events.on('boxEmptied', ({ by }) => {
     audio.play('poof');
-    fx.poof(keeperView.handPosition());
+    fx.poof(by === 'stocker' ? helpersView.stockerHand() : keeperView.handPosition());
   });
   events.on('shelfFull', () => audio.play('boop'));
   events.on('lunchDelivery', () => audio.play('pop'));

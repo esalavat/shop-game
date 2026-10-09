@@ -37,9 +37,9 @@ export function createShelvesView(state, roomOrigin, handPosition, onLand = () =
     return obj;
   }
 
-  events.on('stocked', ({ roomId, fixtureId, itemId, slots }) => {
+  events.on('stocked', ({ roomId, fixtureId, itemId, slots, by }) => {
     const fixture = state.building.rooms.find((r) => r.id === roomId).fixtures.find((f) => f.id === fixtureId);
-    const from = handPosition();
+    const from = handPosition(by); // from whoever unpacked it (the shopkeeper or Bea)
     slots.forEach((slot, i) => {
       const obj = addItem(roomId, fixture, slot, itemId);
       const to = obj.position.clone();

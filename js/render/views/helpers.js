@@ -1,54 +1,100 @@
-// Draws helpers from state: Mia the cashier behind the counter once she's hired (sim/helpers.js).
-// She shuffles aside smoothly when the shopkeeper takes over, and gives a little hop on each scan.
+// Draws helpers from state: Mia the cashier behind the counter (sim/helpers.js) and Bea the stocker
+// carrying boxes to the shelves (sim/stocker.js), once each is hired. They move smoothly between sim
+// ticks, bob while walking, and hop when they do something (Mia on each scan, Bea on each pickup).
 
 import * as THREE from 'three';
 import { createCharacter } from '../models/character.js';
+import { buildBox } from '../models/items.js';
 import { HELPERS } from '../../data/upgrades.js';
+import { BOX_SIZE } from '../../sim/stock.js';
 import { events } from '../../core/events.js';
 
 const lerp = (a, b, t) => a + (b - a) * t;
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+const CARRY_SCALE = 0.75;
+const HAND = new THREE.Vector3(0, 0.5, 0.32); // in front of the chest, character-local (as the shopkeeper's)
+
+function createHelper(id, agent) {
+  const { root, inner } = createCharacter({ ...HELPERS[id].look, apron: true });
+  root.visible = false;
+  const prev = { x: 0, z: 0 };
+  let facing = 0, idlePhase = 0, walkPhase = 0, placed = false;
+  let carried = [], carriedKey = null;
+  const h = { root, hop: 0 };
+
+  /** Boxes in their hands (Bea): rebuilt only when what they hold changes. */
+  function syncCarried(a) {
+    const key = `${a.carrying?.id}|${a.spare?.id}`;
+    if (key === carriedKey) return;
+    carriedKey = key;
+    for (const b of carried) inner.remove(b);
+    const boxes = [a.carrying, a.spare].filter(Boolean);
+    const scale = boxes.length > 1 ? CARRY_SCALE * 0.72 : CARRY_SCALE;
+    carried = boxes.map((box, i) => {
+      const b = buildBox(box.itemId, BOX_SIZE);
+      b.scale.setScalar(scale);
+      const x = boxes.length > 1 ? (i - 0.5) * BOX_SIZE * scale * 1.05 : 0;
+      b.position.set(x, HAND.y - (BOX_SIZE * scale) / 2, HAND.z);
+      inner.add(b);
+      return b;
+    });
+  }
+
+  h.beforeTick = () => {
+    const a = agent();
+    if (!a) return;
+    prev.x = a.x;
+    prev.z = a.z;
+  };
+
+  h.handPosition = () => {
+    root.updateMatrixWorld();
+    return root.localToWorld(HAND.clone());
+  };
+
+  h.frame = (dt, alpha, roomOrigin) => {
+    const a = agent();
+    root.visible = !!a;
+    if (!a) {
+      placed = false;
+      return;
+    }
+    if (!placed) { // first frame after hiring (or loading): no sliding in from the origin
+      prev.x = a.x;
+      prev.z = a.z;
+      facing = a.facing;
+      placed = true;
+    }
+    if ('carrying' in a) syncCarried(a);
+    const o = roomOrigin(a.roomId);
+    const walking = a.path.length > 0;
+    root.position.set(o.x + lerp(prev.x, a.x, alpha), o.y, o.z + lerp(prev.z, a.z, alpha));
+    facing += wrap(a.facing - facing) * Math.min(1, dt * 10);
+    root.rotation.y = facing;
+    idlePhase += dt * 2.2;
+    walkPhase = walking ? walkPhase + dt * 12 : 0;
+    h.hop = Math.max(0, h.hop - dt * 4);
+    inner.position.y = Math.sin(h.hop * Math.PI) * 0.06 + Math.abs(Math.sin(walkPhase)) * 0.04;
+    inner.scale.y = 1 + (walking ? 0 : Math.sin(idlePhase) * 0.02);
+  };
+  return h;
+}
 
 export function createHelpersView(state, roomOrigin) {
   const group = new THREE.Group();
-  const { root, inner } = createCharacter({ ...HELPERS.cashier.look, apron: true });
-  root.visible = false;
-  group.add(root);
-  const prev = { x: 0, z: 0 };
-  let facing = 0, idlePhase = 0, hop = 0, placed = false;
+  const mia = createHelper('cashier', () => state.cashier);
+  const bea = createHelper('stocker', () => state.stocker);
+  const all = [mia, bea];
+  group.add(mia.root, bea.root);
 
-  events.on('scanned', () => { if (state.cashier?.serving) hop = 1; });
+  events.on('scanned', () => { if (state.cashier?.serving) mia.hop = 1; });
+  events.on('boxPicked', ({ by }) => { if (by === 'stocker') bea.hop = 1; });
 
   return {
     group,
-
-    beforeTick() {
-      if (!state.cashier) return;
-      prev.x = state.cashier.x;
-      prev.z = state.cashier.z;
-    },
-
-    frame(dt, alpha) {
-      const m = state.cashier;
-      root.visible = !!m;
-      if (!m) {
-        placed = false;
-        return;
-      }
-      if (!placed) { // first frame after hiring (or loading): no sliding in from the origin
-        prev.x = m.x;
-        prev.z = m.z;
-        facing = m.facing;
-        placed = true;
-      }
-      const o = roomOrigin(m.roomId);
-      root.position.set(o.x + lerp(prev.x, m.x, alpha), o.y, o.z + lerp(prev.z, m.z, alpha));
-      facing += wrap(m.facing - facing) * Math.min(1, dt * 10);
-      root.rotation.y = facing;
-      idlePhase += dt * 2.2;
-      hop = Math.max(0, hop - dt * 4);
-      inner.position.y = Math.sin(hop * Math.PI) * 0.06;
-      inner.scale.y = 1 + Math.sin(idlePhase) * 0.02;
-    },
+    beforeTick() { for (const h of all) h.beforeTick(); },
+    /** World position of Bea's hands (where stocked items hop from). */
+    stockerHand: () => bea.handPosition(),
+    frame(dt, alpha) { for (const h of all) h.frame(dt, alpha, roomOrigin); },
   };
 }

@@ -1,0 +1,102 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { createState } from '../js/sim/state.js';
+import { buildNav } from '../js/sim/nav.js';
+import { tickStocker, chooseBox, STOCKER_WAIT } from '../js/sim/stocker.js';
+import { tickKeeper, walkToBox } from '../js/sim/keeper.js';
+import { dropBox, settleBoxes, pickUpBox, BOX_SPOTS } from '../js/sim/stock.js';
+import { soldOut } from '../js/sim/day.js';
+import { hireHelper } from '../js/sim/upgrades.js';
+import { HELPERS } from '../js/data/upgrades.js';
+
+const shelvesOf = (s) => s.building.rooms[0].fixtures.filter((f) => f.slots);
+const navsFor = (s) => new Map(s.building.rooms.map((r) => [r.id, buildNav(r)]));
+const run = (s, navs, seconds) => {
+  for (let t = 0; t < seconds; t += 0.1) { tickKeeper(s, 0.1); tickStocker(s, navs, 0.1); }
+};
+const stocked = (s) => shelvesOf(s).flatMap((f) => f.slots).filter(Boolean).length;
+
+function beaShop() {
+  const s = createState();
+  s.coins = HELPERS.stocker.cost;
+  assert.ok(hireHelper(s, 'stocker'));
+  return { s, navs: navsFor(s) };
+}
+
+test('Bea costs 200 coins and starts by the wall', () => {
+  const { s, navs } = beaShop();
+  assert.equal(s.coins, 0);
+  run(s, navs, 0.1);
+  assert.ok(s.stocker);
+});
+
+test('Bea carries the doorstep boxes to the shelves and unpacks them', () => {
+  const { s, navs } = beaShop();
+  assert.equal(s.boxes.length, 2); // the starter boxes: 3 tea sets, 3 chairs
+  run(s, navs, 40);
+  assert.equal(s.boxes.length, 0);
+  assert.equal(stocked(s), 6);
+  assert.equal(s.stocker.carrying, null);
+  assert.ok(Math.hypot(s.stocker.x - STOCKER_WAIT.x, s.stocker.z - STOCKER_WAIT.z) < 0.1); // back by the wall
+});
+
+test('she fetches wished-for items first, then items that are not on the shelves', () => {
+  const { s } = beaShop();
+  s.boxes = [];
+  dropBox(s, 'teaset', 3);
+  dropBox(s, 'chair', 3);
+  dropBox(s, 'doll', 3);
+  shelvesOf(s)[0].slots[4] = 'teaset';
+  assert.equal(chooseBox(s).itemId, 'chair'); // not on the shelves yet
+  s.wishes.push({ itemId: 'doll', day: 1 });
+  assert.equal(chooseBox(s).itemId, 'doll');
+});
+
+test("she never takes the box the shopkeeper is walking to", () => {
+  const { s, navs } = beaShop();
+  const first = chooseBox(s);
+  assert.ok(walkToBox(s, navs, first));
+  assert.notEqual(chooseBox(s).id, first.id);
+});
+
+test('she stops when the shelves are full, holding on to what is left', () => {
+  const { s, navs } = beaShop();
+  for (const f of shelvesOf(s)) f.slots = f.slots.map((_, i) => (i === 0 ? null : 'doll'));
+  run(s, navs, 40);
+  assert.equal(stocked(s), 18);
+  assert.equal(s.boxes.length + (s.stocker.carrying ? 1 : 0) + (s.stocker.spare ? 1 : 0), 2); // nothing lost
+});
+
+test('a box in her hands still counts as stock (not sold out)', () => {
+  const { s } = beaShop();
+  const box = s.boxes[0];
+  s.day.phase = 'close'; // so she doesn't start working on her own
+  tickStocker(s, navsFor(s), 0.1);
+  pickUpBox(s, box.id, s.stocker, 'stocker');
+  s.boxes = [];
+  assert.equal(soldOut(s), false);
+});
+
+test('no Bea until she is hired, and she rests after closing', () => {
+  const s = createState();
+  const navs = navsFor(s);
+  run(s, navs, 5);
+  assert.equal(s.stocker, null);
+  assert.equal(s.boxes.length, 2);
+
+  const hired = beaShop();
+  hired.s.day.phase = 'close';
+  run(hired.s, hired.navs, 10);
+  assert.equal(hired.s.boxes.length, 2);
+});
+
+test('taking a box from the bottom of a stack drops the one above it (no floating boxes)', () => {
+  const s = createState();
+  s.boxes = [];
+  const n = BOX_SPOTS.length;
+  const boxes = Array.from({ length: n + 1 }, () => dropBox(s, 'chair', 3));
+  assert.equal(boxes[n].spot, n); // on top of spot 0
+  assert.ok(pickUpBox(s, boxes[0].id));
+  assert.equal(boxes[n].spot, 0);
+  assert.equal(settleBoxes(s), false); // already settled
+});

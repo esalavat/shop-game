@@ -4,6 +4,7 @@ import { createState, giveStarterBoxes, resetTransient, STATE_VERSION, TRANSIENT
 import { defaultFixtures } from '../sim/building.js';
 import { createKeeper } from '../sim/keeper.js';
 import { emptyStats } from '../sim/day.js';
+import { settleBoxes } from '../sim/stock.js';
 
 export const SAVE_KEY = 'mdds_save';
 
@@ -64,6 +65,8 @@ const MIGRATIONS = {
   8: (d) => ({ ...d, version: 9, keeper: { ...d.keeper, arriveRoom: null } }),
   // v10: the best day's coins (end-of-day record); every save gets settings (mute).
   9: (d) => ({ ...d, version: 10, best: { coins: 0 }, settings: { muted: false, ...d.settings } }),
+  // v11: Bea the stocker (state.stocker, once hired: where she is and the boxes she holds).
+  10: (d) => ({ ...d, version: 11, stocker: null }),
 };
 
 export function migrate(data) {
@@ -84,7 +87,9 @@ export function loadGame(storage = defaultStorage()) {
     if (!raw) return createState();
     const data = JSON.parse(raw);
     if (typeof data?.version !== 'number' || data.version > STATE_VERSION) return createState();
-    return resetTransient(migrate(data));
+    const state = resetTransient(migrate(data));
+    settleBoxes(state); // older saves could have a box floating over an empty spot
+    return state;
   } catch {
     return createState(); // corrupted save -> fresh start
   }

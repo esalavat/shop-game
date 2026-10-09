@@ -7,13 +7,12 @@ import { useSpot } from '../data/fixtures.js';
 import { planRoute, shopRoom, roomOffset, onStreet, GREETER, SHOWOFF } from './route.js';
 import { ROOM_SIZE } from '../data/rooms.js';
 import { stepAlong } from './walker.js';
-import { boxSpot, findFixture } from './stock.js';
+import { boxSpot, findFixture, DOORWAY_Z } from './stock.js';
 import { performTask } from './tasks.js';
 import { hasUpgrade } from './upgrades.js';
 import { SHOES_SPEED } from '../data/upgrades.js';
 
 export const KEEPER_SPEED = 1.7; // room units per second
-const DOORWAY_Z = 1.1; // she leans out from the front edge of the shop to grab doorstep boxes
 
 export function createKeeper(roomId) {
   return {

@@ -6,7 +6,7 @@ import { createKeeper } from './keeper.js';
 import { dropBox } from './stock.js';
 import { emptyStats } from './day.js';
 
-export const STATE_VERSION = 10;
+export const STATE_VERSION = 11;
 
 /** Live-only fields: never saved, reset on every load (customers just walk in again). */
 export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer', 'cashier'];
@@ -51,6 +51,7 @@ export function createState(now = Date.now()) {
     shopkeeper: { hair: 'bun', hairColor: '#c2563a', skin: '#ffd9c2', outfit: '#9fe0c8', accessory: 'none', created: false },
     upgrades: {}, // id -> true (data/upgrades.js)
     helpers: {},  // id -> true
+    stocker: null, // Bea, once hired (sim/stocker.js); saved, so boxes in her hands are never lost
     settings: { muted: false }, // sounds and vibration (audio/audio.js)
     best: { coins: 0 },          // best day so far (sim/day.js recordBest)
     lastSeen: now,

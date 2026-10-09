@@ -59,6 +59,7 @@ js/
     marketing.js        # Morning picks, special days, Sparkle → foot traffic
     collection.js       # Dream Dollhouse placing, Sparkle, foot-traffic boost, window spot (unlocks happen in day.js)
     helpers.js          # Hired helpers doing jobs: Mia the cashier (state.cashier, live-only)
+    stocker.js          # Bea the stocker: fetches doorstep boxes and unpacks them (state.stocker, saved so held boxes survive a reload)
     upgrades.js         # Buying upgrades / hiring helpers (one-time; state.upgrades, state.helpers)
     route.js            # Walking between rooms and onto the street (sidewalk lane, doors, greeter spot)
     economy.js          # Coins, Hearts, Sparkle, costs
@@ -72,7 +73,7 @@ js/
     building.js         # Builds the room grid shell from state
     rooms/              # Room interior builders per room type
     models/             # Procedural low-poly model builders (items, characters, furniture)
-    views/              # Sync state → scene: shelves, customers, boxes, checkout, dollhouse (items in its rooms), keeper, helpers (Mia)
+    views/              # Sync state → scene: shelves, customers, boxes, checkout, dollhouse (items in its rooms), keeper, helpers (Mia, Bea)
     pick.js             # Raycast taps → interactable objects
     fx.js               # 3D effects: tap ring, sparkle bursts, box poof (shared geometry; warmUp() precompiles shaders)
     quality.js          # Adaptive pixel ratio: steps down (2 → 1.5 → 1.25) if fps stays under 50

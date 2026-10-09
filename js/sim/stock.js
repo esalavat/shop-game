@@ -1,5 +1,6 @@
-// Delivery boxes and shelf stock: boxes land at the front of the shop, the shopkeeper
-// picks one up, and carries it to a shelf where its items fill the free slots.
+// Delivery boxes and shelf stock: boxes land at the front of the shop, the shopkeeper (or Bea the
+// stocker, sim/stocker.js) picks one up, and carries it to a shelf where its items fill the free slots.
+// A "carrier" is anyone with { carrying, spare }; events say `by: 'keeper' | 'stocker'`.
 
 import { events } from '../core/events.js';
 import { FIXTURES } from '../data/fixtures.js';
@@ -13,6 +14,7 @@ import { hasUpgrade } from './upgrades.js';
 export const BOX_SPOTS = [{ x: 0.66, z: 1.72 }, { x: 1.04, z: 1.72 }, { x: 1.42, z: 1.72 }, { x: 1.8, z: 1.72 }];
 export const DOORSTEP_Y = -0.4; // sidewalk height relative to the shop floor
 export const BOX_SIZE = 0.36;
+export const DOORWAY_Z = 1.1; // where you stand inside the shop to lean out and grab a doorstep box
 
 export function newId(state, prefix) {
   state.nextId = (state.nextId ?? 1) + 1;
@@ -27,6 +29,25 @@ export function boxSpot(i) {
 
 export function shopRoomId(state) {
   return (state.building.rooms.find((r) => r.type === 'shop') ?? state.building.rooms[0]).id;
+}
+
+/**
+ * Boxes fall into gaps: when a box leaves the bottom of a stack, the ones above it drop down a layer
+ * (docs/ISSUES.md: they used to float). Returns true if anything moved.
+ */
+export function settleBoxes(state) {
+  const n = BOX_SPOTS.length;
+  let moved = false, again = true;
+  while (again) {
+    again = false;
+    for (const b of state.boxes) {
+      if (b.spot < n) continue;
+      if (state.boxes.some((o) => o.roomId === b.roomId && o.spot === b.spot - n)) continue;
+      b.spot -= n;
+      moved = again = true;
+    }
+  }
+  return moved;
 }
 
 /** Put a box of items on the shop floor at the first free spot. */
@@ -48,21 +69,21 @@ export function findFixture(state, fixtureId) {
   return null;
 }
 
-/** Can she take another box? One in her hands, plus one more on the Stock Cart. */
-export function canCarryMore(state) {
-  const k = state.keeper;
-  return !k.carrying || (hasUpgrade(state, 'cart') && !k.spare);
+/** Can they take another box? One in their hands, plus one more on the Stock Cart. */
+export function canCarryMore(state, carrier = state.keeper) {
+  return !carrier.carrying || (hasUpgrade(state, 'cart') && !carrier.spare);
 }
 
-export function pickUpBox(state, boxId) {
-  const k = state.keeper;
+export function pickUpBox(state, boxId, carrier = state.keeper, by = 'keeper') {
+  const k = carrier;
   const i = state.boxes.findIndex((b) => b.id === boxId);
-  if (i < 0 || !canCarryMore(state)) return false;
+  if (i < 0 || !canCarryMore(state, k)) return false;
   const box = state.boxes.splice(i, 1)[0];
   if (k.carrying) k.spare = box;
   else k.carrying = box;
+  settleBoxes(state);
   events.emit('boxesChanged');
-  events.emit('boxPicked', { box, spare: k.spare === box });
+  events.emit('boxPicked', { box, spare: k.spare === box, by });
   return true;
 }
 
@@ -71,14 +92,14 @@ export function freeSlots(fixture) {
 }
 
 /** Unpack the carried box onto a shelf. Returns how many items were placed. */
-export function stockShelf(state, fixtureId) {
-  const k = state.keeper;
+export function stockShelf(state, fixtureId, carrier = state.keeper, by = 'keeper') {
+  const k = carrier;
   const found = findFixture(state, fixtureId);
   if (!k.carrying || !found?.fixture.slots) return 0;
   const { room, fixture } = found;
   const free = freeSlots(fixture);
   if (!free.length) {
-    events.emit('shelfFull', { fixtureId });
+    if (by === 'keeper') events.emit('shelfFull', { fixtureId });
     return 0;
   }
   let total = 0;
@@ -88,12 +109,12 @@ export function stockShelf(state, fixtureId) {
     for (const slot of slots) fixture.slots[slot] = b.itemId;
     b.qty -= slots.length;
     total += slots.length;
-    events.emit('stocked', { roomId: room.id, fixtureId, itemId: b.itemId, slots });
+    events.emit('stocked', { roomId: room.id, fixtureId, itemId: b.itemId, slots, by });
     if (b.qty > 0) break; // the shelf is full
-    // Empty: the box on the cart (if any) comes up into her hands and keeps filling the shelf.
+    // Empty: the box on the cart (if any) comes up into their hands and keeps filling the shelf.
     k.carrying = k.spare;
     k.spare = null;
-    events.emit('boxEmptied', { box: b });
+    events.emit('boxEmptied', { box: b, by });
   }
   return total;
 }

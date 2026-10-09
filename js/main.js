@@ -28,6 +28,7 @@ import { GREETER, SIDEWALK, groundAt, shopRoom, streetBounds } from './sim/route
 import { tickDay, twilightFor } from './sim/day.js';
 import { tickCustomers } from './sim/customers.js';
 import { tickHelpers } from './sim/helpers.js';
+import { tickStocker } from './sim/stocker.js';
 import { canCarryMore } from './sim/stock.js';
 import { UPGRADES, HELPERS } from './data/upgrades.js';
 import { separate } from './sim/crowd.js';
@@ -127,14 +128,14 @@ buildWorld();
 focusRoom(roomById(state.keeper.roomId), true);
 const keeperView = createKeeperView(state, roomOrigin);
 const boxesView = createBoxesView(state, roomOrigin);
-const shelvesView = createShelvesView(state, roomOrigin, () => keeperView.handPosition(), (p, step) => juice.itemLanded(p, step));
+const shelvesView = createShelvesView(state, roomOrigin, (by) => (by === 'stocker' ? helpersView.stockerHand() : keeperView.handPosition()), (p, step) => juice.itemLanded(p, step));
 const customersView = createCustomersView(state, roomOrigin);
 const checkoutView = createCheckoutView(state, roomOrigin);
 const dollhouseView = createDollhouseView(state, roomOrigin);
 const helpersView = createHelpersView(state, roomOrigin);
 const spotsView = createSpotsView(state, roomOrigin);
 const bubbles = createShopBubbles({ state, overlay, customersView, checkoutView, thumbs });
-const juice = createJuice({ audio, fx, overlay, keeperView, customersView, dollhouseView, checkoutView });
+const juice = createJuice({ audio, fx, overlay, keeperView, helpersView, customersView, dollhouseView, checkoutView });
 scene.add(keeperView.object, helpersView.group, spotsView.group, boxesView.group, shelvesView.group, customersView.group, checkoutView.group, dollhouseView.group);
 boxesView.rebuild();
 shelvesView.rebuild();
@@ -266,14 +267,16 @@ events.on('lunchDelivery', ({ delivered }) => {
   for (const id of delivered.discovered) toast(`✨ New in your Collection: ${ITEMS[id].name}`);
 });
 events.on('upgradeBought', ({ id }) => toast(`${UPGRADES[id].icon} ${UPGRADES[id].name}: yours!`));
-events.on('helperHired', ({ id }) => toast(`${HELPERS[id].name} joined your shop! 💖 She'll mind the register.`));
+const HELPER_JOBS = { cashier: "She'll mind the register.", stocker: "She'll keep the shelves stocked." };
+events.on('helperHired', ({ id }) => toast(`${HELPERS[id].name} joined your shop! 💖 ${HELPER_JOBS[id] ?? ''}`));
 events.on('dayStarted', ({ day, delivered, rescued }) => {
   const boxes = delivered.boxes ? ` Pip delivered ${delivered.boxes} box${delivered.boxes > 1 ? 'es' : ''} 📦` : '';
   toast(`Good morning! Day ${day}.${boxes}`);
   if (rescued) toast(`Pip left you a free box of ${ITEMS[rescued].name}, just because 🎁`);
   for (const id of delivered.discovered) toast(`✨ New in your Collection: ${ITEMS[id].name}`);
 });
-events.on('boxPicked', ({ spare }) => {
+events.on('boxPicked', ({ spare, by }) => {
+  if (by !== 'keeper') return; // Bea needs no instructions
   if (spare) toast('Two boxes on the cart! Tap a shelf to unpack 🛒');
   else if (canCarryMore(state) && state.boxes.length) toast('Grab another box for the cart, or tap a shelf to unpack!');
   else toast('Now tap a shelf to unpack it!');
@@ -406,6 +409,7 @@ startLoop({
     customersView.beforeTick();
     tickKeeper(state, dt);
     tickHelpers(state, dt);
+    tickStocker(state, navs, dt);
     tickCustomers(state, navs, dt);
     separate(state, navs);
     tickDay(state, dt);

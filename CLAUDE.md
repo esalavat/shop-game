@@ -52,6 +52,14 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
     and opens offline (`docs/TECH.md` §9.3).
   - Still to hear from the user: does the home-screen install work on the Pixel, and does the fps stay smooth?
 
+- **Bea the stocker, built 2026-10-09, waiting for the user's feedback** (GDD v0.18 #51, #53): 🪙 200 in
+  the Grow sheet. She fetches doorstep boxes (wished-for items first, then items not on the shelves) and
+  unpacks them onto the emptiest shelf, in the morning, open hours and evening; never takes the box your
+  shopkeeper is heading for; waits by the right wall. Code: `js/sim/stocker.js`, drawn in
+  `js/render/views/helpers.js`. Stock events carry `by: 'keeper' | 'stocker'`. Save version 11.
+- **Midday mark** on the day bar for Lunchtime Delivery (#52), done.
+- **Fixed:** boxes floating when you take one from the bottom of a stack (`settleBoxes`, docs/ISSUES.md).
+
 **Next:** the user's M8 feedback, then pick from "Not scheduled yet" below or the GDD §17 "Next" list.
 The MVP list in GDD §17 is complete.
 
@@ -60,7 +68,7 @@ The MVP list in GDD §17 is complete.
 - Show the sell price and profit in the order book (§18 #4).
 - Demand-based pricing vs fixed prices (§18 #5).
 - Background music (a music-box loop by time of day, GDD §15).
-- Stocker helper (Bea) who carries and unpacks delivery boxes (GDD #51, proposal in §10).
+- An Orderer helper who re-orders what sells (GDD §10, not decided).
 
 ## How the code is organized
 

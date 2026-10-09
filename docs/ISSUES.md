@@ -10,6 +10,14 @@ _(none)_
 
 ## Fixed
 
+### Boxes float in the air when you take one from the bottom of a stack (2026-10-09, user) — fixed
+- With more than four boxes on the doorstep they stack. Tapping a box in the bottom row picks it up, but the
+  box above it stays where it was, floating.
+- Cause: a box's place is a fixed spot number (`BOX_SPOTS` in `js/sim/stock.js`; spot 4 sits on top of
+  spot 0), and nothing moved the upper box down when the one below left.
+- **Fix:** `settleBoxes()` in `js/sim/stock.js` drops boxes into the gap after any pickup (by the shopkeeper or
+  Bea), and on load for older saves. The boxes view animates the drop.
+
 ### Bonus-spot rings and the street edge flickered on the phone (2026-10-09, user video) — fixed
 - The greeter ring was drawn at exactly the sidewalk's top height, and the sidewalk and road overlapped by a thin
   strip at the same height, so both z-fought (flickered, looked dashed) on the Pixel.
