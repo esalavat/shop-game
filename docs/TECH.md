@@ -359,6 +359,50 @@ they share `localStorage`, and the test build often has a newer save version tha
 
 Each milestone ends with a push so it's playable on your phone.
 
+**After the MVP** (GDD §17 "Next"; progress also in CLAUDE.md Status):
+
+| Feature | Status |
+|---|---|
+| Public game from releases, test build at `/dev/`, save safety (GDD #56, §9) | ✅ |
+| First-day guide and morning Open-shop nudge (#57) | ✅ built, on /dev/ |
+| Theme rooms on the ground floor + Sorting Smarts (#58 step 1, #60) | ✅ built, on /dev/ (user: works, signs look good) |
+| Crowd deadlock fix (customers stuck behind the line) | ✅ on /dev/ |
+| **Stairwell and upstairs rooms (#58 step 2)** | ⏭ next; plan in §11.1 |
+| More items, color variants, catalog pages, Collection bonus and page rewards (#59) | planned after upstairs |
+
+### 11.1 Plan: Stairwell and upstairs (#58 step 2) — not started
+Worked out at the end of the 2026-10-09 session; nothing is coded yet. Design is GDD #58 / §9.1.
+- **Stairwell = two rooms**, type `stairs`, at `(col, 0)` and `(col, 1)`, built together for 🪙 350 at a ground-floor
+  ＋ spot (after the first theme room). Each has one shelf on the right of the back wall (x ≈ +0.85). A `stairs`
+  fixture (not walkable, ~1.2 × 1.2) in the back-left corner of the ground part, and a `stairhole` fixture (same
+  footprint, with a railing) upstairs, so both walk grids keep people off it. The upper slab needs an L-shaped floor
+  (and the ground part an L-shaped ceiling) leaving the corner open; the room's floor plane too.
+- **Upstairs ＋ spots** (`roomSpots`): floor 1 above any ground room, next to (col ± 1) the stairwell top or another
+  upstairs room. `addRoom` already refuses floating rooms. One upstairs floor for now.
+- **Doorways:** the side wall between two adjacent upstairs rooms gets a door gap (≈ 0.7 wide, ~1.9 tall, at
+  z ≈ 0.2). Ground rooms still connect only along the sidewalk. Upstairs rooms get a low railing along the open front.
+- **Roof:** `createBuilding` assumes a rectangular footprint. Make it stepped: one prism roof per run of adjacent
+  columns with the same top height (lower runs get their own roof against the taller wall); the sign and chimney go
+  on the tallest run. `layoutRooms` height / `roofTop` feed the camera limits and `lighting.fitTo`.
+- **Routes in legs** (`sim/route.js`): a route becomes a list of legs, each `{ path, frameRoomId, fromOffset,
+  arriveRoomId, arriveOffset, enter? }`; the agent keeps the rest in `agent.legs`. Ground legs use the shop frame
+  (as now); upstairs legs use the starting room's frame with x offsets `(col - startCol) * (W + T)`, through the
+  doorways (nav path to the side door point, straight through, nav path on). Ground → upstairs = ground leg to the
+  stair foot (≈ (-0.35, -0.7) in the stairwell), a **climb leg** in the ground stairwell frame (one turn around the
+  pole, centre ≈ (-1.1, -0.7), radius ≈ 0.45, with `y` rising from 0 to `H + T`), then `enter: { roomId: top, y: 0 }`
+  and an upstairs leg. Down is the reverse (switch to the ground stairwell frame at `y = H + T` first).
+- **Height:** path points may carry `y`; `stepAlong` (`sim/walker.js`) interpolates `agent.y` when they do. Views
+  (keeper, customers, helpers) add `agent.y ?? 0` to the height and keep the "switched rooms this tick: don't slide"
+  reset. `keeper` / `stocker` gain `y` and `legs` → **save v15** (migration + `node scripts/save-fixture.js`).
+- **Callers:** where a path ends (`tickKeeper`, `tickStocker`, `tickCustomers`), first try `continueRoute(agent)`
+  (starts the next leg; keep walking), and only then treat it as arrived (`finishRoute`, tasks, states).
+  `settleRoute` (re-planning mid-walk) must also handle someone on the stairs or upstairs.
+- **Who goes up:** customers via `roomWith` (any selling room, so upstairs rooms count), Bea via `shelfFor`, the
+  shopkeeper by tapping (first tap on another room focuses it, as now). Checkout stays at the shop counter downstairs.
+- **Tests:** building (spots, stairwell pair, upstairs adjacency), routes up and down and across doorways, a customer
+  buying upstairs and paying downstairs, Bea stocking upstairs, and the busy-day test (`tests/busyday.test.js`) with
+  an upstairs room. Run a stress check (many seeded days) before pushing.
+
 ## 12. Risks
 
 | Risk | Mitigation |

@@ -83,13 +83,16 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   🪙 250, 400, 600…). Three shelves each and a theme sign; matching items earn +25% at the register. Customers walk
   to the room with what they want and back to the shop counter; Bea stocks every room; **Sorting Smarts** (🪙 120)
   sends boxes to their theme room. Save version 14. On `/dev/` only.
-- **Planned next, in order:** (#58 step 2) the **Stairwell and upstairs rooms**; then (#59) **more items** (toward
+- **Planned next, in order:** (#58 step 2) the **Stairwell and upstairs rooms** (the user asked to start it; not
+  coded yet; technical plan in `docs/TECH.md` §11.1); then (#59) **more items** (toward
   100+, color variants, catalog pages that open as you collect), the **Collection bonus** and page rewards (coins,
   confetti, a shopkeeper style). Later: more stockers (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone
   unlocks (§18 #6). Open issue: delivery boxes stack too high (docs/ISSUES.md, delivery-bin idea).
 
-**Next:** the user's M8 feedback, then pick from "Not scheduled yet" below or the GDD §17 "Next" list.
-The MVP list in GDD §17 is complete.
+**Next:** build the Stairwell and upstairs rooms (`docs/TECH.md` §11.1), push to `/dev/` for the user to try.
+Still waiting on: M8 feedback (home-screen install, fps on the Pixel), Bea and first-day-guide feedback. Nothing new
+has been released since **v2026.10.9.2** (first-day guide); theme rooms and the crowd fix are on `/dev/` only, and
+releasing them changes the save version (v13 → v14). The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).
