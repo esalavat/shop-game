@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.7 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.8 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -31,6 +31,8 @@
 | 22 | Evening is **purple twilight**, not orange/golden | v0.6 |
 | 23 | The Dream Dollhouse is **unlocked when the shop first expands**: it gets its own **Window Display room** next to the shop. The starting shop is just counter + two shelves | v0.7 |
 | 24 | Customers **walk in along the sidewalk** from either side and leave the same way, fading out near the end of the road | v0.7 |
+| 25 | **Close early any time:** the open-hours clock is a Close button (tap twice to confirm). When sold out it becomes a one-tap "Close early" with a nudge. Never closes automatically (customers at bare shelves still leave useful wish notes) | v0.8 |
+| 26 | Open hours last **3 minutes**, evening **25 seconds** (tunable in `js/sim/day.js`) | v0.8 |
 
 ## 1. Pitch
 
@@ -171,6 +173,7 @@ Your very own dollhouse, displayed in the shop's front window.
 | **Evening** | Purple twilight; last customers wave goodbye; lamps glow softly. | Winding down |
 | **Close** | Day summary: coins, happy customers, wish notes, Sparkle. Story moments happen here. Then order for tomorrow, buy upgrades, and decorate, all with no timer. | None |
 
+- **Close early (decided v0.8):** the clock button closes the shop any time (two taps). When sold out, one tap and a "Sold out! 🎉" nudge. Closing early goes to evening, so the last customers still finish.
 - Days only advance when you play.
 - **Offline earnings:** if you have helpers, they keep the shop open a little while you're away, at a reduced rate capped at a few hours. When you return: "While you were away, Mia sold 9 things and found a wish note!"
 - 💡 Weekends bring more visitors; some special days only happen on certain days.
@@ -291,20 +294,20 @@ Never: ads, loot boxes, energy timers, or pay-to-skip.
 ### MVP: first playable on GitHub Pages
 Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel good together.
 
-- [ ] One-room shop (dollhouse cutaway), portrait, fixed camera
-- [ ] Shopkeeper who walks to what you tap
-- [ ] **Day cycle:** morning → open → evening → close summary
-- [ ] **Ordering:** order book with ~6 items; boxes arrive next morning
-- [ ] **Stocking:** open boxes, place items on 3–4 shelves
-- [ ] **Checkout:** scan + ring up, with tips
-- [ ] **Collection:** items unlock when first received
+- [x] One-room shop (dollhouse cutaway), portrait, fixed camera
+- [x] Shopkeeper who walks to what you tap
+- [x] **Day cycle:** morning → open → evening → close summary
+- [x] **Ordering:** order book with ~6 items; boxes arrive next morning
+- [x] **Stocking:** carry boxes from the doorstep, place items on 2 shelves
+- [x] **Checkout:** scan + ring up, with tips
+- [ ] **Collection:** items unlock when first received (unlocking is tracked; the album UI isn't built)
 - [ ] **First expansion → Window Display room with Dream Dollhouse v0:** one room with ~4 fixed slots; Sparkle increases visitors
-- [ ] Customers browse, buy, and leave wish notes
+- [x] Customers browse, buy, and leave wish notes
 - [ ] Hire one cashier helper
 - [ ] Simple shopkeeper creator (a few hairstyles, colors, outfits)
 - [ ] Coins, a few upgrades, local save
-- [ ] Toon-shaded low-poly placeholder art in the pastel palette
-- [ ] Playable on a phone browser
+- [x] Toon-shaded low-poly placeholder art in the pastel palette
+- [x] Playable on a phone browser
 
 ### Next
 - Building grid expansion (X and Y), room types, pan/zoom
@@ -326,3 +329,4 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 ## 18. Open Questions
 
 1. Monetization model for the store builds (§16), which can wait until then.
+2. **Early economy is too tight** (playtest, Day 1): with 50 coins and 18 shelf slots you can sell out in the first minute of a 3-minute day. Options for the upgrades milestone: bigger or extra shelves, a lunchtime delivery, more starting coins or stock, cheaper bulk boxes, slower browsing.
