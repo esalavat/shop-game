@@ -29,7 +29,7 @@ addCoins(s, 2000);
 buildExpansion(s);
 const spot = roomSpots(s).at(-1);
 buildThemeRoom(s, 'tea', spot.col, spot.floor); // a theme room (GDD #58), with a box of tea sets on its shelf
-buildStairwell(s, roomSpots(s, 'stairs').at(-1).col); // the Stairwell (GDD #58), and a theme room upstairs
+buildStairwell(s); // the Stairwell (GDD #58), and a theme room upstairs
 const up = roomSpots(s).find((p) => p.floor === 1);
 if (up) buildThemeRoom(s, 'fairy', up.col, 1);
 for (const id of Object.keys(UPGRADES)) buyUpgrade(s, id);

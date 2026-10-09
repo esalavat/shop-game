@@ -56,7 +56,7 @@ export function createDebug({ state, renderer, quality, onViewAll, onReset, onCo
     },
     up: () => {
       // The Stairwell at the right end first, then theme rooms upstairs beside it.
-      if (!hasStairwell(state)) return addStairwell(state, Math.max(...cols()) + 1);
+      if (!hasStairwell(state)) return addStairwell(state);
       const spot = roomSpots(state).find((p) => p.floor === 1);
       const type = themesLeft(state)[0];
       if (spot && type) addRoom(state, type, spot.col, 1);

@@ -1,7 +1,7 @@
 // Building grid actions. Rooms sit on a (col, floor) grid that grows sideways and upward.
 
 import { events } from '../core/events.js';
-import { ROOM_TYPES, THEME_ROOMS, THEME_ROOM_COSTS, STAIRWELL_COST, TOP_FLOOR } from '../data/rooms.js';
+import { ROOM_TYPES, ROOM_SIZE, THEME_ROOMS, THEME_ROOM_COSTS, STAIRWELL_COST, TOP_FLOOR } from '../data/rooms.js';
 import { FIXTURES } from '../data/fixtures.js';
 import { EXPANSIONS } from '../data/dollhouse.js';
 import { addCoins } from './economy.js';
@@ -75,14 +75,13 @@ export function themeRoomCost(state) {
 
 /**
  * Where a new room can go: either end of the ground floor, and once the Stairwell is built, upstairs
- * on top of a ground room next to the Stairwell's top or another upstairs room (GDD #58). The
- * Stairwell itself only goes on the ground floor.
+ * on top of a ground room (never floating) next to the Stairwell's top or another upstairs room (GDD #58).
  */
-export function roomSpots(state, type = null) {
+export function roomSpots(state) {
   const rooms = state.building.rooms;
   const cols = rooms.filter((r) => r.floor === 0).map((r) => r.col);
   const spots = [{ col: Math.min(...cols) - 1, floor: 0 }, { col: Math.max(...cols) + 1, floor: 0 }];
-  if (type === 'stairs' || !hasStairwell(state)) return spots;
+  if (!hasStairwell(state)) return spots;
   for (const r of rooms) {
     if (r.floor !== 0 || hasRoom(state, r.col, 1)) continue;
     if (hasRoom(state, r.col - 1, 1) || hasRoom(state, r.col + 1, 1)) spots.push({ col: r.col, floor: 1 });
@@ -94,9 +93,43 @@ export const hasStairwell = (state) => state.building.rooms.some((r) => r.type =
 /** The Stairwell opens up once a theme room is built; there's only one. */
 export const canBuildStairwell = (state) => !hasStairwell(state) && state.building.rooms.some(isThemeRoom);
 
-/** Both halves of the Stairwell at a ground column (no cost; buildStairwell charges for it). */
-export function addStairwell(state, col) {
-  if (hasRoom(state, col, 0) || hasRoom(state, col, 1)) return null;
+/**
+ * Make room for a new column at `col`: every room from there on moves one place to the right, and
+ * anyone walking between rooms keeps going to the same place (their paths are in some room's
+ * coordinates, so points past the gap shift along with the rooms). Ground floor only (there's
+ * nothing upstairs before the Stairwell).
+ */
+function insertColumn(state, col) {
+  const S = ROOM_SIZE.W + ROOM_SIZE.T;
+  const oldCol = new Map(state.building.rooms.map((r) => [r.id, r.col]));
+  for (const r of state.building.rooms) if (r.col >= col) r.col += 1;
+  const gap = (col - 0.5) * S; // the wall the new column opens up, in building x
+  const move = (p, frame) => {
+    const w = p.x + oldCol.get(frame) * S;
+    if (w > gap) p.x += S;
+    p.x -= (state.building.rooms.find((r) => r.id === frame).col - oldCol.get(frame)) * S;
+  };
+  const people = [state.keeper, state.stocker, state.cashier, ...(state.customers ?? [])].filter(Boolean);
+  for (const a of people) {
+    if (!oldCol.has(a.roomId)) continue;
+    if (a.arriveRoom || a.legs?.length) { // walking in another room's coordinates
+      move(a, a.roomId);
+      for (const p of a.path) move(p, a.roomId);
+      for (const l of a.legs ?? []) for (const p of l.path) move(p, l.frame);
+      if (a.arriveRoom) {
+        const arrive = state.building.rooms.find((r) => r.id === a.arriveRoom.roomId);
+        const frame = state.building.rooms.find((r) => r.id === a.roomId);
+        a.arriveRoom.offset = (arrive.col - frame.col) * S;
+      }
+    }
+  }
+}
+
+/** Both halves of the Stairwell, right next to the shop (no cost; buildStairwell charges for it). */
+export function addStairwell(state) {
+  const shop = state.building.rooms.find((r) => r.type === 'shop') ?? state.building.rooms[0];
+  const col = shop.col + 1;
+  insertColumn(state, col);
   const bottom = makeRoom(newId(state, 'r'), 'stairs', col, 0);
   const top = makeRoom(newId(state, 'r'), 'landing', col, 1);
   state.building.rooms.push(bottom, top);
@@ -104,12 +137,13 @@ export function addStairwell(state, col) {
   return bottom;
 }
 
-/** Build the Stairwell at a ground-floor + spot (GDD #58). Returns its ground room, or null. */
-export function buildStairwell(state, col) {
+/**
+ * Build the Stairwell (GDD #58, #64): always right of the shop. The Window Display and any rooms on
+ * that side move over one place. Returns its ground room, or null.
+ */
+export function buildStairwell(state) {
   if (!canBuildStairwell(state) || state.coins < STAIRWELL_COST) return null;
-  if (!roomSpots(state, 'stairs').some((p) => p.col === col && p.floor === 0)) return null;
-  const room = addStairwell(state, col);
-  if (!room) return null;
+  const room = addStairwell(state);
   addCoins(state, -STAIRWELL_COST);
   events.emit('expanded', { room });
   return room;

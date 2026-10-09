@@ -20,51 +20,69 @@ import { ITEMS } from '../js/data/items.js';
 
 const navsFor = (s) => new Map(s.building.rooms.map((r) => [r.id, buildNav(r)]));
 
-/** Shop, Window Display, Tea Time on the left, the Stairwell on the right, and Fairy Garden upstairs. */
+/** Tea Time, the shop, the Stairwell, the Window Display; upstairs, Fairy Garden over the shop (and more to the left). */
 function bigShop({ upstairs = ['fairy'] } = {}) {
   const s = createState(0);
   s.coins = 1e6;
   buildExpansion(s);
   buildThemeRoom(s, 'tea', roomSpots(s)[0].col, 0);
-  const stairs = buildStairwell(s, roomSpots(s, 'stairs').at(-1).col);
-  const ups = upstairs.map((t) => {
-    const spot = roomSpots(s).find((p) => p.floor === 1);
-    return buildThemeRoom(s, t, spot.col, 1);
-  });
+  const stairs = buildStairwell(s);
+  const shopCol = s.building.rooms[0].col;
+  const ups = upstairs.map((t, i) => buildThemeRoom(s, t, shopCol - i, 1));
   return { s, stairs, top: stairwell(s).top, ups, navs: navsFor(s) };
 }
 
 const runKeeper = (s, seconds = 40) => { for (let t = 0; t < seconds && (t === 0 || s.keeper.path.length); t += 0.1) tickKeeper(s, 0.1); };
 
-test('the Stairwell comes after a theme room, costs 350, and is two rooms, one above the other', () => {
+test('the Stairwell comes after a theme room, costs 350, and always goes right next to the shop', () => {
   const s = createState(0);
   s.coins = 1e6;
-  buildExpansion(s);
+  const display = buildExpansion(s);
   assert.ok(!canBuildStairwell(s));
-  assert.equal(buildStairwell(s, roomSpots(s).at(-1).col), null);
-  buildThemeRoom(s, 'tea', roomSpots(s)[0].col, 0);
+  assert.equal(buildStairwell(s), null);
+  const tea = buildThemeRoom(s, 'tea', roomSpots(s).at(-1).col, 0); // right of the Window Display
   assert.ok(canBuildStairwell(s));
   assert.ok(!roomSpots(s).some((p) => p.floor === 1), 'no upstairs spots before the stairs');
   const coins = s.coins;
-  const col = roomSpots(s, 'stairs').at(-1).col;
-  const bottom = buildStairwell(s, col);
+  const bottom = buildStairwell(s);
   assert.equal(coins - s.coins, STAIRWELL_COST);
+  assert.equal(bottom.col, 1);
   assert.equal(bottom.floor, 0);
-  assert.equal(stairwell(s).top.col, col);
+  assert.equal(stairwell(s).top.col, 1);
   assert.equal(stairwell(s).top.floor, 1);
+  assert.equal(display.col, 2, 'the Window Display moves over one place');
+  assert.equal(tea.col, 3);
+  assert.equal(s.building.rooms[0].col, 0, 'the shop stays put');
   assert.ok(!canBuildStairwell(s), 'only one');
-  assert.equal(buildStairwell(s, roomSpots(s, 'stairs')[0].col), null);
+  assert.equal(buildStairwell(s), null);
 });
 
-test('upstairs + spots sit over ground rooms, next to the Stairwell top or another upstairs room', () => {
+test('someone walking to a room when the Stairwell goes in still gets there', () => {
+  const s = createState(0);
+  s.coins = 1e6;
+  const display = buildExpansion(s);
+  buildThemeRoom(s, 'tea', roomSpots(s)[0].col, 0);
+  let navs = navsFor(s);
+  assert.ok(walkTo(s, navs, { roomId: display.id, x: 0.9, z: -0.5 }));
+  for (let i = 0; i < 40; i++) tickKeeper(s, 0.1); // out on the sidewalk
+  assert.ok(s.keeper.arriveRoom);
+  buildStairwell(s);
+  navs = navsFor(s);
+  runKeeper(s, 30);
+  assert.equal(s.keeper.roomId, display.id);
+  assert.ok(Math.hypot(s.keeper.x - 0.9, s.keeper.z + 0.5) < 1e-6);
+});
+
+test('upstairs + spots sit on top of ground rooms, next to the Stairwell top or another upstairs room', () => {
   const { s, top } = bigShop({ upstairs: [] });
-  const up = roomSpots(s).filter((p) => p.floor === 1);
-  assert.deepEqual(up.map((p) => p.col).sort(), [top.col - 1]); // the stairs are at the right end
-  const fairy = buildThemeRoom(s, 'fairy', top.col - 1, 1);
-  assert.ok(fairy);
-  assert.deepEqual(roomSpots(s).filter((p) => p.floor === 1).map((p) => p.col), [top.col - 2]);
-  assert.equal(addRoom(s, 'dolls', top.col + 5, 1), null, 'nothing floats');
-  assert.equal(addRoom(s, 'dolls', top.col - 1, 2), null, 'one upstairs floor for now');
+  const up = () => roomSpots(s).filter((p) => p.floor === 1).map((p) => p.col).sort((a, b) => a - b);
+  assert.deepEqual(up(), [top.col - 1, top.col + 1]); // over the shop and the Window Display
+  assert.ok(buildThemeRoom(s, 'fairy', top.col - 1, 1));
+  assert.deepEqual(up(), [top.col - 2, top.col + 1]); // over Tea Time now too
+  assert.ok(buildThemeRoom(s, 'dolls', top.col - 2, 1));
+  assert.deepEqual(up(), [top.col + 1], 'nothing past the end of the ground floor');
+  assert.equal(addRoom(s, 'bedroom', top.col - 3, 1), null, 'nothing floats');
+  assert.equal(addRoom(s, 'bedroom', top.col - 1, 2), null, 'one upstairs floor for now');
 });
 
 test('she walks from the shop up the spiral stairs and through a doorway into an upstairs room', () => {

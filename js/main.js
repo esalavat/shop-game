@@ -38,7 +38,7 @@ import { checkoutTap, keeperAtCounter } from './sim/checkout.js';
 import { displayRoom } from './sim/collection.js';
 import { ITEMS } from './data/items.js';
 import { ROOM_TYPES } from './data/rooms.js';
-import { buildThemeRoom, buildStairwell, roomSpots } from './sim/building.js';
+import { buildThemeRoom, roomSpots } from './sim/building.js';
 import { attachGestures } from './input/touch.js';
 import { createHud } from './ui/hud.js';
 import { createOrderBook } from './ui/orderbook.js';
@@ -187,7 +187,7 @@ const decorate = createDecorate(state, thumbs, {
 const grow = createGrow(state, { onDecorate: () => enterDecorate(), onPlaceRoom: (type) => startPlacing(type) });
 
 // ---------------------------------------------------------------------------
-// Building a theme room or the Stairwell (GDD #58): after picking one in the Grow sheet, tap a glowing + spot.
+// Building a theme room (GDD #58): after picking a theme in the Grow sheet, tap a glowing + spot.
 // ---------------------------------------------------------------------------
 let placing = null; // the room type being placed
 const placeBanner = document.getElementById('place-banner');
@@ -196,11 +196,11 @@ const shownSpots = new Set();
 function startPlacing(type) {
   placing = type;
   const t = ROOM_TYPES[type];
-  placeBanner.querySelector('span').textContent = type === 'stairs' ? `Tap a ＋ to build your ${t.icon} ${t.name}` : `Tap a ＋ to build your ${t.icon} ${t.name} room`;
+  placeBanner.querySelector('span').textContent = `Tap a ＋ to build your ${t.icon} ${t.name} room`;
   placeBanner.hidden = false;
   // Zoom out far enough to see the building and every + spot beside it.
   focusedRoomId = null;
-  const L = world.building.layout, xs = roomSpots(state, type).map((p) => L.roomX(p.col));
+  const L = world.building.layout, xs = roomSpots(state).map((p) => L.roomX(p.col));
   const left = Math.min(-L.width / 2, ...xs.map((x) => x - ROOM.W / 2)), right = Math.max(L.width / 2, ...xs.map((x) => x + ROOM.W / 2));
   rig.frame((left + right) / 2, (L.roofTop - 0.8) / 2, right - left + 0.8, L.roofTop + 1.4);
 }
@@ -217,12 +217,11 @@ overlay.root.addEventListener('click', (e) => {
   const [col, floor] = spot.dataset.spot.split(',').map(Number);
   const type = placing;
   stopPlacing();
-  if (type === 'stairs') buildStairwell(state, col);
-  else buildThemeRoom(state, type, col, floor);
+  buildThemeRoom(state, type, col, floor);
 });
 
 function updatePlaceSpots() {
-  const list = placing ? roomSpots(state, placing) : [];
+  const list = placing ? roomSpots(state) : [];
   const keep = new Set(list.map((p) => `${p.col},${p.floor}`));
   for (const key of shownSpots) if (!keep.has(key)) { overlay.removeBubble(`place-${key}`); shownSpots.delete(key); }
   for (const p of list) {

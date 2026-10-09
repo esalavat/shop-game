@@ -95,15 +95,17 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   away. **Close now** (#63, v0.26): in the evening the day button closes on the spot (two taps); customers put their
   things back on the shelves and go home (`sendEveryoneHome` in `sim/customers.js`, `closeNow` in `sim/day.js`).
   On `/dev/` only.
-- **Proposed, waiting on the user's answers:** rethink the building (GDD §18 #8): a fixed Stairwell between the shop
-  and the Window Display, floors growing left and right, unlimited floors, generic shelf rooms instead of theme
-  rooms, room styling later via a decoration shop. Four open questions listed there; don't build until answered.
+- **Stairwell spot fixed (#64, v0.27):** buying it builds it right next to the shop; the Window Display and rooms on
+  that side move over one place (`insertColumn` in `sim/building.js` also shifts anyone mid-walk). Saves on `/dev/`
+  that already placed it elsewhere keep it where it is.
+- **Decided, building next (GDD §18 #8):** generic shelf rooms instead of theme rooms, more floors (each staircase
+  costs more), rooms priced by distance from the Stairwell; room styling later via a decoration shop.
 - **Planned next, in order:** (#59) **more items** (toward 100+, color variants, catalog pages that open as you
   collect), the **Collection bonus** and page rewards (coins, confetti, a shopkeeper style). Later: more stockers
   (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issue: delivery boxes stack too
   high (delivery-bin idea, docs/ISSUES.md).
 
-**Next:** get the user's answers on the building rethink (GDD §18 #8) and build it; hear back about quick evenings
+**Next:** build the building rethink (GDD §18 #8); hear back about quick evenings
 and Close now on `/dev/`; then #59 (more items). Still waiting on: M8 feedback (home-screen install, fps on the Pixel), Bea and
 first-day-guide feedback. Nothing new has been released since **v2026.10.9.2** (first-day guide); theme rooms, the
 crowd fix and the Stairwell are on `/dev/` only, and releasing them changes the save version (v13 → v15). The MVP list
