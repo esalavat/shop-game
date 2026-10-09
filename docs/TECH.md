@@ -175,6 +175,9 @@ docs/                   # GDD, tech plan
   (`goToQueueSpot` re-checks their place in line on arrival). `customer.bonus` collects the theme bonus
   (`themeBonus`, `THEME_BONUS` of the price, rounded up) and `completeSale` adds it. Bea's `shelfFor` picks the emptiest
   shelf in any room, or the matching theme room with `upgrades.sorting`.
+- **Crowds never deadlock** (`sim/crowd.js`): walkers who make no progress toward their next waypoint for 8 ticks
+  slip through people for 15 ticks (progress kept in a WeakMap, nothing saved). Customers also give up after
+  `CUSTOMER.patience` seconds of shopping. `tests/busyday.test.js` replays full busy days and requires them to close.
 - **Placement mode** (`main.js`): the Grow sheet's theme buttons call `startPlacing(type)`, which zooms out to show
   the + spots (overlay bubbles with class `place`, the only tappable ones) and a banner with Cancel.
 - Bonuses: `keeperShowingOff()` (in the Window Display) raises `peekChance` / `peekWantChance` (`SPARKLE.keeper*`).

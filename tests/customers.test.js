@@ -115,3 +115,16 @@ test('customers are not saved; they simply walk in again after a reload', () => 
   assert.equal(loaded.checkout, null);
   assert.ok(!JSON.parse(store.get('mdds_save')).customers);
 });
+
+test('a customer who has shopped for far too long gives up and pays for what they have', () => {
+  const { s, navs, shelves } = setup();
+  const rand = rng(11);
+  const c = spawnCustomer(s, rand);
+  c.wants = ['doll'];
+  c.basket = ['chair'];
+  Object.assign(c, { state: 'browsing', timer: 1e9, path: [], arriveRoom: null, x: 0, z: -0.44, age: 1e4 });
+  tickCustomers(s, navs, 0.1, rand);
+  assert.equal(c.wants.length, 0);
+  assert.ok(['toQueue', 'queued'].includes(c.state));
+  assert.ok(s.queue.includes(c.id));
+});

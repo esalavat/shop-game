@@ -18,6 +18,21 @@ Design questions (not bugs) belong in [GDD.md](GDD.md) §18.
 
 ## Fixed
 
+### Customers stuck at the shelves; the shop could never close (2026-10-09, user, Day 9 with Tea Time) — fixed
+- Customers bunched up at two shelves (in Tea Time and the shop) and never moved, so the evening never ended
+  (closing waits for everyone to leave). Reloading the page clears it (customers aren't saved).
+- **Cause:** the people at the shelves were waiting for a place in line (`waitingQueue`). The line itself was
+  deadlocked: a customer coming back from a theme room joins the line before arriving, and their walk to their spot
+  passed right beside someone already standing in line. `sim/crowd.js` pushed the walker back every tick (people
+  standing are never pushed), so they never arrived, the front of the line never reached the counter, and Mia
+  could never ring anyone up. More rooms meant more customers and more walking past the line, so it showed up with
+  theme rooms; it could happen before too.
+- **Fix:** `separate()` tracks whether each walker is getting closer to their next waypoint; after 8 ticks without
+  progress they slip through people for 15 ticks. Plus a backstop: a customer still shopping after
+  `CUSTOMER.patience` (150 s) gives up on the rest of their list and pays (or leaves). `tests/busyday.test.js`
+  replays a day that used to freeze. A scratch stress run (75 busy days, two theme rooms, Mia and Bea) went from
+  50 stuck runs to none.
+
 ### Boxes float in the air when you take one from the bottom of a stack (2026-10-09, user) — fixed
 - With more than four boxes on the doorstep they stack. Tapping a box in the bottom row picks it up, but the
   box above it stays where it was, floating.
