@@ -6,7 +6,7 @@ import { createKeeper } from './keeper.js';
 import { dropBox } from './stock.js';
 import { emptyStats } from './day.js';
 
-export const STATE_VERSION = 11;
+export const STATE_VERSION = 12;
 
 /** Live-only fields: never saved, reset on every load (customers just walk in again). */
 export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer', 'cashier'];
@@ -47,8 +47,8 @@ export function createState(now = Date.now()) {
     collection: {},
     dollhouse: { slots: {} }, // slotId -> itemId (data/dollhouse.js); on show once the Window Display is built
     wishes: [],
-    // Her look (the creator, ui/creator.js); `created` is false until the player has seen the creator.
-    shopkeeper: { hair: 'bun', hairColor: '#c2563a', skin: '#ffd9c2', outfit: '#9fe0c8', accessory: 'none', created: false },
+    // The shopkeeper's look, girl or boy (the creator, ui/creator.js); `created` is false until the player has seen the creator.
+    shopkeeper: { body: 'girl', hair: 'bun', hairColor: '#c2563a', skin: '#ffd9c2', outfit: '#9fe0c8', accessory: 'none', created: false },
     upgrades: {}, // id -> true (data/upgrades.js)
     helpers: {},  // id -> true
     stocker: null, // Bea, once hired (sim/stocker.js); saved, so boxes in her hands are never lost

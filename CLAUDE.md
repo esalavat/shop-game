@@ -59,13 +59,15 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   `js/render/views/helpers.js`. Stock events carry `by: 'keeper' | 'stocker'`. Save version 11.
 - **Midday mark** on the day bar for Lunchtime Delivery (#52), done.
 - **Order book** cards show the sell price per item and a mint "+🪙 12 profit" tag for the box (#54), done.
+- **Boy or girl shopkeeper** (#43, #55), done: the creator's first row; boys' hair short / spiky / curly /
+  swoop and a bow tie or cap (`CREATOR` in `js/data/customers.js`, drawn in `js/render/models/character.js`).
+  `shopkeeper.body`, save version 12.
 - **Fixed:** boxes floating when you take one from the bottom of a stack (`settleBoxes`, docs/ISSUES.md).
 
 **Next:** the user's M8 feedback, then pick from "Not scheduled yet" below or the GDD §17 "Next" list.
 The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
-- Boy or girl shopkeeper choice in the creator (#43).
 - Demand-based pricing vs fixed prices (§18 #5).
 - Background music (a music-box loop by time of day, GDD §15).
 - An Orderer helper who re-orders what sells (GDD §10, not decided).

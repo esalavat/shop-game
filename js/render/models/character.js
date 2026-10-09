@@ -1,12 +1,13 @@
 // Chunky bean-shaped characters: big head, rosy cheeks, simple hair styles, and an optional
-// accessory (bow, glasses, or hat).
+// accessory. Girls' hair: bob, bun, pigtails, ponytail; boys' (GDD #43): short, spiky, curly, swoop.
+// Accessories: bow, glasses, sun hat, bow tie, cap.
 // `root` is moved and turned; `inner` is bobbed and wobbled for walk/idle animation.
 
 import * as THREE from 'three';
 import { mesh, box, ball, cyl } from './prims.js';
 import { PALETTE as P } from '../toon.js';
 
-const EYE = '#3a2a3a', CHEEK = '#ff9fb0', SHOE = '#5a3a55', BOW = '#ff7fb0', FRAMES = '#5a3a55';
+const EYE = '#3a2a3a', CHEEK = '#ff9fb0', SHOE = '#5a3a55', BOW = '#ff7fb0', FRAMES = '#5a3a55', CAP = '#8fc8f0', BRIM = '#6fb0e0';
 
 /** Grown-up size relative to the room; kids can pass a smaller scale. */
 export const CHARACTER_SCALE = 1.15;
@@ -32,7 +33,7 @@ export function createCharacter({ hair = 'bob', hairColor = '#6b3e2e', skin = '#
   ball(inner, 0.04, CHEEK, -0.15, 0.77, 0.19, 0).scale.z = 0.4;
   ball(inner, 0.04, CHEEK, 0.15, 0.77, 0.19, 0).scale.z = 0.4;
 
-  const capLength = Math.PI * (hair === 'bob' ? 0.62 : 0.5);
+  const capLength = Math.PI * (hair === 'bob' ? 0.62 : hair === 'short' || hair === 'spiky' ? 0.42 : 0.5);
   const cap = mesh(inner, new THREE.SphereGeometry(0.27, 10, 6, 0, Math.PI * 2, 0, capLength), hairColor, 0, 0.83, -0.02);
   if (hair === 'bob') cap.rotation.x = -0.45;
   if (hair === 'bun') ball(inner, 0.12, hairColor, 0, 1.1, -0.05);
@@ -45,6 +46,30 @@ export function createCharacter({ hair = 'bob', hairColor = '#6b3e2e', skin = '#
     const tail = ball(inner, 0.085, hairColor, 0.3, 0.84, -0.06);
     tail.scale.set(0.9, 1.7, 0.9);
     tail.rotation.z = 0.35;
+  }
+  const capped = accessory === 'cap'; // hair on top stays under the cap; fringes peek out below the brim
+  const fringeY = capped ? 0.93 : 1.0;
+  if (hair === 'short') { // a soft fringe over the forehead
+    ball(inner, 0.13, hairColor, 0.04, fringeY, 0.13).scale.set(1.5, 0.55, 0.8);
+  }
+  if (hair === 'spiky' && !capped) {
+    for (const [x, z, tilt] of [[-0.14, 0.05, 0.5], [-0.05, 0.12, 0.2], [0.06, 0.12, -0.2], [0.15, 0.04, -0.5], [0, -0.06, 0]]) {
+      const spike = mesh(inner, new THREE.ConeGeometry(0.075, 0.17, 6), hairColor, x, 1.06, z);
+      spike.rotation.z = tilt;
+      spike.rotation.x = z * 2;
+    }
+  }
+  if (hair === 'curly') { // a ring of curls around the top
+    for (let i = 0; i < 9; i++) {
+      const a = (i / 9) * Math.PI * 2;
+      ball(inner, 0.085, hairColor, Math.sin(a) * 0.2, 1.0 + Math.cos(a * 2) * 0.02, Math.cos(a) * 0.17 - 0.02);
+    }
+    if (!capped) ball(inner, 0.12, hairColor, 0, 1.07, -0.02);
+  }
+  if (hair === 'swoop') { // a big swept fringe to one side
+    const swoop = ball(inner, 0.13, hairColor, -0.07, capped ? 0.9 : 1.02, 0.12);
+    swoop.scale.set(1.6, 0.7, 0.9);
+    swoop.rotation.z = 0.35;
   }
   addAccessory(inner, accessory, hair);
 
@@ -65,6 +90,16 @@ function addAccessory(inner, accessory, hair) {
       ring.castShadow = false;
     }
     box(inner, 0.06, 0.014, 0.014, FRAMES, 0, 0.85, 0.24).castShadow = false;
+  } else if (accessory === 'bowtie') {
+    ball(inner, 0.05, BOW, -0.05, 0.6, 0.17).scale.set(1, 0.75, 0.5);
+    ball(inner, 0.05, BOW, 0.05, 0.6, 0.17).scale.set(1, 0.75, 0.5);
+    ball(inner, 0.025, BOW, 0, 0.6, 0.19, 0);
+  } else if (accessory === 'cap') { // a baseball cap, brim to the front
+    mesh(inner, new THREE.SphereGeometry(0.275, 12, 6, 0, Math.PI * 2, 0, Math.PI * 0.42), CAP, 0, 0.86, -0.02);
+    const brim = cyl(inner, 0.17, 0.17, 0.025, 12, BRIM, 0, 1.0, 0.2); // tipped toward the camera so it shows
+    brim.scale.set(1, 1, 0.75);
+    brim.rotation.x = 0.55;
+    ball(inner, 0.03, P.cream, 0, 1.13, -0.02, 0);
   } else if (accessory === 'hat') {
     cyl(inner, 0.33, 0.33, 0.025, 14, P.butter, 0, 1.0, -0.02).rotation.x = -0.12;
     cyl(inner, 0.17, 0.2, 0.15, 12, P.butter, 0, 1.08, -0.03).rotation.x = -0.12;

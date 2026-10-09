@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.19 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.20 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -61,6 +61,7 @@
 | 52 | **Midday mark on the day bar** (user request): with Lunchtime Delivery owned, a small mark sits halfway along the HUD's day bar during open hours. It **glows butter yellow and pulses** while a lunch order is on its way, and fades once midday has passed. Without the upgrade, no mark. (A mark, not a countdown, so it keeps #34) | v0.17 |
 | 53 | **Bea the stocker** (builds #51): one-time hire, **🪙 200**. She carries boxes from the doorstep to the shelves and unpacks them, slower than you, in the **morning, open hours and evening**. She unpacks **wished-for items first**, then items that aren't on the shelves yet, onto the emptiest shelf; uses the Stock Cart too. She never takes the box your shopkeeper is heading for; when there's nothing to do she waits by the right wall | v0.18 |
 | 54 | **Order book shows what you'll earn** (user, resolves §18 #4): each card shows the **sell price per item** ("Sells for 🪙 10 each") and the **profit for the whole box** as a mint tag ("+🪙 12 profit"), so you can see which items earn the most. Tips aren't counted | v0.19 |
+| 55 | **Boy or girl shopkeeper built** (#43): the creator's first row is **Girl 👧 / Boy 👦**. Boys' hair: **short, spiky, curly, swoop**; boys' accessories: **bow tie, glasses, cap** (girls keep bob / bun / pigtails / ponytail and bow / glasses / sun hat). Switching keeps whatever fits both (colors, glasses). Outfit colors are the same for both. 🎲 randomizes within your choice. Existing shops keep a girl | v0.20 |
 
 ## 1. Pitch
 
@@ -277,7 +278,7 @@ Your very own dollhouse, displayed in the shop's front window.
 - **Bea the stocker (v0.18, #51, #53):** a **one-time hire** (🪙 200). She works in the morning, during open hours and in the evening: picks up a box from the doorstep, walks it to the emptiest shelf with free space, and unpacks it, at a steady pace a bit slower than you. She uses the Stock Cart too. **Smart picks:** wished-for items first, then items that aren't on the shelves yet. **You can always jump in:** she never takes the box your shopkeeper is heading for, and when there's nothing to do she waits by the right wall. With Mia and Bea both hired, your shopkeeper is free for the bonus spots or decorating. 💡 Later: an **Orderer** helper who re-orders what sells (not decided; ordering may be too fun to hand over).
 - Your shopkeeper is always there and walks to whatever you tap.
 - **Where she goes when helpers do the work (v0.14, #41):** she can walk out to the sidewalk and into other ground-floor rooms. Each room can give a bonus while she's in it. First ones: the **Window Display** (more window-peekers, and they want what they saw more often) and the **greeter spot** by the shop door (greeted customers often pick up a second item). Bonus spots are marked with a **glowing ring** on the ground; tap it to go there (#44). Future rooms get their own bonus (💡 Stockroom: unpack faster; Tea Corner: customers stay longer).
-- **Customizable shopkeeper (decided):** hairstyle, hair color, skin tone, outfits, accessories (bows, glasses, aprons, hats). Set up in a quick character creator at the start, and changeable anytime. **v0.12 creator (#38):** hair style (bob, bun, pigtails, ponytail), hair color, skin tone, outfit color, accessory (none, bow, glasses, hat). Tap your shopkeeper in the morning to reopen it. A 🎲 button picks a random look (#42). **Planned (#43):** a first choice of **boy or girl** shopkeeper, with hair styles and outfits to match (e.g. short cuts, overalls, caps), and game text that says "your shopkeeper" instead of "she".
+- **Customizable shopkeeper (decided):** hairstyle, hair color, skin tone, outfits, accessories (bows, glasses, aprons, hats). Set up in a quick character creator at the start, and changeable anytime. **v0.12 creator (#38):** hair style (bob, bun, pigtails, ponytail), hair color, skin tone, outfit color, accessory (none, bow, glasses, hat). Tap your shopkeeper in the morning to reopen it. A 🎲 button picks a random look (#42). **Boy or girl (v0.20, #43, #55):** the first row picks girl or boy; boys get short / spiky / curly / swoop hair and a bow tie or cap. Game text says "your shopkeeper", never "she".
 - Outfits and accessories are earned through Collection pages, story moments, special days, and seasons. They're great rewards because they're about self-expression, not power.
 - 💡 Matching **shop uniforms** for helpers that you design.
 
@@ -353,7 +354,7 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - [x] Customers browse, buy, and leave wish notes
 - [x] Hire one cashier helper
 - [x] **Bea the stocker** helper (#53)
-- [x] Simple shopkeeper creator (a few hairstyles, colors, outfits)
+- [x] Simple shopkeeper creator (a few hairstyles, colors, outfits), girl or boy (#55)
 - [x] Coins, a few upgrades, local save
 - [x] Toon-shaded low-poly placeholder art in the pastel palette
 - [x] Playable on a phone browser
@@ -367,7 +368,6 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - **Snapshot sharing** (high priority for this audience)
 - More Dream Dollhouse rooms
 - More shopkeeper outfits and accessories
-- **Boy or girl shopkeeper** in the creator (#43)
 - Offline earnings; background music (sound effects are done, #46)
 
 ### Later

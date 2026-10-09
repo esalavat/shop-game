@@ -67,6 +67,8 @@ const MIGRATIONS = {
   9: (d) => ({ ...d, version: 10, best: { coins: 0 }, settings: { muted: false, ...d.settings } }),
   // v11: Bea the stocker (state.stocker, once hired: where she is and the boxes she holds).
   10: (d) => ({ ...d, version: 11, stocker: null }),
+  // v12: girl or boy shopkeeper (GDD #43); everyone so far made a girl.
+  11: (d) => ({ ...d, version: 12, shopkeeper: { body: 'girl', ...d.shopkeeper } }),
 };
 
 export function migrate(data) {

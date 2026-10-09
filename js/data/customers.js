@@ -26,9 +26,16 @@ export const KID_SCALE = 0.9;
 
 /** Choices in the shopkeeper creator (ui/creator.js). */
 export const CREATOR = {
-  hair: [['bob', 'Bob'], ['bun', 'Bun'], ['pigtails', 'Pigtails'], ['ponytail', 'Ponytail']],
+  bodies: [['girl', 'Girl 👧'], ['boy', 'Boy 👦']], // GDD #43: the first choice
+  hair: {
+    girl: [['bob', 'Bob'], ['bun', 'Bun'], ['pigtails', 'Pigtails'], ['ponytail', 'Ponytail']],
+    boy: [['short', 'Short'], ['spiky', 'Spiky'], ['curly', 'Curly'], ['swoop', 'Swoop']],
+  },
   hairColors: LOOKS.hairColors,
   skins: LOOKS.skins,
   outfits: LOOKS.outfits,
-  accessories: [['none', 'None'], ['bow', 'Bow 🎀'], ['glasses', 'Glasses 👓'], ['hat', 'Sun hat 👒']],
+  accessories: {
+    girl: [['none', 'None'], ['bow', 'Bow 🎀'], ['glasses', 'Glasses 👓'], ['hat', 'Sun hat 👒']],
+    boy: [['none', 'None'], ['bowtie', 'Bow tie 🎀'], ['glasses', 'Glasses 👓'], ['cap', 'Cap 🧢']],
+  },
 };

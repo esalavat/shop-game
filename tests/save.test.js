@@ -166,3 +166,15 @@ test('a v10 save has no stocker yet, and floating boxes settle on load', () => {
   assert.equal(s.stocker, null);
   assert.equal(s.boxes[0].spot, 0);
 });
+
+test('a v11 save keeps its shopkeeper as a girl', () => {
+  const store = memoryStorage();
+  const v11 = { ...createState(0), version: 11 };
+  delete v11.shopkeeper.body;
+  v11.shopkeeper.hair = 'pigtails';
+  store.setItem(SAVE_KEY, JSON.stringify(v11));
+  const s = loadGame(store);
+  assert.equal(s.version, STATE_VERSION);
+  assert.equal(s.shopkeeper.body, 'girl');
+  assert.equal(s.shopkeeper.hair, 'pigtails');
+});
