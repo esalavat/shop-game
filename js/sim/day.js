@@ -1,5 +1,6 @@
 // The shop day: morning (untimed: deliveries arrive, stock up) -> open (customers come) ->
-// evening (twilight; no new customers, the last ones finish) -> close (summary; order for tomorrow)
+// evening (twilight; no new customers; when it's over, shoppers pay for what they have or go home)
+// -> close (summary; order for tomorrow)
 // -> next morning.
 
 import { events } from '../core/events.js';
@@ -8,7 +9,7 @@ import { ITEMS, boxCost } from '../data/items.js';
 
 export const DAY_LENGTH = {
   open: 180,    // seconds of open hours
-  evening: 5,   // seconds of twilight fading in; then it closes as soon as the shop is empty
+  evening: 10,  // seconds of twilight; then shoppers stop (sim/customers.js) and it closes once the last one has paid
 };
 
 export const MIDDAY = 0.5; // fraction of open hours when Pip's lunchtime delivery comes (upgrade)
@@ -43,7 +44,10 @@ export function soldOut(state) {
   return shelvesEmpty && state.boxes.length === 0 && !holding(state.keeper) && !holding(state.stocker);
 }
 
-/** Advance the clock. Closing waits until the last customer has gone home. */
+/** Everyone left is on their way out (they keep walking off behind the closing summary). */
+const allLeaving = (state) => state.customers.every((c) => c.state === 'leaving');
+
+/** Advance the clock. Closing waits until the last customer has paid (or given up) and is heading home. */
 export function tickDay(state, dt) {
   const d = state.day;
   if (d.phase === 'open') {
@@ -54,7 +58,7 @@ export function tickDay(state, dt) {
     if (d.time >= DAY_LENGTH.open) setPhase(state, 'evening');
   } else if (d.phase === 'evening') {
     d.time = Math.min(DAY_LENGTH.evening, d.time + dt);
-    if (d.time >= DAY_LENGTH.evening && state.customers.length === 0) { // the last ones finish first
+    if (d.time >= DAY_LENGTH.evening && allLeaving(state)) { // the last ones pay first
       setPhase(state, 'close');
       recordBest(state);
       events.emit('dayClosed', { day: d.number, stats: d.stats });

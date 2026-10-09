@@ -9,6 +9,8 @@ import { events } from '../js/core/events.js';
 import { rng } from '../js/core/rng.js';
 import { ITEMS } from '../js/data/items.js';
 
+/** Skip the window-peeking: walk straight in through the shop door. */
+const headStraightIn = (c) => { c.state = 'arriving'; c.path = [{ x: 0.4, z: 2.25 }, { x: 0.4, z: 1.1 }]; c.arriveRoom = null; c.arriveFacing = null; };
 const navsFor = (s) => new Map(s.building.rooms.map((r) => [r.id, buildNav(r)]));
 const run = (s, navs, seconds, rand = rng(1)) => {
   for (let t = 0; t < seconds; t += 0.1) { tickCustomers(s, navs, 0.1, rand); tickDay(s, 0.1); }
@@ -65,20 +67,53 @@ test('customers only arrive while the shop is open', () => {
   assert.equal(s.customers.length, 1);
 });
 
-test('closing waits for the last customer to leave', () => {
+test('closing waits for the last customer in line to pay, not for them to walk off-screen', () => {
   const s = createState();
   const navs = navsFor(s);
   s.building.rooms[0].fixtures.find((f) => f.slots).slots[4] = 'doll';
   s.day.phase = 'evening';
-  s.day.time = DAY_LENGTH.evening;
   s.spawnTimer = Infinity;
   const c = spawnCustomer(s, rng(2));
   c.wants = ['doll'];
-  run(s, navs, 20);
+  if (c.state === 'toWindow') headStraightIn(c);
+  run(s, navs, 30);
+  assert.equal(c.state, 'paying'); // at the counter, waiting to be rung up
   assert.equal(s.day.phase, 'evening', 'still waiting on a customer in line');
   checkoutTap(s);
   checkoutTap(s);
-  run(s, navs, 15);
+  run(s, navs, 0.3);
+  assert.equal(s.day.phase, 'close');
+  assert.equal(s.customers.length, 1, 'still walking away behind the summary');
+  run(s, navs, 30);
+  assert.equal(s.customers.length, 0);
+});
+
+test('when the evening is over, shoppers stop: with something they go to the counter, without they go home', () => {
+  const s = createState();
+  const navs = navsFor(s);
+  const shelf = s.building.rooms[0].fixtures.find((f) => f.slots);
+  shelf.slots[4] = 'doll';
+  s.spawnTimer = Infinity;
+  openShop(s);
+  closeEarly(s);
+  const rand = rng(5);
+  const holding = spawnCustomer(s, rand), empty = spawnCustomer(s, rand);
+  for (const c of [holding, empty]) {
+    c.state = 'browsing'; c.timer = 999; c.path = []; c.arriveRoom = null;
+    c.roomId = 'r1'; c.x = 0.6; c.z = 0; c.wants = ['cottage', 'lamp'];
+  }
+  holding.basket = ['teaset'];
+  run(s, navs, DAY_LENGTH.evening - 0.5, rand);
+  assert.equal(holding.state, 'browsing', 'still shopping during the twilight');
+  run(s, navs, 1, rand);
+  assert.equal(empty.state, 'leaving');
+  assert.ok(['toQueue', 'queued'].includes(holding.state), holding.state);
+  assert.deepEqual(holding.wants, []);
+  run(s, navs, 10, rand);
+  assert.equal(s.day.phase, 'evening');
+  checkoutTap(s, rand);
+  checkoutTap(s, rand);
+  run(s, navs, 0.3, rand);
   assert.equal(s.day.phase, 'close');
 });
 

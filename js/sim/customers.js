@@ -19,7 +19,7 @@ import { ROOM_TYPES, THEME_BONUS } from '../data/rooms.js';
 import { doorOf, finishRoute, roomOffset, routeTo, streetBounds, stairwell, walkRoute, routeEndPath } from './route.js';
 import { startCheckout } from './checkout.js';
 import { cashierReady } from './helpers.js';
-import { recordWish } from './day.js';
+import { recordWish, DAY_LENGTH } from './day.js';
 import { SPARKLE } from '../data/dollhouse.js';
 import { peekChance, peekWantChance, trafficBoost, windowX, dollhouseItems } from './collection.js';
 import { keeperGreeting } from './keeper.js';
@@ -37,8 +37,8 @@ export const STREET = { inLane: 2.25, outLane: 2.65, offEnd: 6.5, edgeZ: 1.3 }; 
  */
 export const QUEUE_SPOTS = [{ x: -0.3, z: 0.12 }, { x: 0.15, z: 0.3 }, { x: 0.1, z: 0.75 }, { x: -0.4, z: 0.9 }];
 const BROWSE_DZ = 0.62;
-/** States where a customer is still shopping (not in line, paying or leaving): see CUSTOMER.patience. */
-const GIVE_UP = new Set(['entering', 'toShelf', 'browsing', 'toRoom']);
+/** States where a customer is still shopping (not in line, paying or leaving): see CUSTOMER.patience and closing time. */
+const GIVE_UP = new Set(['toWindow', 'peeking', 'arriving', 'entering', 'toShelf', 'browsing', 'toRoom']);
 const MAX_WISHES = 12;
 
 const pick = (rand, list) => list[Math.floor(rand() * list.length)];
@@ -279,7 +279,10 @@ export function tickCustomers(state, navs, dt, rand = Math.random) {
     // Backstop: nobody shops forever. Someone who has been browsing far too long pays for what they
     // have (or goes home), so a stuck customer can never keep the shop from closing.
     c.age = (c.age ?? 0) + dt;
-    if (c.age > CUSTOMER.patience && GIVE_UP.has(c.state) && !c.gaveUp) {
+    // The same when the evening is over (GDD #62): everyone still shopping heads for the counter with
+    // what they have, or home, so the day ends quickly however big the building is.
+    const closing = state.day.phase === 'evening' && state.day.time >= DAY_LENGTH.evening;
+    if ((c.age > CUSTOMER.patience || closing) && GIVE_UP.has(c.state) && !c.gaveUp) {
       c.gaveUp = true;
       c.wants = [];
       c.target = null;

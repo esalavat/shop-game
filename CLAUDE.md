@@ -90,14 +90,15 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   down). Customers and Bea climb too; everyone pays downstairs. Routes come in legs (`sim/route.js`, `docs/TECH.md`
   §4.3.3); save version 15. `tests/stairs.test.js`; a scratch stress run of 150 busy days with upstairs rooms had no
   stuck days. On `/dev/` only.
+- **Quick evenings, built 2026-10-09, waiting for the user's feedback** (GDD v0.25 #62): 10 s of twilight, then
+  shoppers pay for what they have or go home; the day closes once the last one has paid, while they're still walking
+  away. On `/dev/` only.
 - **Planned next, in order:** (#59) **more items** (toward 100+, color variants, catalog pages that open as you
   collect), the **Collection bonus** and page rewards (coins, confetti, a shopkeeper style). Later: more stockers
-  (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issues: delivery boxes stack too
-  high (delivery-bin idea), and the evening should close once the last customer has paid or left instead of waiting
-  for them to walk off-screen (user, GDD §18 #7; both in docs/ISSUES.md).
+  (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issue: delivery boxes stack too
+  high (delivery-bin idea, docs/ISSUES.md).
 
-**Next:** ask the user about the Stairwell on `/dev/`; then the evening-close fix (§18 #7) or #59 (more items),
-whichever the user prefers. Still waiting on: M8 feedback (home-screen install, fps on the Pixel), Bea and
+**Next:** hear back about the Stairwell and quick evenings on `/dev/`; then #59 (more items). Still waiting on: M8 feedback (home-screen install, fps on the Pixel), Bea and
 first-day-guide feedback. Nothing new has been released since **v2026.10.9.2** (first-day guide); theme rooms, the
 crowd fix and the Stairwell are on `/dev/` only, and releasing them changes the save version (v13 → v15). The MVP list
 in GDD §17 is complete.

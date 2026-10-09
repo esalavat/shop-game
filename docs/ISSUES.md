@@ -6,13 +6,6 @@ Design questions (not bugs) belong in [GDD.md](GDD.md) §18.
 
 ## Open
 
-### Evening waits for customers to walk all the way off-screen (2026-10-09, user)
-- In the evening the day only closes once `state.customers` is empty (`tickDay` in `js/sim/day.js`), and a
-  customer is only removed when they reach the end of the road. With the Window Display and theme rooms the
-  building is wide, so after the last one pays (or decides to leave) you wait a long time with nothing to do.
-- **Wanted (user):** close as soon as nobody is still shopping, in line or paying, i.e. everyone left is in the
-  `leaving` state. They can keep walking away behind the closing summary (or be cleared). GDD §18 #7.
-
 ### Delivery boxes stack too high and hide the shelves (2026-10-09, user)
 - The doorstep has four box spots (`BOX_SPOTS` in `js/sim/stock.js`); every box after that stacks on top. A big
   delivery (or a few days of orders left unpacked) builds tall towers in front of the shop that hide the shelves
@@ -24,6 +17,17 @@ Design questions (not bugs) belong in [GDD.md](GDD.md) §18.
   show on the doorstep, and how the first-day guide's "Tap a box!" arrow (#57) points at the bin.
 
 ## Fixed
+
+### Evening waits for customers to walk all the way off-screen (2026-10-09, user) — fixed
+- In the evening the day only closes once `state.customers` is empty (`tickDay` in `js/sim/day.js`), and a
+  customer is only removed when they reach the end of the road. With the Window Display and theme rooms the
+  building is wide, so after the last one pays (or decides to leave) you wait a long time with nothing to do.
+- **Wanted (user):** close as soon as nobody is still shopping, in line or paying, i.e. everyone left is in the
+  `leaving` state. They can keep walking away behind the closing summary (or be cleared). GDD §18 #7.
+- **Fix (GDD #62):** the evening is 10 s; when it's over, `tickCustomers` sends everyone still shopping (any state in
+  `GIVE_UP`, the same backstop as `CUSTOMER.patience`) to the line with what they have, or home. `tickDay` closes once
+  every customer left is `leaving`. In a scratch run of 60 busy days with upstairs rooms the evening went from 40 s
+  (median; 75 s worst) to 18 s (54 s worst); what's left is the line paying. Tests in `tests/day.test.js`.
 
 ### Customers stuck at the shelves; the shop could never close (2026-10-09, user, Day 9 with Tea Time) — fixed
 - Customers bunched up at two shelves (in Tea Time and the shop) and never moved, so the evening never ended

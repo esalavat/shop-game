@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.24 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.25 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -68,6 +68,7 @@
 | 59 | **Lots of items, and a Collection that pays off** (user; planned after #58, §6.2, §5.1): aim for **100+ items** over time. Prices **scale up** like today, projected forward: fancier items cost more and make more profit. Many items come in **color variants** (the same chair in mint, pink and lilac), each its own sticker. Each theme is an **album page**; the **order book grows as you collect** (new catalog pages open as you find more items, fancier ones last). **Collection bonus:** each item found brings a few percent more customers; **completing a page** gives a bigger customer boost, a **coin gift with confetti**, and a **shopkeeper style** (an outfit color or accessory). 💡 Later: special things that unlock at **Heart and Sparkle milestones** (§18 #6) | v0.23 |
 | 60 | **Smarter and more stockers** (user; planned with #58, §10): a **Sorting Smarts** upgrade makes stockers unpack each box into its **matching theme room** when there's one with space (otherwise the emptiest shelf, as now). Later, **hire more than one stocker**, each costing more | v0.23 |
 | 61 | **Stairwell and upstairs, as built** (#58 step 2): the Stairwell shows up in Grow after the first theme room (🪙 350) and is placed on a ground-floor ＋ like a theme room; it builds both floors at once. Spiral stairs in the back-left corner (one full turn), one shelf on each floor, a railing round the hole upstairs. Upstairs rooms open into each other through side doorways and have a **low railing along the open front**. The roof steps: each run of rooms with the same height gets its own roof; the sign stays over the shop. **Tap the stairs** to send your shopkeeper up (or the railing upstairs to come down); the view follows. Customers and Bea use the stairs too; everyone still pays at the shop counter | v0.24 |
+| 62 | **Quick evenings** (user; replaces the waiting part of #33): twilight lasts **10 seconds**. When it's over, everyone still shopping stops: customers holding something go straight to the counter and pay for what they have; customers with nothing go home. The day closes as soon as the last one has paid (or given up), **without waiting for them to walk off-screen**; they keep walking away behind the summary | v0.25 |
 
 ## 1. Pitch
 
@@ -221,7 +222,7 @@ Your very own dollhouse, displayed in the shop's front window.
 |---|---|---|
 | **Morning** | Pip's deliveries arrive. Choose today's posters/balloons. Unpack and fill the shelves. | None |
 | **Open** | Customers come and go. Fill shelves, ring up, enjoy. The sun moves across the sky. | ~3–5 min |
-| **Evening** | Purple twilight; last customers wave goodbye; lamps glow softly. | 5 s of twilight, then closes once the shop is empty |
+| **Evening** | Purple twilight; last customers wave goodbye; lamps glow softly. | 10 s of twilight; then shoppers pay for what they have or go home, and it closes once the last one has paid (#62) |
 | **Close** | Day summary: coins, happy customers, wish notes, Sparkle. Story moments happen here. Then order for tomorrow, buy upgrades, and decorate, all with no timer. | None |
 
 - **Close early (decided v0.8):** the day button (🕒 Close) closes the shop any time (two taps). When sold out, one tap and a "Sold out! 🎉" nudge. Closing early goes to evening, so the last customers still finish.
@@ -405,4 +406,4 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 4. ~~**Order book shows only the cost**~~ (user, 2026-10-09). **Resolved in v0.19 (decision #54):** cards show the sell price per item and the profit per box.
 5. **Changing prices with demand?** (user, 2026-10-09): could prices go up when lots of customers want something? This pulls against **fixed prices** (#14, §5.5), which keep the game from feeling like a spreadsheet. 💡 Ways to reward demand without setting prices: wished-for items earn a bonus tip when they're back on the shelf, a "Popular! ⭐" tag on items that sell out a lot (customers pay a little extra), or the Sparkle Sale / special days (§5.4). Not decided.
 6. **Heart and Sparkle milestones** (user, 2026-10-09): special things could unlock at Heart milestones (from happy customers) or Sparkle milestones (from the Dream Dollhouse), alongside the Collection unlocks (#59). Ideas: rare items, decorations, story moments, shopkeeper styles. Not designed yet.
-7. **Evening ends too slowly with a big building** (user, 2026-10-09): closing waits until every customer has walked off-screen (`state.customers.length === 0`, §7). With expansions the walk out along the street is long, and you just wait. **Wanted:** in the evening, once the last customer has checked out or given up, close right then, without waiting for them to walk out of frame (they can keep walking away behind the summary). Not built yet; tracked in docs/ISSUES.md.
+7. ~~**Evening ends too slowly with a big building**~~ (user, 2026-10-09): closing waited for every customer to walk off-screen, and the last ones could wander from room to room. **Resolved in v0.25 (decision #62):** after 10 s of twilight shoppers pay for what they have or go home, and the day closes once they've paid.
