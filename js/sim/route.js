@@ -49,12 +49,11 @@ export function roomOffset(state, room) {
 
 const roomById = (state, id) => state.building.rooms.find((r) => r.id === id);
 const roomAt = (state, col, floor) => state.building.rooms.find((r) => r.col === col && r.floor === floor);
-/** The two halves of the Stairwell (GDD #58), or null before it's built. */
-export const stairwell = (state) => {
+/** The Stairwell's room on a floor, or null (GDD #58: one column, `stairs` on the ground, `landing`s above). */
+export function stairRoom(state, floor) {
   const bottom = state.building.rooms.find((r) => r.type === 'stairs');
-  const top = bottom && roomAt(state, bottom.col, 1);
-  return top ? { bottom, top } : null;
-};
+  return bottom ? roomAt(state, bottom.col, floor) ?? null : null;
+}
 /** Offsets from room `a`'s coordinates to room `b`'s. */
 const dx = (a, b) => (a.col - b.col) * (ROOM_SIZE.W + ROOM_SIZE.T);
 const dy = (a, b) => (a.floor - b.floor) * FLOOR_H;
@@ -153,16 +152,18 @@ export function planRoute(state, navs, from, dest) {
   const legs = [];
   const toFloor = dest.street ? 0 : toRoom.floor;
   if (fromRoom.floor !== toFloor) {
-    const st = stairwell(state);
-    if (!st || Math.max(fromRoom.floor, toFloor) > 1) return null; // one upstairs floor for now
-    const { foot } = STAIRS, climb = climbPath();
-    if (toFloor > 0) { // up: to the foot of the stairs, then round and up
-      legs.push(groundLeg(state, navs, at, st.bottom, foot, false), leg(st.bottom, climb, st.top, true));
-      at = { room: st.top, ...foot };
-    } else { // down: across to the top of the stairs, then round and down
-      legs.push(upperLeg(state, navs, at, st.top, foot), leg(st.bottom, climb.slice(0, -1).reverse().concat({ ...foot, y: 0 }), st.bottom, true));
-      at = { room: st.bottom, ...foot };
+    // Over to the stairs on this floor, then round and up (or down) a floor at a time.
+    const { foot } = STAIRS, climb = climbPath(), down = climb.slice(0, -1).reverse().concat({ ...foot, y: 0 });
+    const here = stairRoom(state, fromRoom.floor), there = stairRoom(state, toFloor);
+    if (!here || !there) return null;
+    legs.push(fromRoom.floor > 0 ? upperLeg(state, navs, at, here, foot) : groundLeg(state, navs, at, here, foot, false));
+    const step = Math.sign(toFloor - fromRoom.floor);
+    for (let f = fromRoom.floor; f !== toFloor; f += step) {
+      const next = stairRoom(state, f + step);
+      if (!next) return null;
+      legs.push(step > 0 ? leg(stairRoom(state, f), climb, next, true) : leg(next, down, next, true));
     }
+    at = { room: there, ...foot };
   }
   legs.push(toFloor > 0 ? upperLeg(state, navs, at, toRoom, dest) : groundLeg(state, navs, at, toRoom, dest, !!dest.street));
   return legs.every(Boolean) ? { legs } : null;

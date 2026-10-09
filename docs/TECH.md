@@ -45,7 +45,7 @@ js/
   data/                 # Content as plain data (no logic)
     items.js            # Products: id, set, price, cost, shelfType, slotType, rarity, model
     shelves.js          # Shelf types and capacities
-    rooms.js            # Room types and sizes; theme rooms (THEME_ROOMS, THEME_ROOM_COSTS, THEME_BONUS)
+    rooms.js            # Room types and sizes; shelf room styles and prices (ROOM_STYLES, ROOM_COSTS, STAIR_COSTS)
     dollhouse.js        # Dream Dollhouse slots, Sparkle tuning, shop expansions (costs)
     customers.js        # Customer types: wants, budgets, looks
     story.js            # Regulars, story beats, triggers
@@ -177,24 +177,30 @@ docs/                   # GDD, tech plan
   `agent.legs` holds the rest; `walkRoute` moves on to the next leg and returns true only at the very end, then the
   caller runs `finishRoute`. Someone on the stairs (`onStairs`) finishes the climb before a new walk (`routeStart`
   plans from the end of it). `routeEnd` / `routeEndPath` give the end of the whole route (tap ring, leaving customers).
-- **Stairwell** (`sim/building.js`): `canBuildStairwell` (after the first theme room, once), `buildStairwell(state,
-  col)` (🪙 `STAIRWELL_COST`) adds a `stairs` room on the ground and a `landing` room above. `roomSpots(state, type)`
-  adds upstairs spots over ground rooms beside the landing or another upstairs room (`TOP_FLOOR` = 1). Fixtures
-  `stairs` / `stairhole` keep the corner off both walk grids. Drawing (`render/building.js`): an L-shaped landing
-  slab and floor, doorways in shared upstairs walls, a front railing upstairs, and stepped roofs (`addRoofs`).
+- **Stairwell, floors and shelf rooms** (`sim/building.js`, GDD #64, #65): `buildStairwell` (after the first shelf room)
+  always adds it right of the shop: `insertColumn` moves every room from that column one place right and shifts
+  anyone mid-walk (their path points past the gap) so they still arrive. `buildFloor` adds a `landing` on top and a
+  `stairs` fixture to the landing below. `stairRooms` lists the column bottom up; `stairCost` (STAIR_COSTS) rises per
+  staircase. Shelf rooms are type `room` with `room.style` (ROOM_STYLES, drawn in `render/building.js`);
+  `roomCost(state, col, floor)` = ROOM_COSTS by ring (`max(distanceOut, floor)`) × (1 + 0.15·floor);
+  `roomSpots` lists ends of the ground floor plus any spot on top of a room next to a room on that floor.
+  Routes climb floor by floor (`planRoute`, a climb leg per floor; `stairRoom(state, floor)` in `sim/route.js`).
+  Fixtures `stairs` / `stairhole` keep the corner off the walk grids. Drawing: an L-shaped landing slab and floor,
+  doorways in shared upstairs walls, a front railing upstairs, stepped roofs (`addRoofs`).
   Customers whose first want is upstairs come in through the ground Stairwell (`headInside`).
-- **Theme rooms** (`sim/building.js`): `roomSpots` (either end of the ground floor), `buildThemeRoom(state, type, col,
-  floor)`, `themeRoomCost`, `sellingRooms` (rooms with shelves), `themeRoomFor(state, theme)`. Customers pick the room
-  for each want with `roomWith` (here, else the item's theme room, else any room with one), come in through that
+- **Rooms customers shop in** (`sim/building.js` `sellingRooms`: rooms with shelves). Customers pick the room
+  for each want with `roomWith` (here, else the nearest room with one), come in through that
   room's door from the street (`headInside`), walk between rooms with `routeTo`, and line up at the shop counter
-  (`goToQueueSpot` re-checks their place in line on arrival). `customer.bonus` collects the theme bonus
-  (`themeBonus`, `THEME_BONUS` of the price, rounded up) and `completeSale` adds it. Bea's `shelfFor` picks the emptiest
-  shelf in any room, or the matching theme room with `upgrades.sorting`.
+  (`goToQueueSpot` re-checks their place in line on arrival). Customers coming for something upstairs walk in
+  through the ground Stairwell. Bea's `shelfFor` picks the emptiest shelf in any room. In the evening (GDD #62, #63)
+  shoppers stop after `DAY_LENGTH.evening` and pay or leave; `sendEveryoneHome` + `closeNow` close on the spot,
+  putting held items back (`customer.takenFrom`).
 - **Crowds never deadlock** (`sim/crowd.js`): walkers who make no progress toward their next waypoint for 8 ticks
   slip through people for 15 ticks (progress kept in a WeakMap, nothing saved). Customers also give up after
   `CUSTOMER.patience` seconds of shopping. `tests/busyday.test.js` replays full busy days and requires them to close.
-- **Placement mode** (`main.js`): the Grow sheet's theme buttons call `startPlacing(type)`, which zooms out to show
-  the + spots (overlay bubbles with class `place`, the only tappable ones) and a banner with Cancel.
+- **Placement mode** (`main.js`): the Grow sheet's "Build a room" calls `startPlacing()`, which zooms out to show
+  the + spots (overlay bubbles with class `place`, the only tappable ones, each with its `roomCost`; class `short`
+  when you can't afford it) and a banner with Cancel.
 - Bonuses: `keeperShowingOff()` (in the Window Display) raises `peekChance` / `peekWantChance` (`SPARKLE.keeper*`).
   `keeperGreeting()` (standing at `GREETER`) makes customers who reach the door `greeted`, often adding a second want
   (`CUSTOMER.greetedSecondItem`).

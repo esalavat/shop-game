@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import { box, prism } from './models/prims.js';
 import { PALETTE as P } from './toon.js';
-import { ROOM_TYPES, ROOM_SIZE } from '../data/rooms.js';
+import { ROOM_TYPES, ROOM_SIZE, ROOM_STYLES } from '../data/rooms.js';
 import { FIXTURES } from '../data/fixtures.js';
 import { buildFixture, fixtureHitbox } from './models/furniture.js';
 import { STAIRS, DOORWAY } from '../sim/route.js';
@@ -115,7 +115,7 @@ function addRoofs(group, rooms, layout) {
  * userData.roomId plus either `floor: true` or a `fixtureId`.
  */
 function furnishRoom(group, room, cx, fy, lighting) {
-  const look = ROOM_TYPES[room.type];
+  const look = { ...ROOM_TYPES[room.type], ...(room.style != null ? ROOM_STYLES[room.style % ROOM_STYLES.length] : null) };
   const back = box(group, W, H, T, look.paper, cx, fy + H / 2, -D / 2 - T / 2);
   back.userData.roomId = room.id;
   const floors = [];
@@ -138,7 +138,6 @@ function furnishRoom(group, room, cx, fy, lighting) {
 
   const win = look.window;
   if (win) addWindow(group, cx + win.x, fy + 1.55, wallZ + 0.03, win.w, win.h, look.curtain, lighting.glassMat);
-  if (look.theme) addThemeSign(group, cx + 1.1, fy + 1.86, wallZ + 0.03, look); // over the right shelf, clear of the lamp in the view
   lighting.addPendant(group, cx, fy + H, 0.1);
 
   for (const f of room.fixtures) {
@@ -164,15 +163,6 @@ function addWindow(group, x, y, z, w, h, curtain, glassMat) {
   box(group, 0.04, h, 0.08, P.cream, x, y, z);
   box(group, 0.2, h + 0.2, 0.04, curtain, x - w / 2 - 0.05, y, z + 0.06);
   box(group, 0.2, h + 0.2, 0.04, curtain, x + w / 2 + 0.05, y, z + 0.06);
-}
-
-/** A theme room's sign above its shelves (GDD #58): the theme's icon and name. */
-function addThemeSign(group, x, y, z, look) {
-  const w = 1.0, h = 0.3;
-  box(group, w + 0.08, h + 0.08, 0.04, look.curtain, x, y, z);
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: signTexture([`${look.icon} ${look.name}`], 300) }));
-  sign.position.set(x, y, z + 0.025);
-  group.add(sign);
 }
 
 function signTexture(lines, height = 400) {

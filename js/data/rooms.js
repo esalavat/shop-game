@@ -3,20 +3,6 @@
 /** Interior size of every room: width, height, depth, and wall/floor thickness. */
 export const ROOM_SIZE = { W: 3.4, H: 2.5, D: 2.6, T: 0.16 };
 
-function themeRoom(theme, name, icon, colors) {
-  return {
-    name, theme, icon, floor: '#e8b98a', ...colors,
-    window: null, // the shelves fill the back wall; a sign with the theme sits above them
-    fixtures: [
-      { kind: 'rug', x: 0, z: 0.25 },
-      { kind: 'shelf', x: -1.15, z: -1.06 },
-      { kind: 'shelf', x: 0, z: -1.06 },
-      { kind: 'shelf', x: 1.15, z: -1.06 },
-      { kind: 'plant', x: -1.45, z: 0.8 },
-    ],
-  };
-}
-
 export const ROOM_TYPES = {
   shop: {
     name: 'Shop',
@@ -70,22 +56,42 @@ export const ROOM_TYPES = {
       { kind: 'shelf', x: 0.85, z: -1.06 },
     ],
   },
-  // Theme rooms (GDD #58): one per Collection theme (ITEMS[id].set), three shelves along the back wall.
-  // Items of the room's theme sell better there (THEME_BONUS).
-  tea: themeRoom('tea', 'Tea Time', '🫖', { paper: '#e4f1ff', stripe: '#d2e7ff', curtain: '#a8d8ff' }),
-  parlor: themeRoom('parlor', 'Cozy Parlor', '🛋️', { paper: '#e3f6ea', stripe: '#d3efdd', curtain: '#9fe0c8' }),
-  fairy: themeRoom('fairy', 'Fairy Garden', '🍄', { paper: '#eef8dc', stripe: '#e1f1c8', curtain: '#ff8f8f' }),
-  bedroom: themeRoom('bedroom', 'Sweet Dreams', '🛏️', { paper: '#ece3ff', stripe: '#e0d4ff', curtain: '#c8b6ff' }),
-  dolls: themeRoom('dolls', 'Doll Friends', '🎀', { paper: '#fff4dc', stripe: '#ffeabf', curtain: '#ffd98a' }),
-  houses: themeRoom('houses', 'Little Houses', '🏡', { paper: '#ffe9df', stripe: '#ffdacb', curtain: '#ffb8a0' }),
+  // Expansion rooms (GDD §18 #8): plain shelf rooms, three shelves along the back wall. Each wears one of
+  // ROOM_STYLES (room.style); a decoration shop will let you restyle them later.
+  room: {
+    name: 'Shelf Room', icon: '🛍️',
+    paper: '#e4f1ff', stripe: '#d2e7ff', floor: '#e8b98a', curtain: '#a8d8ff',
+    window: null, // the shelves fill the back wall
+    fixtures: [
+      { kind: 'rug', x: 0, z: 0.25 },
+      { kind: 'shelf', x: -1.15, z: -1.06 },
+      { kind: 'shelf', x: 0, z: -1.06 },
+      { kind: 'shelf', x: 1.15, z: -1.06 },
+      { kind: 'plant', x: -1.45, z: 0.8 },
+    ],
+  },
 };
 
-/** Theme room types, in the order the Grow sheet lists them. */
-export const THEME_ROOMS = Object.keys(ROOM_TYPES).filter((t) => ROOM_TYPES[t].theme);
-/** What each theme room costs: the first one built, the second, ... (the last repeats). */
-export const THEME_ROOM_COSTS = [250, 400, 600, 850, 1150, 1500];
-/** Items sold from their own theme room earn this much extra (a share of the price, rounded up). */
-export const THEME_BONUS = 0.25;
-/** The Stairwell's price (both floors), and the highest floor rooms can go on. */
-export const STAIRWELL_COST = 350;
-export const TOP_FLOOR = 1;
+/** Wallpapers for shelf rooms (room.style), handed out in turn as rooms are built. */
+export const ROOM_STYLES = [
+  { paper: '#e4f1ff', stripe: '#d2e7ff', curtain: '#a8d8ff' }, // sky
+  { paper: '#e3f6ea', stripe: '#d3efdd', curtain: '#9fe0c8' }, // mint
+  { paper: '#eef8dc', stripe: '#e1f1c8', curtain: '#ff8f8f' }, // leaf
+  { paper: '#ece3ff', stripe: '#e0d4ff', curtain: '#c8b6ff' }, // lilac
+  { paper: '#fff4dc', stripe: '#ffeabf', curtain: '#ffd98a' }, // butter
+  { paper: '#ffe9df', stripe: '#ffdacb', curtain: '#ffb8a0' }, // peach
+];
+
+/**
+ * Shelf rooms cost more the further they are from the middle of the building (the shop and the
+ * Stairwell, on the ground), so a compact, squarish house is the cheapest way to grow (user, GDD #65).
+ * A spot's ring is how far out it is, sideways or up, whichever is more: ROOM_COSTS[ring - 1], then
+ * ROOM_COST_STEP more for each ring past the end of the list.
+ */
+export const ROOM_COSTS = [250, 400, 600, 850, 1150, 1500];
+export const ROOM_COST_STEP = 450;
+/** ...and each floor up costs this much more than the same spot below (a share, rounded to 10s). */
+export const ROOM_FLOOR_MARKUP = 0.15;
+/** The Stairwell (both of its first two floors), then each staircase up to a new floor: each costs more. */
+export const STAIR_COSTS = [350, 700, 1200, 1900, 2800];
+export const STAIR_COST_STEP = 1200;

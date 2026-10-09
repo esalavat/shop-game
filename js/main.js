@@ -26,7 +26,7 @@ import { createSpotsView } from './render/views/spots.js';
 import { DOLLHOUSE } from './render/models/furniture.js';
 import { buildNav } from './sim/nav.js';
 import { walkTo, walkToFixture, walkToBox, walkToGreeter, walkToShowOff, tickKeeper } from './sim/keeper.js';
-import { GREETER, SIDEWALK, STAIRS, groundAt, shopRoom, streetBounds, stairwell, routeEnd } from './sim/route.js';
+import { GREETER, SIDEWALK, STAIRS, groundAt, shopRoom, streetBounds, stairRoom, routeEnd } from './sim/route.js';
 import { tickDay, twilightFor } from './sim/day.js';
 import { tickCustomers } from './sim/customers.js';
 import { tickHelpers } from './sim/helpers.js';
@@ -37,8 +37,7 @@ import { separate } from './sim/crowd.js';
 import { checkoutTap, keeperAtCounter } from './sim/checkout.js';
 import { displayRoom } from './sim/collection.js';
 import { ITEMS } from './data/items.js';
-import { ROOM_TYPES } from './data/rooms.js';
-import { buildThemeRoom, roomSpots } from './sim/building.js';
+import { buildRoom, roomSpots, roomCost } from './sim/building.js';
 import { attachGestures } from './input/touch.js';
 import { createHud } from './ui/hud.js';
 import { createOrderBook } from './ui/orderbook.js';
@@ -184,19 +183,19 @@ const decorate = createDecorate(state, thumbs, {
     if (room) focusRoom(room);
   },
 });
-const grow = createGrow(state, { onDecorate: () => enterDecorate(), onPlaceRoom: (type) => startPlacing(type) });
+const grow = createGrow(state, { onDecorate: () => enterDecorate(), onPlaceRoom: () => startPlacing() });
 
 // ---------------------------------------------------------------------------
-// Building a theme room (GDD #58): after picking a theme in the Grow sheet, tap a glowing + spot.
+// Building a room (GDD #58, §18 #8): after "Build a room" in the Grow sheet, tap a glowing + spot.
+// Each + shows its price (further out and higher up cost more).
 // ---------------------------------------------------------------------------
-let placing = null; // the room type being placed
+let placing = false;
 const placeBanner = document.getElementById('place-banner');
-const shownSpots = new Set();
+const shownSpots = new Map(); // key -> what the bubble shows
 
-function startPlacing(type) {
-  placing = type;
-  const t = ROOM_TYPES[type];
-  placeBanner.querySelector('span').textContent = `Tap a ＋ to build your ${t.icon} ${t.name} room`;
+function startPlacing() {
+  placing = true;
+  placeBanner.querySelector('span').textContent = 'Tap a ＋ to build a new room';
   placeBanner.hidden = false;
   // Zoom out far enough to see the building and every + spot beside it.
   focusedRoomId = null;
@@ -206,7 +205,7 @@ function startPlacing(type) {
 }
 
 function stopPlacing() {
-  placing = null;
+  placing = false;
   placeBanner.hidden = true;
 }
 
@@ -215,21 +214,24 @@ overlay.root.addEventListener('click', (e) => {
   const spot = e.target.closest('[data-spot]');
   if (!spot || !placing) return;
   const [col, floor] = spot.dataset.spot.split(',').map(Number);
-  const type = placing;
+  const short = roomCost(state, col, floor) - state.coins;
+  if (short > 0) return audio.play('boop'), toast(`That spot needs ${short} more coins 🪙`);
   stopPlacing();
-  buildThemeRoom(state, type, col, floor);
+  buildRoom(state, col, floor);
 });
 
 function updatePlaceSpots() {
   const list = placing ? roomSpots(state) : [];
   const keep = new Set(list.map((p) => `${p.col},${p.floor}`));
-  for (const key of shownSpots) if (!keep.has(key)) { overlay.removeBubble(`place-${key}`); shownSpots.delete(key); }
+  for (const key of shownSpots.keys()) if (!keep.has(key)) { overlay.removeBubble(`place-${key}`); shownSpots.delete(key); }
   for (const p of list) {
-    const key = `${p.col},${p.floor}`;
+    const key = `${p.col},${p.floor}`, cost = roomCost(state, p.col, p.floor);
+    const html = `<button data-spot="${key}" aria-label="Build here for ${cost} coins"${cost > state.coins ? ' class="short"' : ''}>＋<small>🪙 ${cost}</small></button>`;
+    if (shownSpots.get(key) === html) continue;
     const L = world.building.layout;
-    overlay.bubble(`place-${key}`, () => new THREE.Vector3(L.roomX(p.col), L.roomY(p.floor) + ROOM.H / 2, 0),
-      `<button data-spot="${key}" aria-label="Build here">＋</button>`, 'place');
-    shownSpots.add(key);
+    overlay.removeBubble(`place-${key}`);
+    overlay.bubble(`place-${key}`, () => new THREE.Vector3(L.roomX(p.col), L.roomY(p.floor) + ROOM.H / 2, 0), html, 'place');
+    shownSpots.set(key, html);
   }
 }
 
@@ -309,8 +311,9 @@ attachGestures(canvas, {
       if (!canCarryMore(state)) return audio.play('boop'), toast(state.keeper.spare ? 'The cart is full! Tap a shelf to unpack.' : 'Hands full! Tap a shelf to unpack this box first.');
       if (walkToBox(state, navs, state.boxes.find((b) => b.id === boxId))) tapFeedback();
     } else if (fixtureId && /^stair/.test(room.fixtures.find((f) => f.id === fixtureId)?.kind)) {
-      // The stairs: up to the top (or down to the bottom), and the view follows.
-      const st = stairwell(state), other = room.floor === 0 ? st?.top : st?.bottom;
+      // The stairs go up a floor; the railing round the hole goes back down. The view follows.
+      const kind = room.fixtures.find((f) => f.id === fixtureId).kind;
+      const other = stairRoom(state, room.floor + (kind === 'stairs' ? 1 : -1));
       if (other && walkTo(state, navs, { roomId: other.id, x: STAIRS.foot.x, z: STAIRS.foot.z }, { face: 0 })) {
         tapFeedback();
         focusRoom(other);
@@ -366,11 +369,13 @@ events.on('expanded', ({ room }) => {
     setTimeout(() => toast('Tap the Dream Dollhouse to decorate it ✨'), 1200);
   } else if (room.type === 'stairs') {
     toast('Your 🪜 Stairwell is open! 🎉');
-    setTimeout(() => toast('Now you can build theme rooms upstairs ✨'), 1200);
+    setTimeout(() => toast('Now you can build rooms upstairs ✨'), 1200);
+  } else if (room.type === 'landing') {
+    toast(`Floor ${room.floor + 1} is open! 🪜🎉`);
+    setTimeout(() => toast('Build rooms up here next to the stairs ✨'), 1200);
   } else {
-    const t = ROOM_TYPES[room.type];
-    toast(`Your ${t.icon} ${t.name} room is open! 🎉`);
-    setTimeout(() => toast(`${t.name} things sell for more in here ✨`), 1200);
+    toast('Your new room is open! 🎉');
+    setTimeout(() => toast('Fill its shelves to sell even more 🛍️'), 1200);
   }
 });
 events.on('dollhouseChanged', ({ slotId, gained }) => {

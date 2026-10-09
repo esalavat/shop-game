@@ -44,22 +44,20 @@ export function completeSale(state, rand = Math.random, { tip: tips = true, by =
   const c = state.checkout;
   if (!c || c.items.some((i) => !i.scanned)) return null;
   const customer = state.customers.find((x) => x.id === c.customerId);
-  const bonus = customer?.bonus ?? 0; // items from their own theme room (GDD #58)
-  const amount = c.items.reduce((sum, i) => sum + ITEMS[i.itemId].price, 0) + bonus;
+  const amount = c.items.reduce((sum, i) => sum + ITEMS[i.itemId].price, 0);
   const [lo, hi] = CUSTOMER.tip;
   const tip = tips ? lo + Math.floor(rand() * (hi - lo + 1)) : 0;
   addCoins(state, amount + tip);
   state.hearts += 1;
   recordSale(state, { amount, tip, items: c.items.map((i) => i.itemId) });
   state.checkout = null;
-  events.emit('sale', { amount, tip, bonus, by, customerId: c.customerId });
+  events.emit('sale', { amount, tip, by, customerId: c.customerId });
   if (customer) {
     customer.basket = [];
     customer.takenFrom = [];
-    customer.bonus = 0;
     customer.state = 'paid';
   }
-  return { amount, tip, bonus };
+  return { amount, tip };
 }
 
 /** One tap at the counter during checkout: scan the next item, or ring up when all are scanned. */

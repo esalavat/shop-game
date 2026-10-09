@@ -15,6 +15,9 @@ import { emptyStats } from '../sim/day.js';
 import { settleBoxes } from '../sim/stock.js';
 import { CHANNEL } from './channel.js';
 
+/** Old theme room types (v14-v15) and the ROOM_STYLES look each one becomes. */
+const THEME_STYLE = { tea: 0, parlor: 1, fairy: 2, bedroom: 3, dolls: 4, houses: 5 };
+
 export const MAIN_SAVE_KEY = 'mdds_save';
 export const SAVE_KEY = CHANNEL === 'main' ? MAIN_SAVE_KEY : `${MAIN_SAVE_KEY}_${CHANNEL}`;
 
@@ -91,6 +94,21 @@ const MIGRATIONS = {
     keeper: { ...d.keeper, legs: [], y: 0 },
     stocker: d.stocker && { ...d.stocker, legs: [], y: 0 },
   }),
+  // v16: expansion rooms are plain shelf rooms (GDD §18 #8, #65): theme rooms (only ever on the test
+  // build) become shelf rooms in their own colors, stock kept; Sorting Smarts is gone, its coins refunded.
+  15: (d) => {
+    const { sorting, ...upgrades } = d.upgrades ?? {};
+    return {
+      ...d,
+      version: 16,
+      coins: d.coins + (sorting ? 120 : 0),
+      upgrades,
+      building: {
+        ...d.building,
+        rooms: d.building.rooms.map((r) => (r.type in THEME_STYLE ? { ...r, type: 'room', style: THEME_STYLE[r.type] } : r)),
+      },
+    };
+  },
 };
 
 export function migrate(data) {

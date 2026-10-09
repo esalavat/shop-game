@@ -1,7 +1,6 @@
 // Bea the stocker (GDD #51, #53): once hired, she carries delivery boxes from the doorstep to the
 // shelves and unpacks them, in the morning, during open hours and in the evening. She fills the
-// emptiest shelf in any room, walking over along the sidewalk (sim/route.js); with Sorting Smarts
-// (GDD #60) each box goes to its matching theme room when that has space. Unlike Mia, she's saved
+// emptiest shelf in any room, walking over along the sidewalk or up the stairs (sim/route.js). Unlike Mia, she's saved
 // (state.stocker), so a box in her hands is never lost on reload.
 //
 // Each tick: walk; when she arrives, pause a moment, then do the job (pick up / unpack); when idle,
@@ -9,9 +8,8 @@
 
 import { HELPERS } from '../data/upgrades.js';
 import { useSpot } from '../data/fixtures.js';
-import { ITEMS } from '../data/items.js';
-import { hasHelper, hasUpgrade } from './upgrades.js';
-import { sellingRooms, themeRoomFor } from './building.js';
+import { hasHelper } from './upgrades.js';
+import { sellingRooms } from './building.js';
 import { finishRoute, routeTo, walkRoute } from './route.js';
 import { boxSpot, canCarryMore, freeSlots, pickUpBox, shopRoomId, stockShelf, DOORWAY_Z } from './stock.js';
 
@@ -33,19 +31,10 @@ export function createStocker(roomId) {
 const shelvesWithRoom = (state) =>
   sellingRooms(state).flatMap((room) => room.fixtures.filter((f) => f.slots && freeSlots(f).length > 0).map((fixture) => ({ room, fixture })));
 
-/**
- * Where the box in her hands goes: the emptiest shelf (in the room she's in, on a tie). With Sorting
- * Smarts, the matching theme room's emptiest shelf first, if it has space.
- */
+/** Where the box in her hands goes: the emptiest shelf (in the room she's in, on a tie). */
 export function shelfFor(state, b) {
-  let pool = shelvesWithRoom(state);
-  if (b.carrying && hasUpgrade(state, 'sorting')) {
-    const theme = themeRoomFor(state, ITEMS[b.carrying.itemId].set);
-    const mine = theme ? pool.filter((s) => s.room.id === theme.id) : [];
-    if (mine.length) pool = mine;
-  }
   const score = (s) => freeSlots(s.fixture).length * 2 + (s.room.id === b.roomId ? 1 : 0);
-  return pool.sort((x, y) => score(y) - score(x))[0] ?? null;
+  return shelvesWithRoom(state).sort((x, y) => score(y) - score(x))[0] ?? null;
 }
 
 const onShelves = (state) => new Set(state.building.rooms.flatMap((r) => r.fixtures.flatMap((f) => f.slots ?? [])).filter(Boolean));

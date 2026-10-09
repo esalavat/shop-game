@@ -1,8 +1,7 @@
 // Customers: walk in, browse shelves for what they want, take it, queue at the counter, pay, leave.
 // If something they want isn't on the shelves, they leave a wish note instead (never upset).
-// With theme rooms (GDD #58) they head for the room that has what they want, walk over along the
-// sidewalk or up the Stairwell (sim/route.js), and come back to the shop's counter to pay. Items taken from their own
-// theme room earn a theme bonus at the register.
+// With more rooms (GDD #58) they head for the room that has what they want, walk over along the
+// sidewalk or up the Stairwell (sim/route.js), and come back to the shop's counter to pay.
 //
 // States: [toWindow -> peeking (stop at the Window Display first)] -> arriving (walking in from the
 //         street) -> entering -> toShelf -> browsing -> (next want...; toRoom -> entering to try
@@ -14,9 +13,8 @@ import { ITEMS } from '../data/items.js';
 import { CUSTOMER, LOOKS, ADULT_SCALE, KID_SCALE } from '../data/customers.js';
 import { findPath } from './nav.js';
 import { newId, shopRoomId, findFixture, freeSlots, dropBox } from './stock.js';
-import { sellingRooms, themeRoomFor, isThemeRoom } from './building.js';
-import { ROOM_TYPES, THEME_BONUS } from '../data/rooms.js';
-import { doorOf, finishRoute, roomOffset, routeTo, streetBounds, stairwell, walkRoute, routeEndPath } from './route.js';
+import { sellingRooms, isShelfRoom } from './building.js';
+import { doorOf, finishRoute, roomOffset, routeTo, streetBounds, stairRoom, walkRoute, routeEndPath } from './route.js';
 import { startCheckout } from './checkout.js';
 import { cashierReady } from './helpers.js';
 import { recordWish, DAY_LENGTH } from './day.js';
@@ -68,18 +66,12 @@ const stockedItems = (state) => [...new Set(sellingRooms(state).flatMap((r) => s
 
 const roomById = (state, id) => state.building.rooms.find((r) => r.id === id);
 
-/** Where to look for an item: right here if it's here, else its theme room, else any room with one. */
+/** Where to look for an item: right here if it's here, else the nearest room with one. */
 function roomWith(state, hereId, itemId) {
   if (findSlot(state, hereId, itemId)) return hereId;
-  const theme = themeRoomFor(state, ITEMS[itemId].set);
-  if (theme && findSlot(state, theme.id, itemId)) return theme.id;
-  return sellingRooms(state).find((r) => findSlot(state, r.id, itemId))?.id ?? null;
-}
-
-/** How much extra an item earns when it's taken from its own theme room (GDD #58), else 0. */
-export function themeBonus(state, roomId, itemId) {
-  const theme = ROOM_TYPES[roomById(state, roomId)?.type]?.theme;
-  return theme && ITEMS[itemId].set === theme ? Math.ceil(ITEMS[itemId].price * THEME_BONUS) : 0;
+  const here = roomById(state, hereId);
+  const far = (r) => Math.abs(r.col - here.col) + Math.abs(r.floor - here.floor) * 2;
+  return sellingRooms(state).filter((r) => findSlot(state, r.id, itemId)).sort((a, b) => far(a) - far(b))[0]?.id ?? null;
 }
 
 /** Off-screen along the street, on one side of the building or the other (shop coordinates). */
@@ -92,7 +84,7 @@ function roadEnd(state, side) {
 function headInside(state, c) {
   const shopId = shopRoomId(state);
   let room = roomById(state, (c.wants[0] && roomWith(state, shopId, c.wants[0])) ?? shopId);
-  if (room.floor > 0) room = stairwell(state)?.bottom ?? roomById(state, shopId); // it's upstairs: in by the stairs
+  if (room.floor > 0) room = stairRoom(state, 0) ?? roomById(state, shopId); // it's upstairs: in by the stairs
   const off = roomOffset(state, room), door = doorOf(room);
   c.path = [{ x: door.x + off, z: STREET.inLane }, { x: door.x + off, z: door.z }];
   c.arriveRoom = room.id === shopId ? null : { roomId: room.id, offset: off, from: shopId };
@@ -122,7 +114,7 @@ export function spawnCustomer(state, rand = Math.random) {
     id: newId(state, 'c'), roomId, x: 0, z: STREET.inLane, facing: -side * Math.PI / 2,
     path: [], arriveFacing: null, legs: [], y: 0,
     side, state: 'arriving', timer: 0.3, look, wants: chooseWants(state, rand), basket: [], target: null,
-    windowWant: null, bonus: 0, arriveRoom: null,
+    windowWant: null, arriveRoom: null,
   };
   c.x = roadEnd(state, side);
   headInside(state, c);
@@ -203,7 +195,6 @@ function finishBrowsing(state, c, navs, rand) {
     shelf.slots[t.slot] = null;
     c.basket.push(t.itemId);
     c.takenFrom = [...(c.takenFrom ?? []), { fixtureId: shelf.id, slot: t.slot }]; // to put it back (sendEveryoneHome)
-    c.bonus += themeBonus(state, c.roomId, t.itemId);
     c.wants.shift();
     events.emit('itemTaken', { roomId: c.roomId, fixtureId: shelf.id, slot: t.slot, itemId: t.itemId, customerId: c.id });
   } else if (t && roomWith(state, c.roomId, t.itemId)) {
@@ -265,7 +256,7 @@ export function tickCustomers(state, navs, dt, rand = Math.random) {
   // New visitors only arrive while the shop is open.
   if (state.day.phase === 'open' && (state.spawnTimer -= dt) <= 0) {
     const anyStock = stockedItems(state).length > 0;
-    const max = CUSTOMER.maxInShop + CUSTOMER.perThemeRoom * state.building.rooms.filter(isThemeRoom).length;
+    const max = CUSTOMER.maxInShop + CUSTOMER.perRoom * state.building.rooms.filter(isShelfRoom).length;
     if (state.customers.length < max) spawnCustomer(state, rand);
     state.spawnTimer = between(rand, anyStock ? CUSTOMER.spawnEvery : CUSTOMER.spawnEveryEmpty) / trafficBoost(state);
   }

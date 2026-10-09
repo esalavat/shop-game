@@ -64,7 +64,7 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   swoop and a bow tie or cap (`CREATOR` in `js/data/customers.js`, drawn in `js/render/models/character.js`).
   `shopkeeper.body`, save version 12.
 - **Fixed:** boxes floating when you take one from the bottom of a stack (`settleBoxes`, docs/ISSUES.md).
-- **Fixed 2026-10-09:** customers stuck behind the line so the shop could never close (user, with theme rooms):
+- **Fixed 2026-10-09:** customers stuck behind the line so the shop could never close (user, with more rooms):
   walkers slip past people when blocked (`sim/crowd.js`), customers give up after 150 s, `tests/busyday.test.js`.
 
 - **Public game and test build, built 2026-10-09** (GDD v0.21 #56, `docs/TECH.md` §9.1, §9.4): pushes to `main`
@@ -78,37 +78,33 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   `state.tutorial`, save version 13, existing saves skip it). Plus an "Open your shop!" arrow any morning after
   5 s of nothing happening. On `/dev/` only until the user releases it.
 
-- **Theme rooms, step 1 built 2026-10-09, waiting for the user's feedback** (GDD v0.23 #58, #60): Grow → Build a
-  theme room → pick one of six themes → tap a ＋ at either end of the ground floor (after the Window Display;
-  🪙 250, 400, 600…). Three shelves each and a theme sign; matching items earn +25% at the register. Customers walk
-  to the room with what they want and back to the shop counter; Bea stocks every room; **Sorting Smarts** (🪙 120)
-  sends boxes to their theme room. Save version 14. On `/dev/` only.
-- **Stairwell and upstairs rooms, built 2026-10-09, waiting for the user's feedback** (GDD v0.24 #58 step 2, #61):
-  Grow → Stairwell (🪙 350, after the first theme room) → tap a ground ＋; it builds both floors (spiral stairs, a shelf
-  on each). Then theme rooms can go upstairs, over ground rooms next to the Stairwell top or another upstairs room;
-  upstairs rooms connect through side doorways. Tap the stairs to send your shopkeeper up (the railing upstairs to come
-  down). Customers and Bea climb too; everyone pays downstairs. Routes come in legs (`sim/route.js`, `docs/TECH.md`
-  §4.3.3); save version 15. `tests/stairs.test.js`; a scratch stress run of 150 busy days with upstairs rooms had no
-  stuck days. On `/dev/` only.
+- **Stairwell and upstairs rooms, built 2026-10-09, waiting for the user's feedback** (GDD v0.24 #58, #61, #64):
+  Grow → Stairwell (🪙 350, after the first room); it always goes right next to the shop (rooms on that side move
+  over) and builds two floors (spiral stairs, a shelf on each). Upstairs rooms connect through side doorways. Tap the
+  stairs to send your shopkeeper up (the railing round the hole to come down). Customers and Bea climb too; everyone
+  pays downstairs. Routes come in legs (`sim/route.js`, `docs/TECH.md` §4.3.3). `tests/stairs.test.js`. (Theme rooms,
+  v0.23 #58, came first and were replaced by plain shelf rooms in #65.) On `/dev/` only.
 - **Quick evenings, built 2026-10-09, waiting for the user's feedback** (GDD v0.25 #62): 10 s of twilight, then
   shoppers pay for what they have or go home; the day closes once the last one has paid, while they're still walking
   away. **Close now** (#63, v0.26): in the evening the day button closes on the spot (two taps); customers put their
   things back on the shelves and go home (`sendEveryoneHome` in `sim/customers.js`, `closeNow` in `sim/day.js`).
   On `/dev/` only.
-- **Stairwell spot fixed (#64, v0.27):** buying it builds it right next to the shop; the Window Display and rooms on
-  that side move over one place (`insertColumn` in `sim/building.js` also shifts anyone mid-walk). Saves on `/dev/`
-  that already placed it elsewhere keep it where it is.
-- **Decided, building next (GDD §18 #8):** generic shelf rooms instead of theme rooms, more floors (each staircase
-  costs more), rooms priced by distance from the Stairwell; room styling later via a decoration shop.
+- **Plain shelf rooms, more floors, prices by distance, built 2026-10-09, waiting for the user's feedback** (GDD v0.28
+  #65): theme rooms and Sorting Smarts are gone (save v16 turns built theme rooms into shelf rooms and refunds
+  Sorting Smarts). Grow → Build a room → tap a ＋ (each shows its price: by ring around the middle, sideways or up,
+  +15% per floor, so a squarish house is cheapest). Grow → Another floor raises the Stairwell (each staircase costs
+  more). Routes climb floor by floor. Prices are first guesses (`js/data/rooms.js`). On `/dev/` only.
+- **Next to design:** the **decoration shop** (its own currency) to restyle rooms (GDD #65).
 - **Planned next, in order:** (#59) **more items** (toward 100+, color variants, catalog pages that open as you
   collect), the **Collection bonus** and page rewards (coins, confetti, a shopkeeper style). Later: more stockers
   (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issue: delivery boxes stack too
   high (delivery-bin idea, docs/ISSUES.md).
 
-**Next:** build the building rethink (GDD §18 #8); hear back about quick evenings
+**Next:** hear back on shelf rooms / floors / prices (#65), the Stairwell, quick evenings and Close now on `/dev/`;
+then design the decoration shop or #59 (more items), whichever the user picks; hear back about quick evenings
 and Close now on `/dev/`; then #59 (more items). Still waiting on: M8 feedback (home-screen install, fps on the Pixel), Bea and
 first-day-guide feedback. Nothing new has been released since **v2026.10.9.2** (first-day guide); theme rooms, the
-crowd fix and the Stairwell are on `/dev/` only, and releasing them changes the save version (v13 → v15). The MVP list
+crowd fix, the Stairwell and shelf rooms are on `/dev/` only, and releasing them changes the save version (v13 → v16). The MVP list
 in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**

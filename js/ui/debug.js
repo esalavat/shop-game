@@ -1,8 +1,7 @@
 // Debug panel, enabled with ?debug in the URL. Loaded on demand so players never download it.
 
 import { addCoins } from '../sim/economy.js';
-import { addRoom, addStairwell, hasStairwell, roomSpots, themesLeft } from '../sim/building.js';
-import { ROOM_TYPES } from '../data/rooms.js';
+import { addRoom, addStairwell, addFloor, hasStairwell, roomSpots } from '../sim/building.js';
 import { ITEMS } from '../data/items.js';
 import { spawnCustomer } from '../sim/customers.js';
 import { openShop, DAY_LENGTH } from '../sim/day.js';
@@ -29,8 +28,6 @@ export function createDebug({ state, renderer, quality, onViewAll, onReset, onCo
   const stats = root.querySelector('.debug-stats');
   root.querySelector('.debug-toggle').addEventListener('click', () => (panel.hidden = !panel.hidden));
 
-  const types = Object.keys(ROOM_TYPES).filter((t) => t !== 'stairs' && t !== 'landing'); // the Stairwell comes in two halves (Upstairs ↑)
-  const nextType = () => types[state.building.rooms.length % types.length];
   const cols = () => state.building.rooms.map((r) => r.col);
 
   const actions = {
@@ -52,14 +49,14 @@ export function createDebug({ state, renderer, quality, onViewAll, onReset, onCo
     },
     right: () => {
       const col = Math.max(...cols()) + 1;
-      addRoom(state, nextType(), col, 0);
+      addRoom(state, 'room', col, 0);
     },
     up: () => {
-      // The Stairwell at the right end first, then theme rooms upstairs beside it.
+      // The Stairwell first, then rooms upstairs beside it, then another floor.
       if (!hasStairwell(state)) return addStairwell(state);
-      const spot = roomSpots(state).find((p) => p.floor === 1);
-      const type = themesLeft(state)[0];
-      if (spot && type) addRoom(state, type, spot.col, 1);
+      const spot = roomSpots(state).find((p) => p.floor > 0);
+      if (spot) addRoom(state, 'room', spot.col, spot.floor);
+      else addFloor(state);
     },
     all: onViewAll,
     reset: () => { if (confirm('Erase the save and start over?')) onReset(); },

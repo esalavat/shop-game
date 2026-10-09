@@ -31,8 +31,22 @@ test('there is a sample save for every save version since the first release', ()
   }
 });
 
+/**
+ * What migrations change on purpose, so "progress intact" compares against it: v16 turned theme rooms
+ * into shelf rooms and refunded Sorting Smarts (GDD §18 #8).
+ */
+const THEMES = ['tea', 'parlor', 'fairy', 'bedroom', 'dolls', 'houses'];
+function expected(save) {
+  const d = structuredClone(save);
+  if (d.version < 16) {
+    if (d.upgrades?.sorting) { d.coins += 120; delete d.upgrades.sorting; }
+    for (const r of d.building.rooms) if (THEMES.includes(r.type)) r.type = 'room';
+  }
+  return d;
+}
+
 for (const { name, raw } of fixtures) {
-  const old = JSON.parse(raw);
+  const old = expected(JSON.parse(raw));
 
   test(`${name} loads with all its progress`, () => {
     const store = memoryStorage();

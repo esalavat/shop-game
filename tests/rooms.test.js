@@ -1,54 +1,98 @@
-// Theme rooms (GDD #58) and Sorting Smarts (GDD #60).
+// Shelf rooms (GDD #58, §18 #8) and what they cost (GDD #65).
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createState } from '../js/sim/state.js';
 import { buildNav } from '../js/sim/nav.js';
-import { buildExpansion, buildThemeRoom, roomSpots, themeRoomCost, themesLeft, canBuildThemeRooms } from '../js/sim/building.js';
+import { buildExpansion, buildRoom, buildStairwell, buildFloor, roomSpots, roomCost, stairCost, canBuildRooms } from '../js/sim/building.js';
 import { spawnCustomer, tickCustomers, QUEUE_SPOTS } from '../js/sim/customers.js';
 import { checkoutTap } from '../js/sim/checkout.js';
 import { tickStocker } from '../js/sim/stocker.js';
 import { tickKeeper } from '../js/sim/keeper.js';
 import { dropBox } from '../js/sim/stock.js';
-import { THEME_ROOM_COSTS } from '../js/data/rooms.js';
+import { ROOM_COSTS, ROOM_STYLES, STAIR_COSTS } from '../js/data/rooms.js';
 import { ITEMS } from '../js/data/items.js';
 import { rng } from '../js/core/rng.js';
 
 const navsFor = (s) => new Map(s.building.rooms.map((r) => [r.id, buildNav(r)]));
 const shelvesIn = (room) => room.fixtures.filter((f) => f.slots);
 
-/** A shop with the Window Display and a Tea Time room on the right. */
+/** A shop with the Window Display and a shelf room on the right (`tea`: it gets tea sets below). */
 function withTeaRoom() {
   const s = createState(0);
   s.coins = 10000;
   buildExpansion(s);
   const right = roomSpots(s).at(-1);
-  const tea = buildThemeRoom(s, 'tea', right.col, right.floor);
+  const tea = buildRoom(s, right.col, right.floor);
   s.spawnTimer = Infinity;
   return { s, tea, shop: s.building.rooms[0], navs: navsFor(s) };
 }
 
-test('theme rooms open after the Window Display, at either end, and cost more each time', () => {
+test('shelf rooms open after the Window Display, at either end, each in the next wallpaper', () => {
   const s = createState(0);
   s.coins = 10000;
-  assert.equal(canBuildThemeRooms(s), false);
-  assert.equal(buildThemeRoom(s, 'tea', 1, 0), null);
+  assert.equal(canBuildRooms(s), false);
+  assert.equal(buildRoom(s, 1, 0), null);
   buildExpansion(s); // Window Display at col 1
   assert.deepEqual(roomSpots(s), [{ col: -1, floor: 0 }, { col: 2, floor: 0 }]);
-  assert.equal(themeRoomCost(s), THEME_ROOM_COSTS[0]);
   const before = s.coins;
-  const tea = buildThemeRoom(s, 'tea', -1, 0);
-  assert.ok(tea);
-  assert.equal(s.coins, before - THEME_ROOM_COSTS[0]);
-  assert.equal(shelvesIn(tea).length, 3);
-  assert.equal(themeRoomCost(s), THEME_ROOM_COSTS[1]);
-  assert.ok(!themesLeft(s).includes('tea'));
-  assert.equal(buildThemeRoom(s, 'tea', 2, 0), null, 'one room per theme');
-  assert.equal(buildThemeRoom(s, 'fairy', 5, 0), null, 'only at a + spot');
-  assert.ok(buildThemeRoom(s, 'fairy', 2, 0));
+  const a = buildRoom(s, -1, 0);
+  assert.ok(a);
+  assert.equal(a.type, 'room');
+  assert.equal(s.coins, before - ROOM_COSTS[0]);
+  assert.equal(shelvesIn(a).length, 3);
+  assert.equal(buildRoom(s, 5, 0), null, 'only at a + spot');
+  const b = buildRoom(s, 2, 0);
+  assert.ok(b);
+  assert.notEqual(a.style, b.style);
+  assert.ok(ROOM_STYLES[b.style]);
 });
 
-test('a customer walks over to the theme room, earns the theme bonus, and pays at the shop counter', () => {
+test('rooms cost more the further out from the middle, sideways or up, so a squarish house is cheapest', () => {
+  const s = createState(0);
+  s.coins = 1e6;
+  buildExpansion(s);                       // shop 0, display 1
+  buildRoom(s, -1, 0);
+  buildStairwell(s);                       // stairs 1, display 2
+  assert.equal(roomCost(s, -1, 0), ROOM_COSTS[0], 'right beside the shop');
+  assert.equal(roomCost(s, 2, 0), ROOM_COSTS[0], 'right beside the stairs');
+  assert.equal(roomCost(s, -2, 0), ROOM_COSTS[1]);
+  assert.equal(roomCost(s, 4, 0), ROOM_COSTS[2]);
+  // Each floor up costs more than the same spot below...
+  for (const col of [-2, -1, 0, 2, 3]) {
+    for (let f = 0; f < 4; f++) assert.ok(roomCost(s, col, f + 1) > roomCost(s, col, f), `col ${col} floor ${f + 1}`);
+  }
+  // ...and filling in the square is cheaper than going further out.
+  assert.ok(roomCost(s, -1, 1) < roomCost(s, -2, 0));
+  assert.ok(roomCost(s, -2, 2) < roomCost(s, -3, 0));
+  assert.ok(roomCost(s, -2, 2) < roomCost(s, -2, 3));
+  s.coins = roomCost(s, -2, 0) - 1;
+  assert.equal(buildRoom(s, -2, 0), null, 'not enough coins');
+});
+
+test('each staircase up costs more than the last, and opens a floor for rooms', () => {
+  const s = createState(0);
+  s.coins = 1e6;
+  buildExpansion(s);
+  buildRoom(s, -1, 0);
+  assert.equal(stairCost(s), STAIR_COSTS[0]);
+  buildStairwell(s);
+  assert.equal(stairCost(s), STAIR_COSTS[1]);
+  assert.ok(buildRoom(s, 0, 1), 'over the shop');
+  assert.ok(buildRoom(s, -1, 1));
+  assert.ok(!roomSpots(s).some((p) => p.floor === 2), 'no floor 2 yet');
+  const coins = s.coins;
+  const landing = buildFloor(s);
+  assert.equal(coins - s.coins, STAIR_COSTS[1]);
+  assert.equal(landing.floor, 2);
+  assert.ok(stairCost(s) > STAIR_COSTS[1]);
+  const up = roomSpots(s).filter((p) => p.floor === 2).map((p) => p.col).sort((a, b) => a - b);
+  assert.deepEqual(up, [0], 'on top of rooms, next to the stairs');
+  assert.ok(buildRoom(s, 0, 2));
+  assert.ok(roomSpots(s).some((p) => p.floor === 2 && p.col === -1));
+});
+
+test('a customer walks over to another room for what they want and pays at the shop counter', () => {
   const { s, tea, shop, navs } = withTeaRoom();
   shelvesIn(tea)[0].slots[4] = 'teaset';
   s.keeper.x = 0; s.keeper.z = 0.3; // away from the counter
@@ -57,29 +101,17 @@ test('a customer walks over to the theme room, earns the theme bonus, and pays a
   c.wants = ['teaset'];
   for (let t = 0; t < 40 && c.state !== 'queued'; t += 0.1) tickCustomers(s, navs, 0.1, rand);
   assert.deepEqual(c.basket, ['teaset']);
-  assert.equal(c.bonus, Math.ceil(ITEMS.teaset.price * 0.25));
   assert.equal(c.state, 'queued');
   assert.equal(c.roomId, shop.id);
   assert.ok(Math.hypot(c.x - QUEUE_SPOTS[0].x, c.z - QUEUE_SPOTS[0].z) < 1e-6);
-  // Ring them up: the price plus the theme bonus (plus a tip).
+  // Ring them up: the price (plus a tip).
   s.keeper.x = -1.05; s.keeper.z = -0.42; s.keeper.path = [];
   for (let t = 0; t < 2 && !s.checkout; t += 0.1) tickCustomers(s, navs, 0.1, rand);
-  const coins = s.coins, bonus = c.bonus;
+  const coins = s.coins;
   checkoutTap(s, rand);
   const sale = checkoutTap(s, () => 0);
   assert.equal(sale, 'sold');
-  assert.equal(s.coins - coins, ITEMS.teaset.price + bonus + 1);
-});
-
-test('items from another theme earn no bonus in a theme room', () => {
-  const { s, tea, navs } = withTeaRoom();
-  shelvesIn(tea)[0].slots[4] = 'doll';
-  const rand = rng(4);
-  const c = spawnCustomer(s, rand);
-  c.wants = ['doll'];
-  for (let t = 0; t < 40 && !c.basket.length; t += 0.1) tickCustomers(s, navs, 0.1, rand);
-  assert.deepEqual(c.basket, ['doll']);
-  assert.equal(c.bonus, 0);
+  assert.equal(s.coins - coins, ITEMS.teaset.price + 1);
 });
 
 test('customers leave from the room they are in, off the end of the street', () => {
@@ -99,10 +131,9 @@ test('customers leave from the room they are in, off the end of the street', () 
   assert.ok(s.wishes.some((w) => w.itemId === 'cottage'));
 });
 
-function beaWithTeaRoom(sorting) {
+function beaWithTeaRoom() {
   const w = withTeaRoom();
   w.s.helpers.stocker = true;
-  if (sorting) w.s.upgrades.sorting = true;
   w.s.boxes = [];
   for (const room of [w.shop, w.tea]) for (const f of shelvesIn(room)) f.slots.fill('doll');
   return w;
@@ -110,7 +141,7 @@ function beaWithTeaRoom(sorting) {
 const run = (s, navs, seconds) => { for (let t = 0; t < seconds; t += 0.1) { tickKeeper(s, 0.1); tickStocker(s, navs, 0.1); } };
 
 test('Bea stocks shelves in other rooms too, walking over along the sidewalk', () => {
-  const { s, tea, shop, navs } = beaWithTeaRoom(false);
+  const { s, tea, shop, navs } = beaWithTeaRoom();
   shelvesIn(tea)[2].slots.fill(null); // the only space is in the Tea Time room
   dropBox(s, 'chair', 3);
   run(s, navs, 40);
@@ -119,14 +150,11 @@ test('Bea stocks shelves in other rooms too, walking over along the sidewalk', (
   assert.equal(s.stocker.arriveRoom, null);
 });
 
-test('with Sorting Smarts Bea takes a box to its theme room; without it, to the emptiest shelf', () => {
-  for (const sorting of [false, true]) {
-    const { s, tea, shop, navs } = beaWithTeaRoom(sorting);
-    shelvesIn(shop)[0].slots.fill(null);            // 9 free in the shop
-    shelvesIn(tea)[0].slots.fill(null, 0, 3);       // 3 free in Tea Time
-    dropBox(s, 'teaset', 3);
-    run(s, navs, 40);
-    const inTea = shelvesIn(tea)[0].slots.filter((x) => x === 'teaset').length;
-    assert.equal(inTea, sorting ? 3 : 0, sorting ? 'sorted into Tea Time' : 'emptiest shelf (the shop)');
-  }
+test('Bea takes a box to the emptiest shelf, wherever it is', () => {
+  const { s, tea, shop, navs } = beaWithTeaRoom();
+  shelvesIn(shop)[0].slots.fill(null, 0, 3);      // 3 free in the shop
+  shelvesIn(tea)[0].slots.fill(null);             // 9 free in the other room
+  dropBox(s, 'teaset', 3);
+  run(s, navs, 40);
+  assert.equal(shelvesIn(tea)[0].slots.filter((x) => x === 'teaset').length, 3);
 });

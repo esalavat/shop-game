@@ -5,8 +5,6 @@ export const UPGRADES = {
   cart: { name: 'Stock Cart', icon: '🛒', cost: 60, desc: 'Carry two boxes at once, so restocking takes half the walking.' },
   shoes: { name: 'Comfy Shoes', icon: '👟', cost: 80, desc: 'Bouncy new shoes: your shopkeeper walks faster.' },
   lunch: { name: 'Lunchtime Delivery', icon: '🥪', cost: 100, desc: 'Pip comes at midday too. Order before lunch and it arrives halfway through the day.' },
-  // GDD #60: only listed once Bea is hired and a theme room is built (ui/grow.js).
-  sorting: { name: 'Sorting Smarts', icon: '🗂️', cost: 120, desc: 'Bea puts each box in its matching theme room, so more things earn the theme bonus.' },
 };
 
 export const SHOES_SPEED = 1.4; // walking speed multiplier with Comfy Shoes

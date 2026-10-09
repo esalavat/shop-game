@@ -26,11 +26,10 @@ export function createShopBubbles({ state, overlay, customersView, checkoutView,
     if (p) overlay.float(p, 'Hi! 👋', 'tip');
   });
   events.on('scanned', () => { const p = checkoutView.counterTop(); if (p) overlay.float(p, 'beep!', 'beep'); });
-  events.on('sale', ({ amount, tip, bonus }) => {
+  events.on('sale', ({ amount, tip }) => {
     const p = checkoutView.counterTop();
     if (!p) return;
     overlay.float(p.clone().add(new THREE.Vector3(0, 0.75, 0)), `+${amount} 🪙`, 'coins');
-    if (bonus) overlay.float(p.clone().add(new THREE.Vector3(0, 1.1, 0)), `theme bonus ✨`, 'tip', { delay: 0.25 });
     if (tip) overlay.float(p.clone().add(new THREE.Vector3(0.55, 0.35, 0)), `+${tip} tip!`, 'tip');
     overlay.float(p.clone().add(new THREE.Vector3(-0.55, 0.35, 0)), '❤️ +1', 'heart');
   });
