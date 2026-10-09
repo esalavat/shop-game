@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.26 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.27 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -70,6 +70,7 @@
 | 61 | **Stairwell and upstairs, as built** (#58 step 2): the Stairwell shows up in Grow after the first theme room (🪙 350) and is placed on a ground-floor ＋ like a theme room; it builds both floors at once. Spiral stairs in the back-left corner (one full turn), one shelf on each floor, a railing round the hole upstairs. Upstairs rooms open into each other through side doorways and have a **low railing along the open front**. The roof steps: each run of rooms with the same height gets its own roof; the sign stays over the shop. **Tap the stairs** to send your shopkeeper up (or the railing upstairs to come down); the view follows. Customers and Bea use the stairs too; everyone still pays at the shop counter | v0.24 |
 | 62 | **Quick evenings** (user; replaces the waiting part of #33): twilight lasts **10 seconds**. When it's over, everyone still shopping stops: customers holding something go straight to the counter and pay for what they have; customers with nothing go home. The day closes as soon as the last one has paid (or given up), **without waiting for them to walk off-screen**; they keep walking away behind the summary | v0.25 |
 | 63 | **Close now in the evening** (user): during the evening the day button says **Close now**; two taps (one if nobody's left) close the shop on the spot. Everyone still in the shop goes home without paying, and **whatever they were holding goes back on the shelves** (its own spot if it's free, else another shelf, else a box on the doorstep) | v0.26 |
+| 64 | **The Stairwell's spot is fixed** (user; changes #61): it's still a Grow purchase (🪙 350, after the first expansion room), but you don't choose where it goes: it's always built **right next to the main shop**, and the Window Display and any rooms on that side **move over one place**. **Upstairs rooms must sit on top of a room below** (nothing floats) | v0.27 |
 
 ## 1. Pitch
 
@@ -408,9 +409,10 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 5. **Changing prices with demand?** (user, 2026-10-09): could prices go up when lots of customers want something? This pulls against **fixed prices** (#14, §5.5), which keep the game from feeling like a spreadsheet. 💡 Ways to reward demand without setting prices: wished-for items earn a bonus tip when they're back on the shelf, a "Popular! ⭐" tag on items that sell out a lot (customers pay a little extra), or the Sparkle Sale / special days (§5.4). Not decided.
 6. **Heart and Sparkle milestones** (user, 2026-10-09): special things could unlock at Heart milestones (from happy customers) or Sparkle milestones (from the Dream Dollhouse), alongside the Collection unlocks (#59). Ideas: rare items, decorations, story moments, shopkeeper styles. Not designed yet.
 7. ~~**Evening ends too slowly with a big building**~~ (user, 2026-10-09): closing waited for every customer to walk off-screen, and the last ones could wander from room to room. **Resolved in v0.25 (decision #62):** after 10 s of twilight shoppers pay for what they have or go home, and the day closes once they've paid.
-8. **Rethink the building: a fixed Stairwell, generic rooms, many floors** (user, 2026-10-09; proposal, being discussed, replaces parts of #58 and #61):
-   - The **Stairwell is always there**, between the shop (the register) and the Window Display, instead of being bought and placed.
-   - **Every floor grows left and right** from the Stairwell, and you can keep adding **more floors** (not just one upstairs).
-   - **Expansion rooms are generic shelf rooms**, not theme rooms. Later, a **decoration shop** with its own currency lets you style each room (wallpaper, floor, decor).
-   - What that likely means: no theme bonus and no Sorting Smarts (theme rooms were only ever on `/dev/`, never released; rooms already built there would become plain shelf rooms with their stock kept). Album themes stay as Collection pages (#59). Existing public saves get the Stairwell put in at column 1 and the Window Display moved one place to the right.
-   - Open points: when the Stairwell first shows up, how a new floor opens, whether upstairs rooms need a room under them, and the price curve for rooms.
+8. **Rethink the building: generic rooms, many floors, prices by distance** (user, 2026-10-09; decided, building next, replaces parts of #58 and #61):
+   - ✅ The Stairwell stays a Grow upgrade but is **always built right next to the shop**; rooms on that side move over (#64, built).
+   - ✅ **Upstairs rooms must sit on top of a room below** (#64).
+   - **More floors:** keep adding floors. Each floor's piece of the Stairwell is bought like the first, and **each staircase up costs more than the last**.
+   - **Rooms cost more the further they are from the center** (the Stairwell column).
+   - **Expansion rooms are generic shelf rooms**, not theme rooms. Later, a **decoration shop** with its own currency lets you style each room (wallpaper, floor, decor). No theme bonus and no Sorting Smarts then (theme rooms were only ever on `/dev/`; ones already built there become plain shelf rooms with their stock kept). Album themes stay as Collection pages (#59).
+   - Still to pick (defaults until the user says otherwise): exact prices.
