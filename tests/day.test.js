@@ -40,6 +40,18 @@ test('open -> evening -> close, with the light fading to twilight', () => {
   assert.equal(twilightFor(s.day), 1);
 });
 
+test('an empty shop closes right after the short twilight', () => {
+  const s = createState();
+  const navs = navsFor(s);
+  s.spawnTimer = Infinity;
+  openShop(s);
+  closeEarly(s);
+  run(s, navs, DAY_LENGTH.evening - 0.5);
+  assert.equal(s.day.phase, 'evening', 'twilight still showing');
+  run(s, navs, 0.6);
+  assert.equal(s.day.phase, 'close');
+});
+
 test('customers only arrive while the shop is open', () => {
   const s = createState();
   const navs = navsFor(s);

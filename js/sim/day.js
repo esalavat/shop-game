@@ -7,7 +7,7 @@ import { dropBox } from './stock.js';
 
 export const DAY_LENGTH = {
   open: 180,    // seconds of open hours
-  evening: 25,  // seconds of twilight before closing
+  evening: 5,   // seconds of twilight fading in; then it closes as soon as the shop is empty
 };
 
 export function emptyStats() {
@@ -47,7 +47,7 @@ export function tickDay(state, dt) {
     if (d.time >= DAY_LENGTH.open) setPhase(state, 'evening');
   } else if (d.phase === 'evening') {
     d.time = Math.min(DAY_LENGTH.evening, d.time + dt);
-    if (d.time >= DAY_LENGTH.evening && state.customers.length === 0) {
+    if (d.time >= DAY_LENGTH.evening && state.customers.length === 0) { // the last ones finish first
       setPhase(state, 'close');
       events.emit('dayClosed', { day: d.number, stats: d.stats });
     }

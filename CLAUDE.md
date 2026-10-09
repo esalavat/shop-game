@@ -41,12 +41,11 @@ deliveries, carrying boxes to shelves), customers with checkout and wish notes, 
   Numbers to tune with feedback: expansion cost (`js/data/dollhouse.js` `EXPANSIONS`), item
   Sparkle (`js/data/items.js`), traffic and peek rates (`SPARKLE` in `js/data/dollhouse.js`).
 
-**Do first: shorten the evening** (playtest feedback, GDD §18 #3). The evening usually has no
-customers or just one, and the player waits out the 25 s timer. §18 #3 has a recommended fix (end
-the evening once the shop is empty, after a short minimum). Confirm the approach with the user,
-then record the decision in the GDD, build it, and add tests.
+- **Short evening (GDD v0.10 decision #33), built 2026-10-09; waiting on the user's playtest:**
+  twilight fades in over 5 s (`DAY_LENGTH.evening` in `js/sim/day.js`), then the day closes as
+  soon as the shop is empty. Customers still inside finish first.
 
-**Then: M7 (Helpers, upgrades, creator)**: hire a cashier, a few upgrades, a simple shopkeeper
+**Next: M7 (Helpers, upgrades, creator)**: hire a cashier, a few upgrades, a simple shopkeeper
 creator. Before or during M7, revisit the early economy (GDD §18 #2): players sell out within the
 first minute. Also fix the open bugs in `docs/ISSUES.md` (delivery boxes blocking the register).
 
