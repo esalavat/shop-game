@@ -2,7 +2,8 @@
 // the closing summary, which counts the day's numbers up and celebrates a record day (GDD #48).
 
 import { ITEMS } from '../data/items.js';
-import { openShop, startNextDay, closeEarly, soldOut } from '../sim/day.js';
+import { openShop, startNextDay, closeEarly, closeNow, soldOut } from '../sim/day.js';
+import { sendEveryoneHome } from '../sim/customers.js';
 import { events } from '../core/events.js';
 import { confetti } from './confetti.js';
 
@@ -26,6 +27,16 @@ export function createDayUI(state, thumbs, orderBook, toast, audio) {
       // Sold out: one tap closes. Otherwise ask for a second tap so it can't happen by accident.
       if (soldOut(state) || performance.now() < armedUntil) closeEarly(state);
       else armedUntil = performance.now() + CONFIRM_MS;
+    } else if (phase === 'evening') {
+      // Close right now (GDD #63): the last customers go home and put back what they were holding.
+      const nobody = state.customers.every((c) => c.state === 'leaving');
+      if (nobody || performance.now() < armedUntil) {
+        sendEveryoneHome(state);
+        closeNow(state);
+      } else {
+        armedUntil = performance.now() + CONFIRM_MS;
+        toast('Close now? Customers will put their things back and head home 🌙');
+      }
     }
   });
 
@@ -108,7 +119,7 @@ export function createDayUI(state, thumbs, orderBook, toast, audio) {
         else if (performance.now() < armedUntil) next = ['🌙', 'Tap again to close', 'primary'];
         else next = ['🕒', 'Close', 'passive']; // no digital time: the HUD bar shows how much day is left
       }
-      else if (d.phase === 'evening') next = ['🌙', 'Closing soon', 'passive'];
+      else if (d.phase === 'evening') next = performance.now() < armedUntil ? ['🌙', 'Tap again to close', 'primary'] : ['🌙', 'Close now', 'passive'];
       else next = ['📋', 'Day summary', ''];
       const key = next.join('|');
       if (key === shown) return;

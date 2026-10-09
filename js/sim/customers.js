@@ -13,7 +13,7 @@ import { events } from '../core/events.js';
 import { ITEMS } from '../data/items.js';
 import { CUSTOMER, LOOKS, ADULT_SCALE, KID_SCALE } from '../data/customers.js';
 import { findPath } from './nav.js';
-import { newId, shopRoomId, findFixture } from './stock.js';
+import { newId, shopRoomId, findFixture, freeSlots, dropBox } from './stock.js';
 import { sellingRooms, themeRoomFor, isThemeRoom } from './building.js';
 import { ROOM_TYPES, THEME_BONUS } from '../data/rooms.js';
 import { doorOf, finishRoute, roomOffset, routeTo, streetBounds, stairwell, walkRoute, routeEndPath } from './route.js';
@@ -202,6 +202,7 @@ function finishBrowsing(state, c, navs, rand) {
   if (t && shelf && t.slot != null && shelf.slots[t.slot] === t.itemId) {
     shelf.slots[t.slot] = null;
     c.basket.push(t.itemId);
+    c.takenFrom = [...(c.takenFrom ?? []), { fixtureId: shelf.id, slot: t.slot }]; // to put it back (sendEveryoneHome)
     c.bonus += themeBonus(state, c.roomId, t.itemId);
     c.wants.shift();
     events.emit('itemTaken', { roomId: c.roomId, fixtureId: shelf.id, slot: t.slot, itemId: t.itemId, customerId: c.id });
@@ -350,4 +351,32 @@ export function tickCustomers(state, navs, dt, rand = Math.random) {
         break;
     }
   }
+}
+
+/** Put an item back where it came from: its own slot, else that shelf, else any shelf, else a box on the doorstep. */
+function putBack(state, itemId, from) {
+  const shelf = from && findFixture(state, from.fixtureId)?.fixture;
+  if (shelf?.slots && shelf.slots[from.slot] === null) return void (shelf.slots[from.slot] = itemId);
+  const any = [shelf, ...sellingRooms(state).flatMap((r) => r.fixtures)].find((f) => f?.slots && freeSlots(f).length);
+  if (any) any.slots[freeSlots(any)[0]] = itemId;
+  else dropBox(state, itemId, 1);
+}
+
+/**
+ * Closing up right now in the evening (GDD #63): everyone still here goes home at once, and whatever
+ * they were holding goes back on the shelves. Nobody pays.
+ */
+export function sendEveryoneHome(state) {
+  for (const c of state.customers) {
+    if (c.state === 'leaving') continue;
+    c.basket.forEach((itemId, i) => putBack(state, itemId, c.takenFrom?.[i]));
+  }
+  if (state.checkout) {
+    state.checkout = null;
+    events.emit('checkoutCancelled');
+  }
+  if (state.cashier) state.cashier.serving = null;
+  state.queue = [];
+  state.customers = [];
+  events.emit('shelvesChanged');
 }

@@ -37,6 +37,7 @@ export function createCheckoutView(state, roomOrigin) {
 
   events.on('scanned', ({ index }) => { if (items[index]) items[index].scanning = true; });
   events.on('sale', clear);
+  events.on('checkoutCancelled', clear);
 
   return {
     group,

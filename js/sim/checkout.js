@@ -55,6 +55,7 @@ export function completeSale(state, rand = Math.random, { tip: tips = true, by =
   events.emit('sale', { amount, tip, bonus, by, customerId: c.customerId });
   if (customer) {
     customer.basket = [];
+    customer.takenFrom = [];
     customer.bonus = 0;
     customer.state = 'paid';
   }

@@ -58,12 +58,24 @@ export function tickDay(state, dt) {
     if (d.time >= DAY_LENGTH.open) setPhase(state, 'evening');
   } else if (d.phase === 'evening') {
     d.time = Math.min(DAY_LENGTH.evening, d.time + dt);
-    if (d.time >= DAY_LENGTH.evening && allLeaving(state)) { // the last ones pay first
-      setPhase(state, 'close');
-      recordBest(state);
-      events.emit('dayClosed', { day: d.number, stats: d.stats });
-    }
+    if (d.time >= DAY_LENGTH.evening && allLeaving(state)) closeDay(state); // the last ones pay first
   }
+}
+
+function closeDay(state) {
+  setPhase(state, 'close');
+  recordBest(state);
+  events.emit('dayClosed', { day: state.day.number, stats: state.day.stats });
+}
+
+/**
+ * Close right now in the evening (GDD #63), after sendEveryoneHome (sim/customers.js) has sent the
+ * last customers home.
+ */
+export function closeNow(state) {
+  if (state.day.phase !== 'evening') return false;
+  closeDay(state);
+  return true;
 }
 
 /**

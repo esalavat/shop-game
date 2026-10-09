@@ -379,6 +379,7 @@ events.on('dollhouseChanged', ({ slotId, gained }) => {
   if (p && gained > 0) overlay.float(p, `+${gained} ✨`, 'sparkle');
 });
 events.on('shelfFull', () => toast('That shelf is full! Try another one.'));
+events.on('shelvesChanged', () => { shelvesView.rebuild(); boxesView.rebuild(); });
 events.on('keeperEnteredRoom', ({ roomId }) => {
   if (roomById(roomId)?.type === 'display') toast('Showing off the Dream Dollhouse ✨ More window shoppers!');
 });

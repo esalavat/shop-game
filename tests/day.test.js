@@ -2,8 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createState } from '../js/sim/state.js';
 import { buildNav } from '../js/sim/nav.js';
-import { openShop, tickDay, startNextDay, twilightFor, closeEarly, soldOut, rescueIfStuck, recordBest, emptyStats, DAY_LENGTH } from '../js/sim/day.js';
-import { tickCustomers, spawnCustomer } from '../js/sim/customers.js';
+import { openShop, tickDay, startNextDay, twilightFor, closeEarly, closeNow, soldOut, rescueIfStuck, recordBest, emptyStats, DAY_LENGTH } from '../js/sim/day.js';
+import { tickCustomers, spawnCustomer, sendEveryoneHome } from '../js/sim/customers.js';
 import { checkoutTap } from '../js/sim/checkout.js';
 import { events } from '../js/core/events.js';
 import { rng } from '../js/core/rng.js';
@@ -205,4 +205,37 @@ test('beating your best day for coins is a record; the first day only sets the b
   assert.equal(close(30), false); // a tie isn't a record
   assert.equal(close(45), true);
   assert.equal(s.best.coins, 45);
+});
+
+test('closing now in the evening sends everyone home and puts what they held back on the shelves', () => {
+  const s = createState();
+  const navs = navsFor(s);
+  const [a, b] = s.building.rooms[0].fixtures.filter((f) => f.slots);
+  a.slots[4] = 'doll';
+  b.slots[0] = 'lamp';
+  s.spawnTimer = Infinity;
+  openShop(s);
+  const rand = rng(8);
+  const buyer = spawnCustomer(s, rand), browser = spawnCustomer(s, rand);
+  buyer.wants = ['doll'];
+  if (buyer.state === 'toWindow') headStraightIn(buyer);
+  browser.wants = ['lamp'];
+  if (browser.state === 'toWindow') headStraightIn(browser);
+  run(s, navs, 30, rand);
+  assert.equal(a.slots[4], null, 'taken');
+  assert.ok(s.checkout, 'someone is at the register');
+  assert.equal(closeNow(s), false, 'only in the evening');
+  closeEarly(s);
+  b.slots[0] = 'chair'; // someone restocked the lamp's slot meanwhile
+  const coins = s.coins;
+  sendEveryoneHome(s);
+  assert.ok(closeNow(s));
+  assert.equal(s.day.phase, 'close');
+  assert.equal(s.customers.length, 0);
+  assert.equal(s.checkout, null);
+  assert.deepEqual(s.queue, []);
+  assert.equal(s.coins, coins, 'nobody paid');
+  assert.equal(a.slots[4], 'doll', 'back in its own slot');
+  const shelved = s.building.rooms[0].fixtures.flatMap((f) => f.slots ?? []);
+  assert.ok(shelved.includes('lamp'), 'back on a shelf, just not its own slot');
 });
