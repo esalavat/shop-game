@@ -103,11 +103,9 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 build. After that, #59 (more items). Still waiting on feedback: everything built 2026-10-09 (Stairwell, shelf rooms,
 floors and prices, quick evenings, Close now), M8 (home-screen install, fps on the Pixel), Bea, the first-day guide.
 
-**Releases:** the last one before this session was **v2026.10.9.2** (first-day guide). On 2026-10-09 the user asked
-to release everything on `main` as **v2026.10.9.3** (theme rooms → shelf rooms, crowd fix, Stairwell and
-floors, quick evenings, Close now; save version v13 → v16). Claude's own run of `npm run release -- --yes` was blocked,
-so the user publishes it with `npm run release` (it asks to confirm). Check with `gh release view`: if the latest
-isn't v2026.10.9.3 or later, those features are still on `/dev/` only. The MVP list in GDD §17 is complete.
+**Releases:** the latest is **v2026.10.9.3** (2026-10-09): shelf rooms with prices by distance, the Stairwell and
+floors, quick evenings, Close now, the crowd fix; save version 16. Everything on `main` is public. The MVP list in GDD
+§17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).
