@@ -10,6 +10,13 @@ _(none)_
 
 ## Fixed
 
+### Bonus-spot rings and the street edge flickered on the phone (2026-10-09, user video) — fixed
+- The greeter ring was drawn at exactly the sidewalk's top height, and the sidewalk and road overlapped by a thin
+  strip at the same height, so both z-fought (flickered, looked dashed) on the Pixel.
+- **Fix:** rings float 0.05 above the ground with a polygon offset (`render/views/spots.js`); the road sits slightly
+  lower than the sidewalk and they no longer overlap (`render/environment.js`). Keep flat decals clear of other
+  surfaces by at least a few hundredths: phones have coarse depth buffers.
+
 ### Soft-lock: no stock and no coins (2026-10-09, user) — fixed after M7 (GDD v0.13 #40)
 - Spending everything (upgrades, helpers, Window Display) with empty shelves and nothing ordered left you with
   fewer coins than the cheapest box, so you could never earn again. Possible since M6, much easier after M7.

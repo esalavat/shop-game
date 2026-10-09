@@ -14,7 +14,7 @@ const SPOTS = {
   greeter: { color: '#ff9ec4', icon: '👋' },
   showoff: { color: '#ffd98a', icon: '✨' },
 };
-const ICON_HEIGHT = 0.15; // how far above the ground the icon floats
+const ICON_HEIGHT = 0.1; // how far above the ring the icon floats
 const ringGeo = new THREE.RingGeometry(0.2, 0.27, 28);
 const dotGeo = new THREE.CircleGeometry(0.2, 28);
 const hitGeo = new THREE.BoxGeometry(0.6, 0.8, 0.6); // covers the ring and the icon above it
@@ -27,16 +27,18 @@ export function createSpotsView(state, roomOrigin) {
 
   function add(id, roomId, local, active, shown = () => true) {
     const o = roomOrigin(roomId);
-    const y = o.y + groundAt(local.z) + 0.02;
+    // Well clear of the ground (and rugs or the sidewalk's top) so the ring never flickers.
+    const y = o.y + groundAt(local.z) + 0.05;
     const color = SPOTS[id].color;
-    const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color, transparent: true, depthWrite: false }));
-    const dot = new THREE.Mesh(dotGeo, new THREE.MeshBasicMaterial({ color, transparent: true, depthWrite: false }));
+    const mat = () => new THREE.MeshBasicMaterial({ color, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    const ring = new THREE.Mesh(ringGeo, mat());
+    const dot = new THREE.Mesh(dotGeo, mat());
     const hit = new THREE.Mesh(hitGeo, new THREE.MeshBasicMaterial({ visible: false }));
     for (const m of [ring, dot]) {
       m.rotation.x = -Math.PI / 2;
       m.position.set(o.x + local.x, y, o.z + local.z);
     }
-    hit.position.set(o.x + local.x, y + 0.4, o.z + local.z);
+    hit.position.set(o.x + local.x, y + 0.35, o.z + local.z);
     hit.userData = { spot: id };
     group.add(ring, dot, hit);
     spots.push({ id, ring, dot, hit, active, shown, icon: new THREE.Vector3(o.x + local.x, y + ICON_HEIGHT, o.z + local.z) });

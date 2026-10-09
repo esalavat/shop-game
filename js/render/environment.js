@@ -13,8 +13,10 @@ export function createEnvironment(layout, lighting) {
   const half = layout.width / 2;
 
   box(group, 80, 0.4, 120, P.grass, 0, GROUND_Y - 0.2, 0);
+  // The sidewalk sits a little higher than the road and they don't overlap, so their edge never
+  // flickers (z-fighting, worst on phones).
   box(group, 80, 0.02, 1.8, P.sidewalk, 0, GROUND_Y + 0.01, front + 1.05);
-  box(group, 80, 0.02, 2.6, P.road, 0, GROUND_Y + 0.01, front + 3.2);
+  box(group, 80, 0.02, 2.55, P.road, 0, GROUND_Y - 0.005, front + 3.225);
   for (let x = -28; x < 28; x += 1.6) box(group, 0.7, 0.01, 0.12, P.cream, x, GROUND_Y + 0.03, front + 3.2);
 
   tree(group, -half - 1.5, -0.4, 1.2);
