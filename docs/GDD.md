@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.20 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.21 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -62,6 +62,7 @@
 | 53 | **Bea the stocker** (builds #51): one-time hire, **🪙 200**. She carries boxes from the doorstep to the shelves and unpacks them, slower than you, in the **morning, open hours and evening**. She unpacks **wished-for items first**, then items that aren't on the shelves yet, onto the emptiest shelf; uses the Stock Cart too. She never takes the box your shopkeeper is heading for; when there's nothing to do she waits by the right wall | v0.18 |
 | 54 | **Order book shows what you'll earn** (user, resolves §18 #4): each card shows the **sell price per item** ("Sells for 🪙 10 each") and the **profit for the whole box** as a mint tag ("+🪙 12 profit"), so you can see which items earn the most. Tips aren't counted | v0.19 |
 | 55 | **Boy or girl shopkeeper built** (#43): the creator's first row is **Girl 👧 / Boy 👦**. Boys' hair: **short, spiky, curly, swoop**; boys' accessories: **bow tie, glasses, cap** (girls keep bob / bun / pigtails / ponytail and bow / glasses / sun hat). Switching keeps whatever fits both (colors, glasses). Outfit colors are the same for both. 🎲 randomizes within your choice. Existing shops keep a girl | v0.20 |
+| 56 | **Public game and test build** (user): the game is shared at the main link, which only changes on a **release** (about once a day, `npm run release`). Every change goes to the **test build at `/dev/`** first. The test build has a DEV badge, installs as its own app ("Dollhouse Shop DEV"), and plays on a **copy** of your real save, so testing never touches real progress. **Saves are never lost**: a save from a newer version is never overwritten (the game asks you to update instead), and every release must still load sample saves from all earlier versions (docs/TECH.md §9.1, §9.4) | v0.21 |
 
 ## 1. Pitch
 

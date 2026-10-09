@@ -7,7 +7,7 @@ import { ITEMS } from '../data/items.js';
 import { spawnCustomer } from '../sim/customers.js';
 import { openShop, DAY_LENGTH } from '../sim/day.js';
 
-export function createDebug({ state, renderer, quality, onViewAll, onReset, onStockChanged }) {
+export function createDebug({ state, renderer, quality, onViewAll, onReset, onCopyMain, onStockChanged }) {
   const root = document.createElement('div');
   root.id = 'debug';
   root.innerHTML = `
@@ -21,6 +21,7 @@ export function createDebug({ state, renderer, quality, onViewAll, onReset, onSt
       <button data-act="right">Add room →</button>
       <button data-act="up">Add floor ↑</button>
       <button data-act="all">Whole shop</button>
+      ${onCopyMain ? '<button data-act="copyMain" class="danger">Copy main save</button>' : ''}
       <button data-act="reset" class="danger">Reset save</button>
     </div>`;
   document.getElementById('app').append(root);
@@ -64,6 +65,7 @@ export function createDebug({ state, renderer, quality, onViewAll, onReset, onSt
     },
     all: onViewAll,
     reset: () => { if (confirm('Erase the save and start over?')) onReset(); },
+    copyMain: () => { if (confirm('Replace this save with a copy of the main game\'s save?')) onCopyMain(); },
   };
   panel.addEventListener('click', (e) => actions[e.target.dataset.act]?.());
 

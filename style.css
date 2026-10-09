@@ -140,7 +140,7 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
   line-height: 1.5;
 }
 
-#boot-error {
+#boot-error, #update-needed {
   position: absolute;
   inset: 0;
   display: flex;
@@ -149,9 +149,10 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
   background: var(--frame);
 }
 
-#boot-error[hidden] { display: none; }
+#boot-error[hidden], #update-needed[hidden] { display: none; }
+#boot-error .rotate-card, #update-needed .rotate-card { margin: 0 16px; }
 
-#boot-error button {
+#boot-error button, #update-needed button {
   margin-top: 12px;
   padding: 10px 24px;
   border: 0;
@@ -164,6 +165,20 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 
 @media (orientation: landscape) and (max-height: 520px) {
   #rotate { display: flex; }
+}
+
+/* ---------- Test build badge (/dev/) ---------- */
+#dev-badge {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 92px);
+  left: 10px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: rgba(90, 58, 85, 0.75);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  pointer-events: none;
 }
 
 /* ---------- Debug (?debug) ---------- */

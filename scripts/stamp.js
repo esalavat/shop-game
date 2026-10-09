@@ -5,13 +5,18 @@
 // (including relative imports between them) at `file.js?v=<version>`, so one deploy's files
 // always load together. The source stays plain and needs no build to run locally.
 //
-// Usage: node scripts/stamp.js <outDir> [version]   (version defaults to $GITHUB_SHA or a timestamp)
+// It also writes the channel and version into <html data-channel data-version> (js/core/channel.js).
+// The 'dev' channel is the test build at /dev/: its home-screen app gets its own name.
+//
+// Usage: node scripts/stamp.js <outDir> [version] [channel]
+//   version defaults to $GITHUB_SHA or a timestamp; channel is 'main' (default) or 'dev'.
 
 import { cpSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const outDir = process.argv[2] ?? '_site';
-const version = (process.argv[3] ?? process.env.GITHUB_SHA ?? Date.now().toString(36)).slice(0, 10);
+const version = (process.argv[3] || process.env.GITHUB_SHA || Date.now().toString(36)).slice(0, 10);
+const channel = process.argv[4] ?? 'main';
 const PUBLISH = ['index.html', 'style.css', 'manifest.webmanifest', 'icon.svg', 'icons', 'sw.js', 'js', 'vendor', 'prototypes'];
 const MODULE_DIRS = ['js', 'vendor'];
 
@@ -45,6 +50,16 @@ const map = `<script type="importmap">\n${JSON.stringify({ imports }, null, 1)}\
 html = html.replace(/<script type="importmap">[\s\S]*?<\/script>/, map);
 html = html.replace(/(src="js\/main\.js)\?v=[^"]*"/, `$1?v=${version}"`);
 html = html.replace(/(href="style\.css)\?v=[^"]*"/, `$1?v=${version}"`);
+html = html.replace(/<html lang="en">/, `<html lang="en" data-channel="${channel}" data-version="${version}">`);
+if (channel !== 'main') html = html.replace(/<title>(.*?)<\/title>/, `<title>$1 (${channel.toUpperCase()})</title>`);
 writeFileSync(indexPath, html);
 
-console.log(`Stamped ${Object.keys(imports).length} modules with v=${version} into ${outDir}/`);
+if (channel !== 'main') {
+  const manifestPath = join(outDir, 'manifest.webmanifest');
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+  manifest.name += ` (${channel.toUpperCase()})`;
+  manifest.short_name += ` ${channel.toUpperCase()}`;
+  writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+}
+
+console.log(`Stamped ${Object.keys(imports).length} modules with v=${version} (${channel}) into ${outDir}/`);

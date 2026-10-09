@@ -1,8 +1,15 @@
 name: Deploy to GitHub Pages
 
+# One Pages site, two builds (docs/TECH.md §9.1):
+#   /shop-game/      the public game: the latest GitHub Release (npm run release)
+#   /shop-game/dev/  the test build: the tip of main, on every push
+# Every run rebuilds both, so either trigger leaves the other build as it was.
+
 on:
   push:
     branches: [main]
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -22,11 +29,34 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+          path: src
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-      - run: npm test
-      - run: node scripts/stamp.js _site
+      - name: Find the latest release
+        id: release
+        working-directory: src
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh release view --json tagName --jq .tagName 2>/dev/null || true)
+          echo "Public game: ${tag:-main (no release yet)}"
+          echo "ref=${tag:-main}" >> "$GITHUB_OUTPUT"
+      - name: Public game (latest release) at /
+        working-directory: src
+        run: |
+          git worktree add --detach ../public "${{ steps.release.outputs.ref }}"
+          cd ../public
+          npm test
+          node scripts/stamp.js ../_site "$(git rev-parse HEAD)" main
+      - name: Test build (main) at /dev/
+        working-directory: src
+        run: |
+          npm test
+          node scripts/stamp.js ../_site/dev "$(git rev-parse HEAD)" dev
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

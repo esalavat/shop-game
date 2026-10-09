@@ -1,7 +1,9 @@
 // Boot: load the save, build the world, wire input and UI, start the loop.
 
 import * as THREE from 'three';
-import { loadGame, saveGame, clearSave } from './core/save.js';
+import { loadGame, saveGame, clearSave, isSaveLocked } from './core/save.js';
+import { IS_DEV, CHANNEL, BUILD } from './core/channel.js';
+import { createState } from './sim/state.js';
 import { startLoop } from './core/loop.js';
 import { events } from './core/events.js';
 import { createRenderer } from './render/renderer.js';
@@ -53,6 +55,18 @@ import { createQuality } from './render/quality.js';
 const AUTOSAVE_SECONDS = 15;
 
 const state = loadGame();
+if (isSaveLocked(state)) {
+  // This page is older than the save on the device (a cached copy after an update). The save is
+  // left untouched; a fresh load brings the code that can read it.
+  document.getElementById('update-needed').hidden = false;
+  document.getElementById('update-reload').addEventListener('click', () => location.replace(location.pathname + '?fresh=' + Date.now()));
+}
+if (IS_DEV) {
+  const badge = document.createElement('div');
+  badge.id = 'dev-badge';
+  badge.textContent = `${CHANNEL.toUpperCase()} · ${BUILD.slice(0, 7)}`;
+  document.getElementById('app').append(badge);
+}
 const app = document.getElementById('app');
 const canvas = document.getElementById('game');
 const renderer = createRenderer(canvas);
@@ -385,9 +399,15 @@ if (new URLSearchParams(location.search).has('debug')) {
       onStockChanged: () => shelvesView.rebuild(),
       onReset() {
         resetting = true;
-        clearSave();
+        saveGame(createState()); // a new game (on the test build, clearing would copy the real save again)
         location.reload();
       },
+      // Test build only: drop its own save so the next load copies the real one again.
+      onCopyMain: IS_DEV ? () => {
+        resetting = true;
+        clearSave();
+        location.reload();
+      } : null,
     });
   });
 }

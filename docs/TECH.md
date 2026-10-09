@@ -40,7 +40,8 @@ js/
     loop.js             # Fixed-step simulation + render loop, pause on hidden tab
     events.js           # Tiny event bus (sim → render/UI notifications)
     rng.js              # Seeded random
-    save.js             # Load/save/migrate, autosave, offline-time calc
+    save.js             # Load/save/migrate, never overwriting a save it can't read (§9.4)
+    channel.js          # Which build this is: 'main' (public) or 'dev' (/dev/), from <html data-channel>
   data/                 # Content as plain data (no logic)
     items.js            # Products: id, set, price, cost, shelfType, slotType, rarity, model
     shelves.js          # Shelf types and capacities
@@ -177,7 +178,8 @@ docs/                   # GDD, tech plan
 
 ### 4.5 Saves
 - Autosave at every phase change, after purchases, and every ~15 s during Open, plus on `visibilitychange`/`pagehide`.
-- `version` field + **migration functions** so old saves always load.
+- `version` field + **migration functions** so old saves always load. The safety rules and the sample
+  saves that guard them are in §9.4.
 - Transient data (walking customers) isn't saved; the day resumes cleanly.
 - Export/import as a compressed **base64 string**, which later becomes the Dream Dollhouse **share code** (GDD §6.5).
 
@@ -241,11 +243,32 @@ fine because they aren't positioned with transforms.
 
 ## 9. Deployment
 
-### 9.1 GitHub Pages (now)
-- Push to `main` → a GitHub Actions workflow runs the tests, then `scripts/stamp.js` writes an import map that
-  points every module at `file.js?v=<commit>`, and deploys to `https://esalavat.github.io/shop-game/`.
-- Why: GitHub Pages lets browsers cache each file for 10 minutes, and phones were loading a new `index.html`
-  with old cached modules (blank screen). Stamping makes one deploy's files always load together.
+### 9.1 GitHub Pages: the public game and the test build (now)
+One Pages site holds two builds (GDD #56):
+
+| Link | What's there | Updated by |
+|---|---|---|
+| `https://esalavat.github.io/shop-game/` | The public game: the **latest GitHub Release** | `npm run release` |
+| `https://esalavat.github.io/shop-game/dev/` | The test build: the **tip of `main`** | every push to `main` |
+
+- `.github/workflows/pages.yml` runs on a push to `main`, a published release, or by hand. It always rebuilds
+  **both**: it checks out the latest release (or `main` before the first release) into a worktree, runs its
+  tests and stamps it into `_site/`, then runs `main`'s tests and stamps it into `_site/dev/` with the
+  `dev` channel. Failing tests stop the deploy, so the site stays as it was.
+- `scripts/stamp.js <out> <version> [channel]` writes an import map that points every module at
+  `file.js?v=<commit>`, and writes `<html data-channel data-version>` (read by `js/core/channel.js`). The
+  dev channel also gets "(DEV)" in its title and home-screen app name, and a "DEV · <commit>" badge.
+- Why stamping: GitHub Pages lets browsers cache each file for 10 minutes, and phones were loading a new
+  `index.html` with old cached modules (blank screen). Stamping makes one deploy's files always load together.
+- **Releasing:** `npm run release` (`scripts/release.js`) takes `origin/main` (what's on /dev/ now), shows
+  the commits since the last release, warns if the save version changes, and after a "y" creates a GitHub
+  Release tagged `v<year>.<month>.<day>` (`.2`, `.3`… for more the same day) with those commits as notes.
+  Publishing it triggers the deploy. `-- --yes` skips the question; `-- <commit>` releases an older commit of main.
+- **Rolling back:** `gh release edit <older tag> --latest`, then `gh workflow run pages.yml`. Only when the
+  bad release didn't change the save version: players who opened it already have upgraded saves, and older
+  code shows them the "newer version" card (§9.4). In that case fix forward.
+- The `github-pages` environment allows deploys from the `main` branch and `v*` tags (repo settings).
+- `.github/workflows/test.yml` runs the tests on pull requests into `main`.
 - `index.html` shows a "Reload" card if the game hasn't started within 10 s or `main.js` fails to load.
 - Prototypes live under `prototypes/` and are also published (e.g. `/prototypes/camera/`), which is handy for phone testing.
 
@@ -263,11 +286,38 @@ fine because they aren't positioned with transforms.
   keeps one copy per file instead of growing with each deploy.
 - `index.html` registers it on load. `scripts/stamp.js` publishes `sw.js` and `icons/`.
 - Never switch it to cache-first without a versioning plan: that would bring back the stale-file blank screen.
+- The public game and the test build each register their own `sw.js`. The public one's scope
+  (`/shop-game/`) also covers `/shop-game/dev/`, so it ignores requests under `dev/`; the caches are
+  `mdds` and `mdds-dev`.
+
+### 9.4 Never losing a save
+Players' progress must survive every release. Both builds share one origin (`esalavat.github.io`), so
+they share `localStorage`, and the test build often has a newer save version than the public game.
+
+- **One save per build.** The public game uses `mdds_save`; the test build uses `mdds_save_dev`. The first
+  time the test build opens, it loads a **copy** of `mdds_save` (so you test on real progress) and from
+  then on saves only to its own key. Debug panel on dev: "Copy main save" copies it again; "Reset save" starts a new game.
+- **A newer save is never overwritten.** If the save's version is above `STATE_VERSION` (an old cached page
+  after an update, or a rolled-back release), `loadGame` returns a fresh state that `saveGame` refuses to
+  write (`isSaveLocked`), and the game shows "Your shop was saved by a newer version of the game" with an
+  Update button (a fresh reload).
+- **Backups before risk.** Before migrating, the original is kept under `<key>_v<n>` (one per old version).
+  A save that isn't valid JSON, or whose migration throws, is kept under `<key>_broken` before starting over,
+  so a fix can bring it back.
+- **Sample saves.** `tests/fixtures/saves/v<n>.json` is a well-progressed shop saved by version n
+  (`node scripts/save-fixture.js` writes one for the current `STATE_VERSION`; it never rewrites an existing
+  one). `tests/saves.test.js` loads every sample with the latest code and checks coins, Hearts, Sparkle,
+  day, rooms, shelf stock, boxes, orders, collection, Dollhouse, upgrades, helpers, the shopkeeper's look
+  and settings all survive, and that it round-trips. It fails if any version from v12 on has no sample.
+- **When the save shape changes:** bump `STATE_VERSION`, add the migration and its test, then run
+  `node scripts/save-fixture.js`. Never edit or delete an old sample, and never remove or rename a saved field
+  without a migration.
 
 ## 10. Testing
 - **Sim unit tests** (`node --test tests/`): economy math, day phases, order delivery, customer state transitions, save migrations.
 - **Manual phone testing** on the Pages URL each milestone (iPhone Safari + Android Chrome).
-- `?debug` URL flag: fps meter, speed-up time, add coins, skip to phase, reset save.
+- **Save safety** (`tests/saves.test.js`): every released save version's sample save still loads (§9.4).
+- `?debug` URL flag: fps meter, speed-up time, add coins, skip to phase, reset save (and copy the main save, on dev).
 
 ## 11. Build Order (MVP milestones)
 

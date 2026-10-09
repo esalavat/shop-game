@@ -1,7 +1,8 @@
 # My Dream Dollhouse Shop
 
 A cozy, mobile-first (portrait, touch-only) low-poly 3D shop game for ages 11-15, built with
-three.js and plain ES modules (no build step). Live at https://esalavat.github.io/shop-game/.
+three.js and plain ES modules (no build step). The public game is at https://esalavat.github.io/shop-game/
+(the latest release); the test build is at https://esalavat.github.io/shop-game/dev/ (the tip of `main`).
 
 - **Design:** [docs/GDD.md](docs/GDD.md). The Decisions Log at the top is the source of truth;
   §18 lists open questions.
@@ -64,6 +65,12 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   `shopkeeper.body`, save version 12.
 - **Fixed:** boxes floating when you take one from the bottom of a stack (`settleBoxes`, docs/ISSUES.md).
 
+- **Public game and test build, built 2026-10-09** (GDD v0.21 #56, `docs/TECH.md` §9.1, §9.4): pushes to `main`
+  deploy `/dev/`; `npm run release` publishes a GitHub Release, which deploys the public link. Separate saves
+  per build (dev starts from a copy of the real save), a newer save is never overwritten, backups before
+  migrating, and sample saves in `tests/fixtures/saves/` that every release must load. Repo settings: the
+  `github-pages` environment must allow `v*` tags. Still to check: the user's first release.
+
 **Next:** the user's M8 feedback, then pick from "Not scheduled yet" below or the GDD §17 "Next" list.
 The MVP list in GDD §17 is complete.
 
@@ -93,21 +100,25 @@ The MVP list in GDD §17 is complete.
 
 ## Working rules
 
-- **Saves:** when the shape of `state` changes, bump `STATE_VERSION` in `js/sim/state.js` and add
-  a migration in `js/core/save.js` (with a test in `tests/save.test.js`). Live-only fields
-  (customers, queue, checkout) are listed in `TRANSIENT` and never saved.
+- **Saves are never lost** (people play the public game now; `docs/TECH.md` §9.4): when the shape of `state`
+  changes, bump `STATE_VERSION` in `js/sim/state.js`, add a migration in `js/core/save.js` (with a test in
+  `tests/save.test.js`), then run `node scripts/save-fixture.js` to add the new sample save. Never edit or
+  delete old samples in `tests/fixtures/saves/`, and never drop or rename a saved field without a migration.
+  Live-only fields (customers, queue, checkout) are listed in `TRANSIENT` and never saved. Anything else
+  kept in the browser must be per build (see `js/core/channel.js`): both builds share one origin.
 - **Tests:** `npm test` (node --test, zero dependencies). Add tests for new sim behavior.
 - **Run locally:** `npm run serve`, then open http://localhost:8123 (`scripts/serve.js` also takes a
   `PORT` env var; the preview config in `.claude/launch.json` lets it pick a free port). Add `?debug` for the debug
   panel: fill shelves, spawn customer, skip ahead, add rooms, reset save. The local server disables
   caching on purpose.
 - **Verify in the browser at phone size** (375x812) before pushing.
-- **Deploy:** push to `main`. GitHub Actions (`.github/workflows/pages.yml`) runs the tests, then
-  `scripts/stamp.js` version-stamps every module URL so phones never mix cached files from
-  different deploys.
+- **Deploy:** push to `main` → the test build at `/dev/` (GitHub Actions `.github/workflows/pages.yml` runs
+  the tests, then `scripts/stamp.js` version-stamps every module URL so phones never mix cached files).
+  **Releases** to the public link happen only when the user asks: `npm run release` (it shows what's going
+  out and asks first). Mention it when a save-version change is going out. Details in `docs/TECH.md` §9.1.
 - **Commits:** plain messages, with no "Co-Authored-By: Claude" trailer.
 - **No digital timers** (countdowns like 2:15) anywhere in the game UI. Show time as a bar or
   through the lighting.
 - **Process with the user:** discuss design changes and update docs/GDD.md before building them.
-  Each milestone ends with a push so the user can try it on their phone (a Pixel), then give
-  feedback.
+  Each milestone ends with a push so the user can try it on their phone (a Pixel) on the `/dev/` link,
+  then give feedback; the user decides when it's released.

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { loadGame, saveGame, clearSave, SAVE_KEY } from '../js/core/save.js';
+import { loadGame, saveGame, clearSave, isSaveLocked, SAVE_KEY, MAIN_SAVE_KEY } from '../js/core/save.js';
 import { createState, STATE_VERSION } from '../js/sim/state.js';
 
 function memoryStorage() {
@@ -28,16 +28,53 @@ test('save then load round-trips and stamps lastSeen', () => {
   assert.equal(loaded.lastSeen, 5000);
 });
 
-test('corrupted save falls back to a fresh state', () => {
+test('corrupted save falls back to a fresh state, keeping the broken one aside', () => {
   const store = memoryStorage();
   store.setItem(SAVE_KEY, '{not json');
   assert.equal(loadGame(store).coins, createState().coins);
+  assert.equal(store.getItem(`${SAVE_KEY}_broken`), '{not json');
 });
 
-test('save from a newer version is not trusted', () => {
+test('a save from a newer version is never overwritten by older code', () => {
   const store = memoryStorage();
-  store.setItem(SAVE_KEY, JSON.stringify({ version: STATE_VERSION + 1, coins: 999 }));
-  assert.notEqual(loadGame(store).coins, 999);
+  const newer = JSON.stringify({ version: STATE_VERSION + 1, coins: 999 });
+  store.setItem(SAVE_KEY, newer);
+  const s = loadGame(store);
+  assert.notEqual(s.coins, 999);
+  assert.ok(isSaveLocked(s));
+  assert.equal(saveGame(s, store), false);
+  assert.equal(store.getItem(SAVE_KEY), newer);
+});
+
+test('a save that fails to upgrade is kept aside', () => {
+  const store = memoryStorage();
+  const bad = JSON.stringify({ version: 0, coins: 5 }); // there is no migration from v0
+  store.setItem(SAVE_KEY, bad);
+  assert.equal(loadGame(store).version, STATE_VERSION);
+  assert.equal(store.getItem(`${SAVE_KEY}_broken`), bad);
+});
+
+test('the test build starts from a copy of the main save and never writes it', () => {
+  const store = memoryStorage();
+  const main = createState(0);
+  main.coins = 321;
+  saveGame(main, store, 0, MAIN_SAVE_KEY);
+  const before = store.getItem(MAIN_SAVE_KEY);
+  const dev = loadGame(store, 'mdds_save_dev');
+  assert.equal(dev.coins, 321);
+  dev.coins = 5;
+  saveGame(dev, store, 1, 'mdds_save_dev');
+  assert.equal(store.getItem(MAIN_SAVE_KEY), before);
+  assert.equal(loadGame(store, 'mdds_save_dev').coins, 5);
+  assert.equal(loadGame(store, MAIN_SAVE_KEY).coins, 321);
+});
+
+test('a newer main save copied into the test build does not lock it', () => {
+  const store = memoryStorage();
+  store.setItem(MAIN_SAVE_KEY, JSON.stringify({ version: STATE_VERSION + 1 }));
+  const dev = loadGame(store, 'mdds_save_dev');
+  assert.ok(!isSaveLocked(dev));
+  assert.equal(store.getItem('mdds_save_dev_broken'), null);
 });
 
 test('clearSave removes the save', () => {

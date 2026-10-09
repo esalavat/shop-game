@@ -1,12 +1,22 @@
 // Save/load with versioned migrations. Storage is injectable so this runs under node --test.
+//
+// Progress must never be lost (docs/TECH.md §9.4):
+// - The public game and the test build at /dev/ share one origin, so each keeps its own save key.
+//   The test build starts from a copy of the real save and never writes the real one.
+// - A save from a newer version (an old cached page after an update) loads but is never saved
+//   over: the old code can't read it, and a refresh brings the code that can.
+// - Before a save is upgraded, the original is kept under `<key>_v<n>`; a save that can't be read
+//   at all is kept under `<key>_broken` before starting over.
 
 import { createState, giveStarterBoxes, resetTransient, STATE_VERSION, TRANSIENT } from '../sim/state.js';
 import { defaultFixtures } from '../sim/building.js';
 import { createKeeper } from '../sim/keeper.js';
 import { emptyStats } from '../sim/day.js';
 import { settleBoxes } from '../sim/stock.js';
+import { CHANNEL } from './channel.js';
 
-export const SAVE_KEY = 'mdds_save';
+export const MAIN_SAVE_KEY = 'mdds_save';
+export const SAVE_KEY = CHANNEL === 'main' ? MAIN_SAVE_KEY : `${MAIN_SAVE_KEY}_${CHANNEL}`;
 
 // MIGRATIONS[n] upgrades a version-n save to version n+1.
 const MIGRATIONS = {
@@ -83,32 +93,64 @@ export function migrate(data) {
 
 const defaultStorage = () => globalThis.localStorage;
 
-export function loadGame(storage = defaultStorage()) {
+// States loaded from a newer save; saveGame leaves the save alone for these.
+const locked = new WeakSet();
+
+/** True when the save on this device is from a newer version of the game than this code. */
+export const isSaveLocked = (state) => locked.has(state);
+
+function keep(storage, key, raw) {
+  try { storage.setItem(key, raw); } catch { /* quota: nothing more we can do */ }
+}
+
+export function loadGame(storage = defaultStorage(), key = SAVE_KEY) {
+  let raw = null, own = true;
   try {
-    const raw = storage?.getItem(SAVE_KEY);
-    if (!raw) return createState();
-    const data = JSON.parse(raw);
-    if (typeof data?.version !== 'number' || data.version > STATE_VERSION) return createState();
+    raw = storage?.getItem(key) ?? null;
+    if (raw === null && key !== MAIN_SAVE_KEY) {
+      raw = storage?.getItem(MAIN_SAVE_KEY) ?? null; // a test build starts from a copy of the real save
+      own = false;
+    }
+  } catch { /* storage blocked: play without a save */ }
+  if (raw === null) return createState();
+
+  let data;
+  try {
+    data = JSON.parse(raw);
+    if (typeof data?.version !== 'number') throw new Error('not a save');
+  } catch {
+    if (own) keep(storage, `${key}_broken`, raw);
+    return createState();
+  }
+  if (data.version > STATE_VERSION) {
+    const state = createState();
+    if (own) locked.add(state);
+    return state;
+  }
+  try {
+    if (own && data.version < STATE_VERSION) keep(storage, `${key}_v${data.version}`, raw);
     const state = resetTransient(migrate(data));
     settleBoxes(state); // older saves could have a box floating over an empty spot
     return state;
   } catch {
-    return createState(); // corrupted save -> fresh start
+    if (own) keep(storage, `${key}_broken`, raw);
+    return createState();
   }
 }
 
-export function saveGame(state, storage = defaultStorage(), now = Date.now()) {
+export function saveGame(state, storage = defaultStorage(), now = Date.now(), key = SAVE_KEY) {
+  if (locked.has(state)) return false;
   state.lastSeen = now;
   try {
     const saved = { ...state };
-    for (const key of TRANSIENT) delete saved[key];
-    storage?.setItem(SAVE_KEY, JSON.stringify(saved));
+    for (const k of TRANSIENT) delete saved[k];
+    storage?.setItem(key, JSON.stringify(saved));
     return true;
   } catch {
     return false; // private mode / quota: keep playing without saving
   }
 }
 
-export function clearSave(storage = defaultStorage()) {
-  try { storage?.removeItem(SAVE_KEY); } catch { /* ignore */ }
+export function clearSave(storage = defaultStorage(), key = SAVE_KEY) {
+  try { storage?.removeItem(key); } catch { /* ignore */ }
 }
