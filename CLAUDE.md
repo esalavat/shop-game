@@ -32,8 +32,8 @@ M0-M6 are done: skeleton, furnished shop and shopkeeper, the stock loop (order b
 deliveries, carrying boxes to shelves), customers with checkout and wish notes, the day cycle
 (morning / open / twilight evening / closing summary, plus close early), and M6:
 
-- **M6 (Collection & Dream Dollhouse v0), pushed 2026-10-09, waiting for the user's phone
-  feedback.** Toolbar is now Order / Album / day button / Grow. Grow builds the Window Display
+- **M6 (Collection & Dream Dollhouse v0), pushed 2026-10-09. The user tried it and approved it
+  ("M6 is good").** Toolbar is now Order / Album / day button / Grow. Grow builds the Window Display
   (🪙 100, right of the shop) and then becomes the Dollhouse button. Decorate mode zooms in on the
   dollhouse with a bottom panel: 4 rooms (one slot each) and the Collection items that fit. Sparkle
   comes from placed items, speeds up visitor arrivals, and makes some visitors stop beside the
@@ -41,7 +41,12 @@ deliveries, carrying boxes to shelves), customers with checkout and wish notes, 
   Numbers to tune with feedback: expansion cost (`js/data/dollhouse.js` `EXPANSIONS`), item
   Sparkle (`js/data/items.js`), traffic and peek rates (`SPARKLE` in `js/data/dollhouse.js`).
 
-**Next: M7 (Helpers, upgrades, creator)**: hire a cashier, a few upgrades, a simple shopkeeper
+**Do first: shorten the evening** (playtest feedback, GDD §18 #3). The evening usually has no
+customers or just one, and the player waits out the 25 s timer. §18 #3 has a recommended fix (end
+the evening once the shop is empty, after a short minimum). Confirm the approach with the user,
+then record the decision in the GDD, build it, and add tests.
+
+**Then: M7 (Helpers, upgrades, creator)**: hire a cashier, a few upgrades, a simple shopkeeper
 creator. Before or during M7, revisit the early economy (GDD §18 #2): players sell out within the
 first minute. Also fix the open bugs in `docs/ISSUES.md` (delivery boxes blocking the register).
 

@@ -350,3 +350,7 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 
 1. Monetization model for the store builds (§16), which can wait until then.
 2. **Early economy is too tight** (playtest, Day 1): with 50 coins and 18 shelf slots you can sell out in the first minute of a 3-minute day. Options for the upgrades milestone: bigger or extra shelves, a lunchtime delivery, more starting coins or stock, cheaper bulk boxes, slower browsing.
+3. **Evening is too long** (playtest after M6, 2026-10-09): by evening there are usually no customers, or just one, and you wait out the 25-second timer with nothing to do. The evening exists for the twilight mood and so the last customers can finish (decision #26), not as waiting time.
+   - **Recommended fix (needs the user's OK before building):** end the evening as soon as the shop is empty, after a short minimum (~4 s) so the twilight still shows, and keep 25 s only as the most it can last. Customers who are inside still finish as they do today.
+   - **Also possible:** when nobody is left, the day button becomes a one-tap "Close up 🌙" (like the sold-out "Close early"); shorten the evening to ~10 s; or speed up the clock while the shop is empty.
+   - **Where:** `tickDay` and `DAY_LENGTH.evening` in `js/sim/day.js`, the day button in `js/ui/day.js`, tests in `tests/day.test.js`. When decided, record it in the Decisions Log (it changes #26).
