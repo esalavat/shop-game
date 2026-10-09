@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.10 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.11 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -31,7 +31,7 @@
 | 22 | Evening is **purple twilight**, not orange/golden | v0.6 |
 | 23 | The Dream Dollhouse is **unlocked when the shop first expands**: it gets its own **Window Display room** next to the shop. The starting shop is just counter + two shelves | v0.7 |
 | 24 | Customers **walk in along the sidewalk** from either side and leave the same way, fading out near the end of the road | v0.7 |
-| 25 | **Close early any time:** the open-hours clock is a Close button (tap twice to confirm). When sold out it becomes a one-tap "Close early" with a nudge. Never closes automatically (customers at bare shelves still leave useful wish notes) | v0.8 |
+| 25 | **Close early any time:** the day button becomes a Close button during open hours (tap twice to confirm). When sold out it becomes a one-tap "Close early" with a nudge. Never closes automatically (customers at bare shelves still leave useful wish notes) | v0.8 |
 | 26 | Open hours last **3 minutes**, evening **25 seconds** (tunable in `js/sim/day.js`). Evening length changed by #33 | v0.8 |
 | 27 | **First expansion:** a **Grow** button in the toolbar opens the build sheet. The Window Display costs **🪙 100**, can be built any time, and goes right of the shop | v0.9 |
 | 28 | **Dream Dollhouse v0** is a two-storey house with **4 rooms, one slot each**: Bedroom, Playroom (upstairs), Parlor, Tea Room (downstairs). Each slot fits some kinds of item (bed, seat, table, light, friend, toy). An item can go in several slots at once (Collection items are free and unlimited) | v0.9 |
@@ -40,6 +40,7 @@
 | 31 | **Sparkle drives foot traffic:** customers arrive more often (up to 1.5× at 30 Sparkle) and some stop at the window first ("ooh!"). Window-peekers often **want something they saw in the dollhouse** (the bubble shows it) | v0.9 |
 | 32 | **Collection album** (toolbar button) shows every item as a sticker: found ones in color, the rest as silhouettes. Album pages and page rewards wait until there are more items per theme | v0.9 |
 | 33 | **Short evening:** twilight fades in over **5 seconds**, then the day closes as soon as the shop is empty. Customers still inside finish first, however long that takes (playtest: the 25 s evening was mostly waiting) | v0.10 |
+| 34 | **No digital timers anywhere.** Time of day shows only as the progress bar at the top; the Close button just says "Close" (it used to show a countdown like 2:15) | v0.11 |
 
 ## 1. Pitch
 
@@ -194,7 +195,7 @@ Your very own dollhouse, displayed in the shop's front window.
 | **Evening** | Purple twilight; last customers wave goodbye; lamps glow softly. | 5 s of twilight, then closes once the shop is empty |
 | **Close** | Day summary: coins, happy customers, wish notes, Sparkle. Story moments happen here. Then order for tomorrow, buy upgrades, and decorate, all with no timer. | None |
 
-- **Close early (decided v0.8):** the clock button closes the shop any time (two taps). When sold out, one tap and a "Sold out! 🎉" nudge. Closing early goes to evening, so the last customers still finish.
+- **Close early (decided v0.8):** the day button (🕒 Close) closes the shop any time (two taps). When sold out, one tap and a "Sold out! 🎉" nudge. Closing early goes to evening, so the last customers still finish.
 - Days only advance when you play.
 - **Offline earnings:** if you have helpers, they keep the shop open a little while you're away, at a reduced rate capped at a few hours. When you return: "While you were away, Mia sold 9 things and found a wish note!"
 - 💡 Weekends bring more visitors; some special days only happen on certain days.
@@ -276,7 +277,7 @@ Your very own dollhouse, displayed in the shop's front window.
 | Tap & hold | See what something is |
 | Decorate mode | Tap a slot → pick an item from your Collection |
 
-Big buttons sit at the **bottom of the screen**: order book, posters, helpers, decorate, Collection. Today (v0.9): **Order**, **Album**, the **day button**, and **Grow** (which becomes **Dollhouse** once built). The top shows coins, Hearts, Sparkle, and a little sun/moon clock.
+Big buttons sit at the **bottom of the screen**: order book, posters, helpers, decorate, Collection. Today (v0.9): **Order**, **Album**, the **day button**, and **Grow** (which becomes **Dollhouse** once built). The top shows coins, Hearts, Sparkle, and the day's progress bar. **No digital timers anywhere** (decision #34): time shows as the bar and the light, never as numbers.
 
 ## 13. Camera
 
@@ -351,4 +352,4 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 
 1. Monetization model for the store builds (§16), which can wait until then.
 2. **Early economy is too tight** (playtest, Day 1): with 50 coins and 18 shelf slots you can sell out in the first minute of a 3-minute day. Options for the upgrades milestone: bigger or extra shelves, a lunchtime delivery, more starting coins or stock, cheaper bulk boxes, slower browsing.
-3. ~~**Evening is too long**~~ (playtest after M6, 2026-10-09). **Resolved in v0.10 (decision #33):** 5 s of twilight, then the day closes once the shop is empty. Check in the next playtest that 5 s is long enough to enjoy the twilight.
+3. ~~**Evening is too long**~~ (playtest after M6, 2026-10-09). **Resolved in v0.10 (decision #33):** 5 s of twilight, then the day closes once the shop is empty. The user tried it and approved it.

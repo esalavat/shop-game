@@ -73,7 +73,7 @@ js/
     pick.js             # Raycast taps → interactable objects
     fx.js               # Coin pops, sparkles, hearts, confetti
   ui/                   # DOM overlay
-    hud.js              # Coins / Hearts / Sparkle / clock
+    hud.js              # Coins / Hearts / Sparkle / day progress bar (no digital timers)
     toolbar.js          # Bottom buttons
     orderbook.js, album.js, grow.js (build sheet / Dollhouse button), decorate.js, day.js (summary)
     story.js            # Dialogue cards for story moments

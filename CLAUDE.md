@@ -41,9 +41,11 @@ deliveries, carrying boxes to shelves), customers with checkout and wish notes, 
   Numbers to tune with feedback: expansion cost (`js/data/dollhouse.js` `EXPANSIONS`), item
   Sparkle (`js/data/items.js`), traffic and peek rates (`SPARKLE` in `js/data/dollhouse.js`).
 
-- **Short evening (GDD v0.10 decision #33), built 2026-10-09; waiting on the user's playtest:**
+- **Short evening (GDD v0.10 decision #33), built 2026-10-09:**
   twilight fades in over 5 s (`DAY_LENGTH.evening` in `js/sim/day.js`), then the day closes as
-  soon as the shop is empty. Customers still inside finish first.
+  soon as the shop is empty. Customers still inside finish first. The user tried it and approved it.
+- **No digital timers (GDD v0.11 decision #34):** the Close button just says "Close"; the HUD bar
+  is the only sign of time left.
 
 **Next: M7 (Helpers, upgrades, creator)**: hire a cashier, a few upgrades, a simple shopkeeper
 creator. Before or during M7, revisit the early economy (GDD §18 #2): players sell out within the
@@ -77,6 +79,8 @@ first minute. Also fix the open bugs in `docs/ISSUES.md` (delivery boxes blockin
   `scripts/stamp.js` version-stamps every module URL so phones never mix cached files from
   different deploys.
 - **Commits:** plain messages, with no "Co-Authored-By: Claude" trailer.
+- **No digital timers** (countdowns like 2:15) anywhere in the game UI. Show time as a bar or
+  through the lighting.
 - **Process with the user:** discuss design changes and update docs/GDD.md before building them.
   Each milestone ends with a push so the user can try it on their phone (a Pixel), then give
   feedback.

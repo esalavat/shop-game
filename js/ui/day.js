@@ -1,14 +1,9 @@
-// The day's controls: the toolbar day button (Open shop / clock that closes early / Summary) and
+// The day's controls: the toolbar day button (Open shop / Close / Summary) and
 // the closing summary.
 
 import { ITEMS } from '../data/items.js';
-import { DAY_LENGTH, openShop, startNextDay, closeEarly, soldOut } from '../sim/day.js';
+import { openShop, startNextDay, closeEarly, soldOut } from '../sim/day.js';
 import { events } from '../core/events.js';
-
-const clock = (seconds) => {
-  const s = Math.max(0, Math.ceil(seconds));
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-};
 
 const CONFIRM_MS = 3000; // how long "Tap again to close" waits for the second tap
 
@@ -74,7 +69,7 @@ export function createDayUI(state, thumbs, orderBook, toast) {
         }
         if (out) next = ['🌙', 'Close early', 'primary'];
         else if (performance.now() < armedUntil) next = ['🌙', 'Tap again to close', 'primary'];
-        else next = ['🕒', `${clock(DAY_LENGTH.open - d.time)} · Close`, 'passive'];
+        else next = ['🕒', 'Close', 'passive']; // no digital time: the HUD bar shows how much day is left
       }
       else if (d.phase === 'evening') next = ['🌙', 'Closing soon', 'passive'];
       else next = ['📋', 'Day summary', ''];
