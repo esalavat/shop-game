@@ -259,7 +259,9 @@ One Pages site holds two builds (GDD #56):
   `dev` channel. Failing tests stop the deploy, so the site stays as it was.
 - Pages names each deploy after `GITHUB_SHA` and silently keeps the old files for a name it has already
   deployed. A release of `main`'s tip has the same commit as the push before it (this bit the first
-  same-day release), so the workflow names the deploy after a hash of both builds' commits instead.
+  same-day release). `actions/deploy-pages` always uses the triggering commit (and a step can't override
+  `GITHUB_SHA`), so the workflow's last step calls the Pages deployment API itself (via `actions/github-script`)
+  with a version hashed from both builds' commits.
 - `scripts/stamp.js <out> <version> [channel]` writes an import map that points every module at
   `file.js?v=<commit>`, and writes `<html data-channel data-version>` (read by `js/core/channel.js`). The
   dev channel also gets "(DEV)" in its title and home-screen app name, and a "DEV · <commit>" badge.

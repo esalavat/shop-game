@@ -61,16 +61,40 @@ jobs:
           npm test
           node scripts/stamp.js ../_site/dev "$(git rev-parse HEAD)" dev
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-      # Pages names each deploy after GITHUB_SHA and skips one it has seen. A release of main's tip has
-      # the same commit as the push before it, so name the deploy after both builds instead.
-      - name: Name this deploy
-        id: version
-        run: echo "id=$(echo -n '${{ steps.public.outputs.sha }} ${{ steps.dev.outputs.sha }}' | sha1sum | cut -c1-40)" >> "$GITHUB_OUTPUT"
       - uses: actions/configure-pages@v6
-      - uses: actions/upload-pages-artifact@v5
+      - id: artifact
+        uses: actions/upload-pages-artifact@v5
         with:
           path: _site
+      # Pages skips a deploy whose build version it has already deployed, and actions/deploy-pages always
+      # uses the triggering commit. A release of main's tip has the same commit as the push before it, so
+      # this deploys through the API (what deploy-pages does) with a version made from both builds' commits.
       - id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/github-script@v9
         env:
-          GITHUB_SHA: ${{ steps.version.outputs.id }}
+          ARTIFACT_ID: ${{ steps.artifact.outputs.artifact_id }}
+          BUILDS: ${{ steps.public.outputs.sha }} ${{ steps.dev.outputs.sha }}
+        with:
+          script: |
+            const { createHash } = require('node:crypto');
+            const version = createHash('sha1').update(process.env.BUILDS).digest('hex');
+            const { owner, repo } = context.repo;
+            const { data } = await github.request('POST /repos/{owner}/{repo}/pages/deployments', {
+              owner, repo,
+              artifact_id: Number(process.env.ARTIFACT_ID),
+              pages_build_version: version,
+              oidc_token: await core.getIDToken(),
+            });
+            core.info(`Deploying ${process.env.BUILDS} as ${version}`);
+            core.setOutput('page_url', data.page_url);
+            const id = data.id ?? data.status_url.split('/').pop();
+            for (let i = 0; i < 120; i++) {
+              await new Promise((r) => setTimeout(r, 5000));
+              const { data: d } = await github.request('GET /repos/{owner}/{repo}/pages/deployments/{id}', { owner, repo, id });
+              core.info(`Status: ${d.status}`);
+              if (d.status === 'succeed') return;
+              if (['deployment_failed', 'deployment_content_failed', 'deployment_cancelled', 'deployment_lost'].includes(d.status)) {
+                return core.setFailed(`Pages deployment ${d.status}`);
+              }
+            }
+            core.setFailed('Pages deployment timed out');
