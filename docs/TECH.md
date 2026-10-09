@@ -118,21 +118,23 @@ docs/                   # GDD, tech plan
 
 ```js
 {
-  version: 1,
+  version: 16,                         // STATE_VERSION (js/sim/state.js)
   day: { number: 1, phase: 'morning', time: 0 },
   coins: 50, hearts: 0, sparkle: 0,
-  building: { rooms: [{ id, type, col, floor, theme, shelves: [...] }] },
+  building: { rooms: [{ id, type, col, floor, style?, fixtures: [{ id, kind, x, z, slots? }] }] }, // type: shop | display | room | stairs | landing; style: shelf rooms (v16)
   stock: { boxes: [...], back: { itemId: count } },
   orders: [{ itemId, qty, arrivesDay }],
   customers: [{ id, type, state, pos, wants, cart, ... }],   // transient, not saved
   collection: { itemId: true },
   dollhouse: { slots: { slotId: itemId } },   // v0: 4 fixed rooms (data/dollhouse.js); later rooms/wallpaper
   helpers: { cashier: true },          // one-time hires (v8); Mia's position is live-only in `cashier`
-  upgrades: { cart: true, shoes: true, lunch: true },
-  keeper: { ..., carrying, spare, arriveRoom }, // `spare` = second box on the Stock Cart; `arriveRoom` while walking between rooms (v9)
+  upgrades: { cart: true, shoes: true, lunch: true },   // (Sorting Smarts was removed in v16)
+  keeper: { ..., carrying, spare, arriveRoom, legs, y }, // `spare` = second box on the Stock Cart; `arriveRoom` while walking between rooms (v9); `legs` / `y` for routes up the stairs (v15)
+  stocker: { ...same walking fields, carrying, spare, job, timer } | null, // Bea, once hired (v11)
   shopkeeper: { hair, hairColor, skin, outfit, accessory, created },
   story: { seen: [...], flags: {...} },
   settings: { muted: false },
+  best: { coins }, tutorial: 'done',
   lastSeen: 1760000000000
 }
 ```

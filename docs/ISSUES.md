@@ -6,6 +6,15 @@ Design questions (not bugs) belong in [GDD.md](GDD.md) §18.
 
 ## Open
 
+### Toasts sit on top of the "Tap a ＋" banner (2026-10-09, noticed in testing)
+- In room placement mode, a toast (e.g. "Your 🪜 Stairwell is open!") appears over the place banner at the top, so
+  both are hard to read for a moment. Minor; move toasts below the banner while it shows, or hide the banner first.
+
+### A Stairwell built before v0.27 can sit away from the shop (2026-10-09, test build only)
+- Between v0.24 and v0.27 (on `/dev/` only) you chose where the Stairwell went. Those saves keep it where it is; new
+  ones always go right of the shop (#64). Nothing breaks (routes work from any column), it just doesn't match the
+  rule. Never on the public game.
+
 ### Delivery boxes stack too high and hide the shelves (2026-10-09, user)
 - The doorstep has four box spots (`BOX_SPOTS` in `js/sim/stock.js`); every box after that stacks on top. A big
   delivery (or a few days of orders left unpacked) builds tall towers in front of the shop that hide the shelves
