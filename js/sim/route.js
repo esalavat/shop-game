@@ -14,6 +14,12 @@ export const SIDEWALK = { edgeZ: 1.3, lane: 2.0, minZ: 1.6, maxZ: 2.1 };
 const DOOR = { shop: { x: 0.4, z: 1.1 }, other: { x: 0, z: 1.1 } };
 /** The greeter spot: on the sidewalk by the shop door, left of it (boxes sit to the right). */
 export const GREETER = { x: -0.15, z: 1.75, face: 0 };
+/**
+ * The show-off spot in the Window Display (room-local): just behind the Dream Dollhouse's left side,
+ * so the dollhouse is in front of her and she never hides it (or stands behind a plant). The bonus
+ * counts anywhere in the room; this is just the best place to stand.
+ */
+export const SHOWOFF = { x: -0.75, z: -0.55, face: 0 };
 const STEP_DEPTH = 0.25; // the front step from a room's floor down to the sidewalk
 
 export const shopRoom = (state) => state.building.rooms.find((r) => r.type === 'shop') ?? state.building.rooms[0];

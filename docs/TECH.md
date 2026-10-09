@@ -161,6 +161,9 @@ docs/                   # GDD, tech plan
   (`CUSTOMER.greetedSecondItem`).
 - Input: an invisible sidewalk strip in `main.js` (`world.street`). Taps near the shop door go to the greeter spot;
   other sidewalk taps go there (clamped to `streetBounds`). Rooms upstairs aren't reachable yet (no stairs).
+- Bonus spots (GDD #44): `render/views/spots.js` draws a ring at `GREETER` and `SHOWOFF` (`sim/route.js`) and gives
+  each a tap box (`userData.spot`). `markers()` feeds bobbing DOM icons (👋 / ✨, `.bubble.spot`) that `main.js` shows
+  while she's elsewhere. The show-off spot only shows once Sparkle > 0. Floor and sidewalk walks end facing the camera (`face: 0`).
 
 ### 4.4 Customers & movement
 - Each customer is a small **state machine**: `enter → browse(shelf) → pick → queue → checkout → leave` (plus `peekWindow`, `wishNote`).

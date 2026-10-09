@@ -53,6 +53,8 @@ Dream Dollhouse v0 (M6, approved), and M7:
     pick up a second item.
   - The rest of the sidewalk has no bonus.
   - The creator has a 🎲 randomize button.
+  - **Bonus spots are marked (GDD #44):** a glowing ring and a bobbing icon (👋 by the shop door, ✨ beside the
+    dollhouse once something is on show). Tap one to send her there. She faces the camera after a floor walk.
 - **Planned, not built: boy or girl shopkeeper** in the creator (GDD #43).
 - The early economy stays as it is (decision #39): closing early covers selling out.
 - **Pip's rescue box (GDD v0.13 #40), built 2026-10-09:** if a morning starts with nothing to sell,

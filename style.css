@@ -376,6 +376,11 @@ button {
 .bubble.waiting { font-size: 18px; animation: wiggle 1s ease-in-out infinite; }
 .bubble.prompt { background: var(--pink); color: #fff; }
 .bubble.prompt::after { border-top-color: var(--pink); }
+/* Bonus-spot markers (views/spots.js): a little bobbing icon just above a glowing ring on the ground. */
+.bubble.spot { padding: 2px 5px; border: 2px solid var(--pink); border-radius: 50%; background: rgba(255, 255, 255, 0.85); font-size: 15px; animation: bob 1.4s ease-in-out infinite; }
+.bubble.spot::after { display: none; }
+.bubble.spot-showoff { border-color: #e8b64a; }
+@keyframes bob { 50% { margin-top: -5px; } }
 
 @keyframes wiggle {
   0%, 100% { rotate: 0deg; }

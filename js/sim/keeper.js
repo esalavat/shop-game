@@ -4,7 +4,7 @@
 
 import { events } from '../core/events.js';
 import { useSpot } from '../data/fixtures.js';
-import { planRoute, shopRoom, roomOffset, onStreet, GREETER } from './route.js';
+import { planRoute, shopRoom, roomOffset, onStreet, GREETER, SHOWOFF } from './route.js';
 import { ROOM_SIZE } from '../data/rooms.js';
 import { stepAlong } from './walker.js';
 import { boxSpot, findFixture } from './stock.js';
@@ -84,6 +84,13 @@ function settle(state) {
 /** Out to the greeter spot by the shop door (GDD #41). */
 export function walkToGreeter(state, navs) {
   return walkTo(state, navs, { street: true, x: GREETER.x, z: GREETER.z }, { face: GREETER.face });
+}
+
+/** Over to the Window Display, beside the Dream Dollhouse, to show it off (GDD #41). */
+export function walkToShowOff(state, navs) {
+  const room = state.building.rooms.find((r) => r.type === 'display' && r.floor === 0);
+  if (!room) return false;
+  return walkTo(state, navs, { roomId: room.id, x: SHOWOFF.x, z: SHOWOFF.z }, { face: SHOWOFF.face });
 }
 
 /** Standing at the greeter spot, ready to say hello to whoever comes in. */

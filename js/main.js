@@ -20,9 +20,10 @@ import { createCustomersView } from './render/views/customers.js';
 import { createCheckoutView } from './render/views/checkout.js';
 import { createDollhouseView } from './render/views/dollhouse.js';
 import { createHelpersView } from './render/views/helpers.js';
+import { createSpotsView } from './render/views/spots.js';
 import { DOLLHOUSE } from './render/models/furniture.js';
 import { buildNav } from './sim/nav.js';
-import { walkTo, walkToFixture, walkToBox, walkToGreeter, tickKeeper } from './sim/keeper.js';
+import { walkTo, walkToFixture, walkToBox, walkToGreeter, walkToShowOff, tickKeeper } from './sim/keeper.js';
 import { GREETER, SIDEWALK, groundAt, shopRoom, streetBounds } from './sim/route.js';
 import { tickDay, twilightFor } from './sim/day.js';
 import { tickCustomers } from './sim/customers.js';
@@ -125,16 +126,19 @@ const customersView = createCustomersView(state, roomOrigin);
 const checkoutView = createCheckoutView(state, roomOrigin);
 const dollhouseView = createDollhouseView(state, roomOrigin);
 const helpersView = createHelpersView(state, roomOrigin);
+const spotsView = createSpotsView(state, roomOrigin);
 const bubbles = createShopBubbles({ state, overlay, customersView, checkoutView, thumbs });
-scene.add(keeperView.object, helpersView.group, boxesView.group, shelvesView.group, customersView.group, checkoutView.group, dollhouseView.group);
+scene.add(keeperView.object, helpersView.group, spotsView.group, boxesView.group, shelvesView.group, customersView.group, checkoutView.group, dollhouseView.group);
 boxesView.rebuild();
 shelvesView.rebuild();
 dollhouseView.rebuild();
+spotsView.rebuild();
 events.on('buildingChanged', () => {
   buildWorld();
   boxesView.rebuild();
   shelvesView.rebuild();
   dollhouseView.rebuild();
+  spotsView.rebuild();
   if (decorate.isOpen) decorate.close();
   focusAll();
 });
@@ -201,10 +205,11 @@ attachGestures(canvas, {
     }
     // In the morning, tapping the shopkeeper herself opens the creator.
     const keeperTargets = state.day.phase === 'morning' && state.keeper.roomId === focusedRoomId ? keeperView.hitTargets : [];
-    const targets = [...keeperTargets, ...world.building.hitTargets, ...boxesView.hitTargets, ...customersView.hitTargets, world.street];
+    const targets = [...keeperTargets, ...world.building.hitTargets, ...boxesView.hitTargets, ...customersView.hitTargets, ...spotsView.hitTargets, world.street];
     const hit = pickAt(rig.camera, canvas, x, y, targets);
     if (!hit) return;
     if (hit.object.userData.keeper) return creator.open();
+    if (hit.object.userData.spot) return tapSpot(hit.object.userData.spot);
     if (hit.object.userData.street) return tapStreet(hit.point);
     const { roomId, fixtureId, boxId, customerId, floor } = hit.object.userData;
     const room = roomById(roomId);
@@ -233,7 +238,8 @@ attachGestures(canvas, {
       const task = state.keeper.carrying && fixture.slots ? { type: 'stock', fixtureId } : null;
       if (walkToFixture(state, navs, fixture, task)) tapFeedback();
     } else if (floor) {
-      if (walkTo(state, navs, { roomId, x: hit.point.x - o.x, z: hit.point.z - o.z })) tapFeedback();
+      // She turns to face you when she gets there.
+      if (walkTo(state, navs, { roomId, x: hit.point.x - o.x, z: hit.point.z - o.z }, { face: 0 })) tapFeedback();
     }
   },
   onDrag: (dx, dy) => rig.pan(dx, dy, canvas.clientHeight),
@@ -296,6 +302,29 @@ function tapFeedback() {
   if (!spot) return;
   const o = roomOrigin(k.roomId);
   fx.tapRing(new THREE.Vector3(o.x + spot.x, o.y + groundAt(spot.z), o.z + spot.z));
+}
+
+/** Bobbing icons over the bonus spots (hidden while decorating or in the creator). */
+const shownMarkers = new Set();
+function updateSpotMarkers() {
+  const list = decorate.isOpen || creator.isOpen ? [] : spotsView.markers();
+  const keep = new Set(list.map((m) => m.id));
+  for (const id of shownMarkers) if (!keep.has(id)) { overlay.removeBubble(`spot-${id}`); shownMarkers.delete(id); }
+  for (const m of list) {
+    overlay.bubble(`spot-${m.id}`, () => m.position, m.icon, `spot spot-${m.id}`);
+    shownMarkers.add(m.id);
+  }
+}
+
+/** A glowing bonus spot (views/spots.js): the greeter spot or the show-off spot by the dollhouse. */
+function tapSpot(id) {
+  if (id === 'showoff') {
+    const room = displayRoom(state);
+    if (room && focusedRoomId !== room.id) focusRoom(room);
+    if (walkToShowOff(state, navs)) tapFeedback();
+  } else if (walkToGreeter(state, navs)) {
+    tapFeedback();
+  }
 }
 
 /** The sidewalk: in front of the shop door she waits to greet people; anywhere else she just goes there. */
@@ -379,6 +408,8 @@ startLoop({
     customersView.frame(dt, alpha);
     checkoutView.update(dt);
     dollhouseView.update(dt);
+    spotsView.update(dt);
+    updateSpotMarkers();
     fx.update(dt);
     rig.update(dt, time);
     hud.update();

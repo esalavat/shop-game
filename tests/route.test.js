@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import { createState } from '../js/sim/state.js';
 import { buildNav } from '../js/sim/nav.js';
 import { addRoom } from '../js/sim/building.js';
-import { walkTo, walkToFixture, walkToGreeter, keeperGreeting, tickKeeper } from '../js/sim/keeper.js';
+import { walkTo, walkToFixture, walkToGreeter, walkToShowOff, keeperGreeting, tickKeeper } from '../js/sim/keeper.js';
 import { spawnCustomer, tickCustomers } from '../js/sim/customers.js';
 import { peekChance, peekWantChance, keeperShowingOff } from '../js/sim/collection.js';
-import { GREETER, SIDEWALK } from '../js/sim/route.js';
+import { GREETER, SHOWOFF, SIDEWALK } from '../js/sim/route.js';
 import { SPARKLE } from '../js/data/dollhouse.js';
 import { CUSTOMER } from '../js/data/customers.js';
 import { events } from '../js/core/events.js';
@@ -103,4 +103,14 @@ test('showing off the dollhouse draws more window-peekers who want what they saw
   run(s, 20);
   assert.ok(peekChance(s) > before);
   assert.equal(peekWantChance(s), SPARKLE.keeperPeekWant);
+});
+
+test('the show-off spot beside the dollhouse is reachable, and she faces the camera there', () => {
+  const { s, display, navs } = withDisplay();
+  assert.ok(walkToShowOff(s, navs));
+  run(s, 20);
+  assert.equal(s.keeper.roomId, display.id);
+  assert.ok(Math.hypot(s.keeper.x - SHOWOFF.x, s.keeper.z - SHOWOFF.z) < 1e-6);
+  assert.equal(s.keeper.facing, 0);
+  assert.ok(keeperShowingOff(s));
 });
