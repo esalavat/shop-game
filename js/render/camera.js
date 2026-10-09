@@ -11,7 +11,7 @@ export class CameraRig {
   constructor() {
     this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 120);
     this.aspect = 1;
-    this.target = { cx: 0, cy: 0, w: 1, h: 1, zoom: 1 };
+    this.target = { cx: 0, cy: 0, w: 1, h: 1, zoom: 1, lift: 0 };
     this.view = { ...this.target };
     this.limits = { minX: -Infinity, maxX: Infinity, minY: -Infinity, maxY: Infinity };
     this.halfH = 1;
@@ -24,9 +24,12 @@ export class CameraRig {
     this._clamp();
   }
 
-  /** Fit a w x h area centered on (cx, cy) to the screen. */
-  frame(cx, cy, w, h, instant = false) {
-    Object.assign(this.target, { cx, cy, w, h, zoom: 1 });
+  /**
+   * Fit a w x h area centered on (cx, cy) to the screen. `lift` raises it on screen by that fraction
+   * of the screen height (e.g. to keep it above a bottom panel).
+   */
+  frame(cx, cy, w, h, instant = false, lift = 0) {
+    Object.assign(this.target, { cx, cy, w, h, zoom: 1, lift });
     this._clamp();
     if (instant) Object.assign(this.view, this.target);
   }
@@ -52,14 +55,14 @@ export class CameraRig {
 
   update(dt, time) {
     const k = 1 - Math.exp(-dt * 7);
-    for (const key of ['cx', 'cy', 'w', 'h', 'zoom']) this.view[key] += (this.target[key] - this.view[key]) * k;
+    for (const key of ['cx', 'cy', 'w', 'h', 'zoom', 'lift']) this.view[key] += (this.target[key] - this.view[key]) * k;
     const v = this.view;
     this.halfH = Math.max(v.h / 2, v.w / 2 / this.aspect) / v.zoom;
 
     const yaw = THREE.MathUtils.degToRad(Math.sin(time * 0.4) * 0.6);
     const pitch = PITCH + THREE.MathUtils.degToRad(Math.sin(time * 0.31) * 0.3);
     this._dir.set(Math.sin(yaw) * Math.cos(pitch), Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch));
-    this._center.set(v.cx, v.cy, 0.3);
+    this._center.set(v.cx, v.cy - v.lift * 2 * this.halfH, 0.3);
 
     const cam = this.camera;
     cam.top = this.halfH;

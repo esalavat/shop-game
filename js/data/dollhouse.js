@@ -1,0 +1,27 @@
+// The Dream Dollhouse in the Window Display: a two-storey house with four rooms, one slot each.
+//   cell: [column, storey] inside the house (0 = left / downstairs, 1 = right / upstairs)
+//   fits: item kinds (ITEMS[id].kind) that can go there
+
+export const DOLLHOUSE_SLOTS = [
+  { id: 'bedroom', name: 'Bedroom', icon: '🛏️', cell: [0, 1], fits: ['bed', 'friend', 'light'] },
+  { id: 'playroom', name: 'Playroom', icon: '🧸', cell: [1, 1], fits: ['toy', 'friend', 'light'] },
+  { id: 'parlor', name: 'Parlor', icon: '🛋️', cell: [0, 0], fits: ['seat', 'friend', 'light'] },
+  { id: 'tearoom', name: 'Tea Room', icon: '🫖', cell: [1, 0], fits: ['table', 'seat', 'light'] },
+];
+
+export const SPARKLE = {
+  fullHouse: 5,       // bonus when every room has something in it
+  trafficFull: 60,    // Sparkle that would double how often visitors arrive...
+  trafficMax: 1.5,    // ...capped at this many times as often
+  peekBase: 0.25,     // chance a visitor stops at the window first, once anything is on show...
+  peekPer: 1 / 60,    // ...plus this much per Sparkle...
+  peekMax: 0.7,       // ...up to this
+  peekWant: 0.5,      // chance a window-peeker then wants something from the dollhouse
+  peekTime: [1.6, 2.4], // seconds spent looking in the window
+  peekOffset: [0.7, 1.15], // how far to the side of the window's middle they stand, so the dollhouse stays in view
+};
+
+/** Shop expansions, in the order they unlock. */
+export const EXPANSIONS = [
+  { type: 'display', cost: 100 },
+];

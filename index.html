@@ -33,7 +33,9 @@
 
   <div id="toolbar">
     <button id="btn-order"><span class="tb-ico" aria-hidden="true">📖</span>Order</button>
+    <button id="btn-album"><span class="tb-ico" aria-hidden="true">🌟</span>Album</button>
     <button id="btn-day"><span class="tb-ico" aria-hidden="true"></span><span class="tb-label"></span></button>
+    <button id="btn-grow"><span class="tb-ico" aria-hidden="true">🔨</span><span class="tb-label">Grow</span></button>
   </div>
 
   <div id="orderbook" class="sheet" hidden>
@@ -45,6 +47,43 @@
       <div class="pending"></div>
       <div class="cards"></div>
     </div>
+  </div>
+
+  <div id="album" class="sheet" hidden>
+    <div class="sheet-body">
+      <div class="sheet-head">
+        <h2>Collection</h2>
+        <button class="close" aria-label="Close">✕</button>
+      </div>
+      <div class="pending album-count"></div>
+      <div class="stickers"></div>
+    </div>
+  </div>
+
+  <div id="grow" class="sheet" hidden>
+    <div class="sheet-body">
+      <div class="sheet-head">
+        <h2>Grow your shop</h2>
+        <button class="close" aria-label="Close">✕</button>
+      </div>
+      <div class="grow-card">
+        <div class="grow-art" aria-hidden="true">🪟🏠✨</div>
+        <h3>Window Display</h3>
+        <p>A sunny shop window right next door, with your very own <b>Dream Dollhouse</b> inside.
+          Decorate it with treasures from your Collection. The more it sparkles, the more visitors stop by!</p>
+        <button class="grow-build"></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="decorate" hidden>
+    <div class="deco-head">
+      <h2>Dream Dollhouse <span class="deco-sparkle"></span></h2>
+      <button class="deco-done">Done</button>
+    </div>
+    <div class="deco-rooms"></div>
+    <div class="deco-hint"></div>
+    <div class="deco-items"></div>
   </div>
 
   <div id="boot-error" hidden>

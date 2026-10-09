@@ -1,18 +1,25 @@
-// The shop's speech bubbles and pop-ups: wish notes above customers, a bell when someone is
-// waiting with nobody at the counter, the scan / ring-up prompt, and coins floating up on a sale.
+// The shop's speech bubbles and pop-ups: "ooh!" at the window, wish notes above customers, a bell
+// when someone is waiting with nobody at the counter, the scan / ring-up prompt, and coins floating
+// up on a sale.
 
 import * as THREE from 'three';
 import { events } from '../core/events.js';
 import { keeperAtCounter } from '../sim/checkout.js';
 
 const WISH_SECONDS = 3;
+const PEEK_WORDS = ['ooh! ✨', 'so cute! 💖', 'wow ✨', 'aww 💖'];
 const ABOVE_COUNTER = new THREE.Vector3(0, 0.75, 0);
 
 export function createShopBubbles({ state, overlay, customersView, checkoutView, thumbs }) {
   const wishes = new Map(); // customerId -> { itemId, t }
+  const peeks = new Map();  // customerId -> { html }
   const counterAbove = () => checkoutView.counterTop()?.add(ABOVE_COUNTER) ?? null;
 
   events.on('wish', ({ customerId, itemId }) => wishes.set(customerId, { itemId, t: WISH_SECONDS }));
+  events.on('peek', ({ customerId, itemId }) => {
+    const html = itemId ? `<img alt="" src="${thumbs.get(itemId)}"> 💖` : PEEK_WORDS[Math.floor(Math.random() * PEEK_WORDS.length)];
+    peeks.set(customerId, { html });
+  });
   events.on('scanned', () => { const p = checkoutView.counterTop(); if (p) overlay.float(p, 'beep!', 'beep'); });
   events.on('sale', ({ amount, tip }) => {
     const p = checkoutView.counterTop();
@@ -32,6 +39,17 @@ export function createShopBubbles({ state, overlay, customersView, checkoutView,
           overlay.removeBubble(key);
         } else {
           overlay.bubble(key, () => customersView.headPosition(id), `<img alt="" src="${thumbs.get(w.itemId)}">`, 'wish');
+        }
+      }
+
+      for (const [id, p] of peeks) {
+        const key = `peek-${id}`;
+        // Shown while they stand at the window (gone once they walk on).
+        if (state.customers.find((c) => c.id === id)?.state !== 'peeking') {
+          peeks.delete(id);
+          overlay.removeBubble(key);
+        } else {
+          overlay.bubble(key, () => customersView.headPosition(id), p.html, 'peek');
         }
       }
 

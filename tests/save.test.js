@@ -89,3 +89,29 @@ test('a v4 save takes the Dream Dollhouse out of the shop and keeps shelf stock'
   assert.equal(shelves[1].slots[1], 'bed');
   assert.equal(s.building.rooms.length, 1);
 });
+
+test('a v6 save gets an empty Dream Dollhouse and no Sparkle', () => {
+  const store = memoryStorage();
+  const v6 = {
+    ...createState(0), version: 6, sparkle: 3,
+    day: { number: 4, phase: 'close', time: 0, stats: { coins: 0, tips: 0, served: 0, hearts: 0, sold: {}, wishes: [] } },
+  };
+  delete v6.dollhouse;
+  store.setItem(SAVE_KEY, JSON.stringify(v6));
+  const s = loadGame(store);
+  assert.equal(s.version, STATE_VERSION);
+  assert.deepEqual(s.dollhouse, { slots: {} });
+  assert.equal(s.sparkle, 0);
+  assert.equal(s.day.number, 4);
+});
+
+test('the Dream Dollhouse round-trips through a save', () => {
+  const store = memoryStorage();
+  const s = createState(0);
+  s.dollhouse.slots.tearoom = 'teaset';
+  s.sparkle = 3;
+  saveGame(s, store);
+  const loaded = loadGame(store);
+  assert.equal(loaded.dollhouse.slots.tearoom, 'teaset');
+  assert.equal(loaded.sparkle, 3);
+});

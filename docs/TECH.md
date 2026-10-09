@@ -43,7 +43,8 @@ js/
   data/                 # Content as plain data (no logic)
     items.js            # Products: id, set, price, cost, shelfType, slotType, rarity, model
     shelves.js          # Shelf types and capacities
-    rooms.js            # Room types, sizes, unlock costs
+    rooms.js            # Room types, sizes
+    dollhouse.js        # Dream Dollhouse slots, Sparkle tuning, shop expansions (costs)
     customers.js        # Customer types: wants, budgets, looks
     story.js            # Regulars, story beats, triggers
     upgrades.js
@@ -55,7 +56,7 @@ js/
     customers.js        # Spawning, browsing, buying, wish notes (state machines)
     checkout.js         # Queue, scanning, tips
     marketing.js        # Morning picks, special days, Sparkle → foot traffic
-    collection.js       # Unlocks, album pages, Dream Dollhouse slots, Sparkle
+    collection.js       # Dream Dollhouse placing, Sparkle, foot-traffic boost, window spot (unlocks happen in day.js)
     helpers.js          # Hired helpers doing jobs
     economy.js          # Coins, Hearts, Sparkle, costs
     story.js            # Checks triggers, queues story moments
@@ -68,13 +69,13 @@ js/
     building.js         # Builds the room grid shell from state
     rooms/              # Room interior builders per room type
     models/             # Procedural low-poly model builders (items, characters, furniture)
-    views/              # Sync state → scene: shelves, customers, boxes, dollhouse
+    views/              # Sync state → scene: shelves, customers, boxes, checkout, dollhouse (items in its rooms)
     pick.js             # Raycast taps → interactable objects
     fx.js               # Coin pops, sparkles, hearts, confetti
   ui/                   # DOM overlay
     hud.js              # Coins / Hearts / Sparkle / clock
     toolbar.js          # Bottom buttons
-    panels/             # Order book, Collection album, helpers, decorate, day summary
+    orderbook.js, album.js, grow.js (build sheet / Dollhouse button), decorate.js, day.js (summary)
     story.js            # Dialogue cards for story moments
     creator.js          # Shopkeeper creator
   input/
@@ -114,7 +115,7 @@ docs/                   # GDD, tech plan
   orders: [{ itemId, qty, arrivesDay }],
   customers: [{ id, type, state, pos, wants, cart, ... }],   // transient, not saved
   collection: { itemId: true },
-  dollhouse: { rooms: [{ type, wallpaper, floor, slots: { slotId: itemId } }] },
+  dollhouse: { slots: { slotId: itemId } },   // v0: 4 fixed rooms (data/dollhouse.js); later rooms/wallpaper
   helpers: [{ id, job, level, look }],
   shopkeeper: { hair, hairColor, skin, outfit, accessories },
   story: { seen: [...], flags: {...} },
@@ -127,6 +128,11 @@ docs/                   # GDD, tech plan
 - **Fixed-step sim** (e.g. 10 ticks/sec) for determinism and cheap logic; **render every animation frame** with interpolation for smooth movement.
 - Sim only advances during the **Open/Evening** phases; Morning and Close are untimed.
 - Pause sim and rendering when the tab is hidden (`visibilitychange`); on return, compute offline earnings from `lastSeen`.
+
+### 4.3.1 Decorate mode (M6)
+- `ui/decorate.js` is a bottom panel (not a dimmed sheet) so the 3D dollhouse stays visible and tappable above it.
+  `main.js` frames the camera with `rig.frame(..., lift)`, where `lift` raises the target above the panel.
+- While decorating, taps only hit the dollhouse's room hitboxes (`views/dollhouse.js`); the shop sim keeps running.
 
 ### 4.4 Customers & movement
 - Each customer is a small **state machine**: `enter → browse(shelf) → pick → queue → checkout → leave` (plus `peekWindow`, `wishNote`).
@@ -214,7 +220,7 @@ docs/                   # GDD, tech plan
 | M3 | **Stock loop** ✅ | Order book → boxes arrive next morning → open boxes → items onto shelves |
 | M4 | **Customers & checkout** ✅ | Customers browse, pick, queue; tap-to-scan checkout; coins and tips; wish notes |
 | M5 | **Day cycle** ✅ | Morning → Open → Evening → Close with lighting changes and a day summary |
-| M6 | **Collection & Dream Dollhouse v0** | Items unlock on delivery; first expansion builds the Window Display room; dollhouse with fixed slots; Sparkle drives foot traffic |
+| M6 | **Collection & Dream Dollhouse v0** ✅ | Items unlock on delivery; first expansion builds the Window Display room; dollhouse with fixed slots; Sparkle drives foot traffic |
 | M7 | **Helpers, upgrades, creator** | Hire a cashier; a few upgrades; simple shopkeeper creator |
 | M8 | **Polish pass** | Juice (pops, sparkles), first sounds, phone perf check, PWA manifest |
 

@@ -1,7 +1,8 @@
 // Customers: walk in, browse shelves for what they want, take it, queue at the counter, pay, leave.
 // If something they want isn't on the shelves, they leave a wish note instead (never upset).
 //
-// States: arriving (walking in from the street) -> entering -> toShelf -> browsing -> (next want...)
+// States: [toWindow -> peeking (stop at the Window Display first)] -> arriving (walking in from the
+//         street) -> entering -> toShelf -> browsing -> (next want...)
 //         -> toQueue -> queued -> paying -> paid -> leaving (out the door and off along the street)
 //         waitingQueue when the line is full; straight to leaving if they found nothing.
 
@@ -13,6 +14,8 @@ import { stepAlong } from './walker.js';
 import { newId, shopRoomId, findFixture } from './stock.js';
 import { keeperAtCounter, startCheckout } from './checkout.js';
 import { recordWish } from './day.js';
+import { SPARKLE } from '../data/dollhouse.js';
+import { peekChance, trafficBoost, windowX, dollhouseItems } from './collection.js';
 
 /** Just inside the shop's open front, where customers step in and out (room-local). */
 export const ENTRY = { x: 0.4, z: 1.1 };
@@ -73,7 +76,18 @@ export function spawnCustomer(state, rand = Math.random) {
     id: newId(state, 'c'), roomId, x: side * STREET.farX, z: STREET.inLane, facing: -side * Math.PI / 2,
     path: [{ x: ENTRY.x, z: STREET.inLane }, { x: ENTRY.x, z: ENTRY.z }], arriveFacing: null,
     side, state: 'arriving', timer: 0.3, look, wants: chooseWants(state, roomId, rand), basket: [], target: null,
+    windowWant: null,
   };
+  // Drawn in by the Dream Dollhouse: look in the window first, and maybe want something from it.
+  const chance = peekChance(state);
+  if (chance && rand() < chance) {
+    // Off to the side they came from, so they don't block the view of the dollhouse.
+    c.path = [{ x: windowX(state) + side * between(rand, SPARKLE.peekOffset), z: STREET.inLane }];
+    c.arriveFacing = Math.PI;
+    c.state = 'toWindow';
+    const onShow = [...dollhouseItems(state)];
+    if (onShow.length && rand() < SPARKLE.peekWant) c.wants[0] = c.windowWant = pick(rand, onShow);
+  }
   state.customers.push(c);
   events.emit('customerArrived', { customer: c });
   return c;
@@ -179,7 +193,7 @@ export function tickCustomers(state, navs, dt, rand = Math.random) {
   if (state.day.phase === 'open' && (state.spawnTimer -= dt) <= 0) {
     const anyStock = stockedSlots(state, shopRoomId(state)).length > 0;
     if (state.customers.length < CUSTOMER.maxInShop) spawnCustomer(state, rand);
-    state.spawnTimer = between(rand, anyStock ? CUSTOMER.spawnEvery : CUSTOMER.spawnEveryEmpty);
+    state.spawnTimer = between(rand, anyStock ? CUSTOMER.spawnEvery : CUSTOMER.spawnEveryEmpty) / trafficBoost(state);
   }
 
   for (const c of [...state.customers]) {
@@ -188,6 +202,20 @@ export function tickCustomers(state, navs, dt, rand = Math.random) {
     if (stepAlong(c, speed, dt) && c.arriveFacing !== null) c.facing = c.arriveFacing;
     const walking = c.path.length > 0;
     switch (c.state) {
+      case 'toWindow':
+        if (!walking) {
+          c.state = 'peeking';
+          c.timer = between(rand, SPARKLE.peekTime);
+          events.emit('peek', { customerId: c.id, itemId: c.windowWant });
+        }
+        break;
+      case 'peeking':
+        if ((c.timer -= dt) <= 0) {
+          c.path = [{ x: ENTRY.x, z: STREET.inLane }, { x: ENTRY.x, z: ENTRY.z }];
+          c.arriveFacing = null;
+          c.state = 'arriving';
+        }
+        break;
       case 'arriving':
         if (!walking) c.state = 'entering';
         break;

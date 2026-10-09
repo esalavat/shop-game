@@ -18,12 +18,15 @@ import { createShelvesView } from './render/views/shelves.js';
 import { makeThumbnails } from './render/thumbs.js';
 import { createCustomersView } from './render/views/customers.js';
 import { createCheckoutView } from './render/views/checkout.js';
+import { createDollhouseView } from './render/views/dollhouse.js';
+import { DOLLHOUSE } from './render/models/furniture.js';
 import { buildNav } from './sim/nav.js';
 import { walkTo, walkToFixture, walkToBox, tickKeeper } from './sim/keeper.js';
 import { tickDay, twilightFor } from './sim/day.js';
 import { tickCustomers } from './sim/customers.js';
 import { separate } from './sim/crowd.js';
 import { checkoutTap, keeperAtCounter } from './sim/checkout.js';
+import { displayRoom } from './sim/collection.js';
 import { ITEMS } from './data/items.js';
 import { attachGestures } from './input/touch.js';
 import { createHud } from './ui/hud.js';
@@ -32,6 +35,9 @@ import { createToaster } from './ui/toast.js';
 import { createOverlay } from './ui/overlay.js';
 import { createShopBubbles } from './ui/shopBubbles.js';
 import { createDayUI } from './ui/day.js';
+import { createAlbum } from './ui/album.js';
+import { createGrow } from './ui/grow.js';
+import { createDecorate } from './ui/decorate.js';
 
 const AUTOSAVE_SECONDS = 15;
 
@@ -49,6 +55,7 @@ const thumbs = makeThumbnails(renderer, Object.keys(ITEMS));
 const orderBook = createOrderBook(state, thumbs);
 const overlay = createOverlay(canvas, () => rig.camera);
 const dayUI = createDayUI(state, thumbs, orderBook, toast);
+const album = createAlbum(state, thumbs);
 lighting.setTwilight(twilightFor(state.day)); // start in the right light (e.g. reopened after closing)
 
 // ---------------------------------------------------------------------------
@@ -104,27 +111,67 @@ const boxesView = createBoxesView(state, roomOrigin);
 const shelvesView = createShelvesView(state, roomOrigin, () => keeperView.handPosition());
 const customersView = createCustomersView(state, roomOrigin);
 const checkoutView = createCheckoutView(state, roomOrigin);
+const dollhouseView = createDollhouseView(state, roomOrigin);
 const bubbles = createShopBubbles({ state, overlay, customersView, checkoutView, thumbs });
-scene.add(keeperView.object, boxesView.group, shelvesView.group, customersView.group, checkoutView.group);
+scene.add(keeperView.object, boxesView.group, shelvesView.group, customersView.group, checkoutView.group, dollhouseView.group);
 boxesView.rebuild();
 shelvesView.rebuild();
+dollhouseView.rebuild();
 events.on('buildingChanged', () => {
   buildWorld();
   boxesView.rebuild();
   shelvesView.rebuild();
+  dollhouseView.rebuild();
+  if (decorate.isOpen) decorate.close();
   focusAll();
 });
+
+// ---------------------------------------------------------------------------
+// Dream Dollhouse decorate mode
+// ---------------------------------------------------------------------------
+const decorate = createDecorate(state, thumbs, {
+  onSelect: (slotId) => dollhouseView.setSelected(slotId),
+  onClose() {
+    dollhouseView.setSelected(null);
+    const room = displayRoom(state);
+    if (room) focusRoom(room);
+  },
+});
+const grow = createGrow(state, { onDecorate: () => enterDecorate() });
+
+/** Zoom in on the Dream Dollhouse, kept above the decorate panel. */
+function enterDecorate(slotId) {
+  const room = displayRoom(state);
+  const pedestal = room?.fixtures.find((f) => f.kind === 'pedestal');
+  if (!pedestal) return;
+  orderBook.close();
+  decorate.open(slotId);
+  focusedRoomId = room.id;
+  const o = roomOrigin(room.id);
+  const houseH = (DOLLHOUSE.h + 0.42) * DOLLHOUSE.scale; // walls + roof
+  const cover = decorate.coverFraction();
+  rig.frame(o.x + pedestal.x, o.y + DOLLHOUSE.y + houseH / 2, 1.8, houseH / (1 - cover) + 0.5, false, cover / 2);
+}
 
 // ---------------------------------------------------------------------------
 // Input & layout
 // ---------------------------------------------------------------------------
 attachGestures(canvas, {
   onTap(x, y) {
+    if (decorate.isOpen) {
+      const hit = pickAt(rig.camera, canvas, x, y, dollhouseView.hitTargets);
+      if (hit) decorate.select(hit.object.userData.dollSlot);
+      return;
+    }
     const targets = [...world.building.hitTargets, ...boxesView.hitTargets, ...customersView.hitTargets];
     const hit = pickAt(rig.camera, canvas, x, y, targets);
     if (!hit) return;
     const { roomId, fixtureId, boxId, customerId, floor } = hit.object.userData;
     const room = roomById(roomId);
+    // The Dream Dollhouse opens decorate mode straight away.
+    if (room.type === 'display' && fixtureId && room.fixtures.find((f) => f.id === fixtureId)?.kind === 'pedestal') {
+      return enterDecorate();
+    }
     // First tap on another room just looks at it.
     if (roomId !== focusedRoomId) return focusRoom(room);
     // Walking between rooms comes later; for now she stays in her room.
@@ -158,6 +205,7 @@ attachGestures(canvas, {
 // Toolbar & messages
 // ---------------------------------------------------------------------------
 document.getElementById('btn-order').addEventListener('click', () => orderBook.open());
+document.getElementById('btn-album').addEventListener('click', () => album.open());
 
 events.on('orderPlaced', ({ order }) => toast(`Ordered ${ITEMS[order.itemId].name}! Pip brings it tomorrow 📦`));
 events.on('dayStarted', ({ day, delivered }) => {
@@ -169,6 +217,15 @@ events.on('boxPicked', () => toast('Now tap a shelf to unpack it!'));
 events.on('phaseChanged', ({ phase }) => {
   if (phase === 'open') toast("We're open! ☀️ Here come the customers.");
   if (phase === 'evening') toast('The sun is setting 🌙 Last customers of the day!');
+});
+events.on('expanded', ({ room }) => {
+  focusRoom(room); // show off the new room
+  toast('Your Window Display is open! 🎉');
+  setTimeout(() => toast('Tap the Dream Dollhouse to decorate it ✨'), 1200);
+});
+events.on('dollhouseChanged', ({ slotId, gained }) => {
+  const p = dollhouseView.worldPosition(slotId);
+  if (p && gained > 0) overlay.float(p, `+${gained} ✨`, 'sparkle');
 });
 events.on('shelfFull', () => toast('That shelf is full! Try another one.'));
 let toldAboutCounter = false;
@@ -198,7 +255,7 @@ const save = () => { if (!resetting) saveGame(state); };
 setInterval(save, AUTOSAVE_SECONDS * 1000);
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 addEventListener('pagehide', save);
-for (const e of ['orderPlaced', 'dayStarted', 'stocked', 'sale', 'phaseChanged', 'dayClosed']) events.on(e, save);
+for (const e of ['orderPlaced', 'dayStarted', 'stocked', 'sale', 'phaseChanged', 'dayClosed', 'expanded', 'dollhouseChanged']) events.on(e, save);
 
 // ---------------------------------------------------------------------------
 // Debug (?debug)
@@ -244,10 +301,12 @@ startLoop({
     shelvesView.update(dt);
     customersView.frame(dt, alpha);
     checkoutView.update(dt);
+    dollhouseView.update(dt);
     fx.update(dt);
     rig.update(dt, time);
     hud.update();
     dayUI.update();
+    grow.update();
     bubbles.update(dt);
     overlay.update(dt);
     debug?.frame(dt);

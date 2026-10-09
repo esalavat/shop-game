@@ -40,8 +40,8 @@ const BUILDERS = {
     cyl(g, 0.42, 0.46, 0.4, 10, P.cream, 0, 0.2, 0);
     cyl(g, 0.46, 0.46, 0.04, 10, P.pink, 0, 0.42, 0);
     const house = dreamDollhouse();
-    house.position.y = 0.44;
-    house.scale.setScalar(0.85);
+    house.position.y = DOLLHOUSE.y;
+    house.scale.setScalar(DOLLHOUSE.scale);
     g.add(house);
   },
 
@@ -65,26 +65,32 @@ export function buildFixture(kind) {
   return g;
 }
 
-/** The player's Dream Dollhouse: an open-front two-storey house with tiny furniture. */
+/**
+ * The Dream Dollhouse on its pedestal: an open-front house, two rooms per storey. Its furniture is
+ * whatever the player places (render/views/dollhouse.js). Sizes are in the house's own units; it sits
+ * `y` above the pedestal base, scaled by `scale`.
+ */
+export const DOLLHOUSE = { w: 0.9, h: 0.9, d: 0.5, t: 0.04, y: 0.44, scale: 0.85 };
+
+/** Floor-center of a room inside the house (house units), by [column, storey]. */
+export function dollhouseCell([col, storey]) {
+  const { w, h, t } = DOLLHOUSE;
+  return { x: (col - 0.5) * (w / 2), y: storey * (h / 2) + t / 2, z: 0.02 };
+}
+
 export function dreamDollhouse() {
   const g = new THREE.Group();
-  const w = 0.9, h = 0.9, d = 0.5, t = 0.04;
+  const { w, h, d, t } = DOLLHOUSE;
   box(g, w, h, t, '#fff0f6', 0, h / 2, -d / 2);
-  box(g, w / 2 - t, h / 2 - t, 0.01, P.lilac, -w / 4, h * 0.75, -d / 2 + t / 2 + 0.005);
-  box(g, w / 2 - t, h / 2 - t, 0.01, P.mint, w / 4, h * 0.25, -d / 2 + t / 2 + 0.005);
+  // A different wallpaper in each room.
+  const papers = [[P.mint, -1, 0], ['#fff3c9', 1, 0], [P.lilac, -1, 1], ['#ffe1ec', 1, 1]];
+  for (const [c, sx, storey] of papers) box(g, w / 2 - t, h / 2 - t, 0.01, c, sx * w / 4, h / 4 + storey * h / 2, -d / 2 + t / 2 + 0.005);
   box(g, t, h, d, P.pink, -w / 2, h / 2, 0);
   box(g, t, h, d, P.pink, w / 2, h / 2, 0);
   box(g, t, h, d, P.pink, 0, h / 2, 0);
   for (const y of [0, h / 2, h]) box(g, w + t, t, d + 0.02, P.cream, 0, y, 0);
   prism(g, w + 0.18, 0.42, d + 0.12, P.roof).position.y = h + t / 2;
   box(g, 0.1, 0.22, 0.1, P.brick, 0.25, h + 0.3, -0.05);
-  // tiny furniture
-  box(g, 0.22, 0.05, 0.14, P.lilac, -0.2, h / 2 + 0.05, -0.05);
-  box(g, 0.06, 0.03, 0.1, P.cream, -0.29, h / 2 + 0.09, -0.05);
-  cyl(g, 0.08, 0.08, 0.02, 8, P.cream, 0.22, 0.12, 0);
-  cyl(g, 0.015, 0.015, 0.1, 4, P.wood, 0.22, 0.06, 0);
-  cyl(g, 0.02, 0.06, 0.08, 6, P.butter, 0.25, h / 2 + 0.2, -0.12);
-  box(g, 0.12, 0.06, 0.08, P.pink, -0.22, 0.05, 0);
   return g;
 }
 

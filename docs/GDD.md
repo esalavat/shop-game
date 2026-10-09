@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.8 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.9 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -33,6 +33,12 @@
 | 24 | Customers **walk in along the sidewalk** from either side and leave the same way, fading out near the end of the road | v0.7 |
 | 25 | **Close early any time:** the open-hours clock is a Close button (tap twice to confirm). When sold out it becomes a one-tap "Close early" with a nudge. Never closes automatically (customers at bare shelves still leave useful wish notes) | v0.8 |
 | 26 | Open hours last **3 minutes**, evening **25 seconds** (tunable in `js/sim/day.js`) | v0.8 |
+| 27 | **First expansion:** a **Grow** button in the toolbar opens the build sheet. The Window Display costs **🪙 100**, can be built any time, and goes right of the shop | v0.9 |
+| 28 | **Dream Dollhouse v0** is a two-storey house with **4 rooms, one slot each**: Bedroom, Playroom (upstairs), Parlor, Tea Room (downstairs). Each slot fits some kinds of item (bed, seat, table, light, friend, toy). An item can go in several slots at once (Collection items are free and unlimited) | v0.9 |
+| 29 | **Decorate mode:** tap the Dream Dollhouse (or the toolbar's Dollhouse button). The camera zooms in; a bottom panel shows the 4 rooms and the Collection items that fit the chosen one. Tapping a room in the dollhouse also picks it. The shop keeps running while you decorate | v0.9 |
+| 30 | **Sparkle ✨** = the sum of the placed items' Sparkle (more special items sparkle more), **+5** when all 4 rooms are filled | v0.9 |
+| 31 | **Sparkle drives foot traffic:** customers arrive more often (up to 1.5× at 30 Sparkle) and some stop at the window first ("ooh!"). Window-peekers often **want something they saw in the dollhouse** (the bubble shows it) | v0.9 |
+| 32 | **Collection album** (toolbar button) shows every item as a sticker: found ones in color, the rest as silhouettes. Album pages and page rewards wait until there are more items per theme | v0.9 |
 
 ## 1. Pitch
 
@@ -137,11 +143,13 @@ Your very own dollhouse, displayed in the shop's front window.
 
 ### 6.1 What it is
 - **Unlocked with the first expansion (decided v0.7):** the starting shop is small, so the Dream Dollhouse arrives with a **Window Display room** built next to the shop, facing the street like a real shop window. Unlocking it is a milestone moment.
+- **How you get it (v0.9):** the toolbar's **Grow 🔨** button opens a build sheet; the Window Display costs **🪙 100** and is built right of the shop. The Grow button glows once you can afford it, then becomes the **Dollhouse 🏠** button.
 - A dollhouse with its own small grid of rooms (bedroom, living room, kitchen, nursery, pet room…), shown in the window and editable in a close-up **decorate mode**.
 - It starts as a bare one-room house and grows: more rooms, roof styles, wallpaper, floors, twinkly lights.
 
 ### 6.2 The Collection
 - Every item you **receive in a delivery** (or get as a story gift) is added to your **Collection**, a sticker-book style album.
+- **v0 album (v0.9):** one page with every item as a sticker (found = in color, not yet = silhouette with "Order one to find it"), a "4 of 6 found" count, and a 🏠 badge on items in your dollhouse. Themed pages and page rewards come when each theme has several items.
 - Anything in your Collection can be placed in the Dream Dollhouse **for free and forever**. It doesn't use up shop stock.
 - Collection pages fill in by theme (Tea Time, Sweet Dreams Bedroom, Pet Friends, Princess Castle…). Completing a page gives a reward.
 - Some **special treasures** only come from story events and can't be bought.
@@ -149,14 +157,26 @@ Your very own dollhouse, displayed in the shop's front window.
 
 ### 6.3 Decorating
 - Each dollhouse room has **fixed slots** (bed spot, table spot, wall spot, rug spot, shelf spot…). Tap a slot to pick an item from your Collection that fits it.
+- **v0 (v0.9):** 4 rooms with one slot each. Every item has a kind; each room fits a few kinds:
+
+  | Room | Fits | e.g. |
+  |---|---|---|
+  | Bedroom (upstairs left) | bed, friend, light | Rosy Bed, Petal Doll, Mushroom Lamp |
+  | Playroom (upstairs right) | toy, friend, light | Cottage Dollhouse, Petal Doll |
+  | Parlor (downstairs left) | seat, friend, light | Cozy Chair |
+  | Tea Room (downstairs right) | table, seat, light | Tiny Tea Set, Cozy Chair |
+
+  The starter items (tea set, chair) fit right away. One item can fill several rooms. Tapping the same item again (or "Empty") takes it out.
 - Wallpaper, floors, and roof are chosen per room or for the whole house.
 - 💡 A free placement grid can come later.
 
 ### 6.4 What it does
 - **Sparkle ✨:** each placed item adds Sparkle based on how special it is. Matching sets and fully decorated rooms add bonus Sparkle.
+  - **v0 numbers (v0.9):** tea set 3, chair 4, lamp 4, bed 5, doll 6, cottage 10; +5 when all 4 rooms are filled (max 30 today). Tunable in `js/data/items.js` and `js/data/dollhouse.js`.
+  - **Foot traffic (v0.9):** visitors arrive up to 1.5× as often (at 30 Sparkle). With anything in the window, 25–70% of visitors (more with more Sparkle) stop beside the window first (to one side, so they don't block the view) with an "ooh!" bubble, and half of those then want an item from the dollhouse.
 - Sparkle is the shop's main advertisement: more passersby, and they stop and peek in the window with little hearts and "ooh!" bubbles. Some come inside.
 - Sparkle milestones unlock new things (catalog pages, story moments, decorations).
-- 💡 A customer sometimes points at something in the window: "I want that bed!" If you have it in stock, that's an easy sale.
+- **Decided v0.9:** a window-peeker sometimes points at something in the window ("I want that!" with its picture). If you have it in stock, that's an easy sale; if not, it becomes a wish note.
 
 ### 6.5 Sharing (future)
 - **Phase 1 (no server):** a **Snapshot** button makes a pretty photo of your Dream Dollhouse to save or share.
@@ -255,7 +275,7 @@ Your very own dollhouse, displayed in the shop's front window.
 | Tap & hold | See what something is |
 | Decorate mode | Tap a slot → pick an item from your Collection |
 
-Big buttons sit at the **bottom of the screen**: order book, posters, helpers, decorate, Collection. The top shows coins, Hearts, Sparkle, and a little sun/moon clock.
+Big buttons sit at the **bottom of the screen**: order book, posters, helpers, decorate, Collection. Today (v0.9): **Order**, **Album**, the **day button**, and **Grow** (which becomes **Dollhouse** once built). The top shows coins, Hearts, Sparkle, and a little sun/moon clock.
 
 ## 13. Camera
 
@@ -300,8 +320,8 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - [x] **Ordering:** order book with ~6 items; boxes arrive next morning
 - [x] **Stocking:** carry boxes from the doorstep, place items on 2 shelves
 - [x] **Checkout:** scan + ring up, with tips
-- [ ] **Collection:** items unlock when first received (unlocking is tracked; the album UI isn't built)
-- [ ] **First expansion → Window Display room with Dream Dollhouse v0:** one room with ~4 fixed slots; Sparkle increases visitors
+- [x] **Collection:** items unlock when first received; sticker album
+- [x] **First expansion → Window Display room with Dream Dollhouse v0:** 4 rooms with one slot each; Sparkle increases visitors
 - [x] Customers browse, buy, and leave wish notes
 - [ ] Hire one cashier helper
 - [ ] Simple shopkeeper creator (a few hairstyles, colors, outfits)

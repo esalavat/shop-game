@@ -48,6 +48,8 @@ const MIGRATIONS = {
   },
   // v6: real shop days with a clock and a daily tally. Old saves wake up on a fresh morning.
   5: (d) => ({ ...d, version: 6, day: { number: d.day.number, phase: 'morning', time: 0, stats: emptyStats() } }),
+  // v7: the Dream Dollhouse gets decorating slots; Sparkle comes from what's placed in it (none yet).
+  6: (d) => ({ ...d, version: 7, dollhouse: { slots: {} }, sparkle: 0 }),
 };
 
 export function migrate(data) {
