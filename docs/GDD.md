@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.15 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.16 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -57,6 +57,7 @@
 | 48 | **End-of-day celebration:** the closing summary counts the numbers up with ticks and a cha-ching. Beating your best day for coins shows **"New record! 🏆"** with confetti (Day 1 just sets the first record) | v0.15 |
 | 49 | **Bouncy UI:** buttons squish when pressed, sheets and panels spring open, toasts pop in, with a soft tap sound | v0.15 |
 | 50 | **Installable and playable offline** (PWA): "Add to Home screen" gives a proper app icon, and the game opens without a connection. Online, it always loads the newest version | v0.15 |
+| 51 | **Stocker helper** (planned, not built yet): a second one-time hire who carries delivery boxes from the doorstep to the shelves and unpacks them, so stocking can run on its own like checkout does with Mia. Details are a proposal in §10, open for feedback | v0.16 |
 
 ## 1. Pitch
 
@@ -270,6 +271,13 @@ Your very own dollhouse, displayed in the shop's front window.
 - Helpers are named, cute characters; they work at a steady pace and can be upgraded.
 - Hiring is about choosing what *you* want to do.
 - **Helpers are one-time hires** (no wages), bought from the Grow sheet. First one (v0.12): **Mia the cashier** (#36). She works the register at a steady pace without tips; whenever your shopkeeper steps behind the counter, Mia steps aside so you can ring people up yourself.
+- **Stocker helper (planned, #51).** 💡 Proposal, not decided yet:
+  - A named helper (working name **Bea**), hired once from the Grow sheet, about **🪙 200** (more than Mia, since stocking is the bigger chore).
+  - She picks up a box from the doorstep, walks it to a shelf with free space, and unpacks it, one box at a time and a bit slower than you. She uses the Stock Cart upgrade too.
+  - **Smart picks:** she unpacks items customers wished for first, then fills the emptiest shelf.
+  - **You can always jump in.** If your shopkeeper grabs a box, Bea takes a different one. When the shelves are full she waits in a corner (later: the Stockroom).
+  - Between them, Mia and Bea let you spend the day on the fun bonus spots (greeter, Window Display) or decorating, which is the point of helpers: you choose which jobs you keep.
+  - Open questions: the cost; whether she also works in the morning, before opening (💡 yes, so the shop is ready when you open); whether a later **Orderer** helper should re-order what sells, so the whole stock loop can run by itself.
 - Your shopkeeper is always there and walks to whatever you tap.
 - **Where she goes when helpers do the work (v0.14, #41):** she can walk out to the sidewalk and into other ground-floor rooms. Each room can give a bonus while she's in it. First ones: the **Window Display** (more window-peekers, and they want what they saw more often) and the **greeter spot** by the shop door (greeted customers often pick up a second item). Bonus spots are marked with a **glowing ring** on the ground; tap it to go there (#44). Future rooms get their own bonus (💡 Stockroom: unpack faster; Tea Corner: customers stay longer).
 - **Customizable shopkeeper (decided):** hairstyle, hair color, skin tone, outfits, accessories (bows, glasses, aprons, hats). Set up in a quick character creator at the start, and changeable anytime. **v0.12 creator (#38):** hair style (bob, bun, pigtails, ponytail), hair color, skin tone, outfit color, accessory (none, bow, glasses, hat). Tap your shopkeeper in the morning to reopen it. A 🎲 button picks a random look (#42). **Planned (#43):** a first choice of **boy or girl** shopkeeper, with hair styles and outfits to match (e.g. short cuts, overalls, caps), and game text that says "your shopkeeper" instead of "she".
@@ -362,6 +370,7 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - More Dream Dollhouse rooms
 - More shopkeeper outfits and accessories
 - **Boy or girl shopkeeper** in the creator (#43)
+- **Stocker helper** who carries and unpacks delivery boxes (#51, proposal in §10)
 - Offline earnings; background music (sound effects are done, #46)
 
 ### Later

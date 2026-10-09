@@ -34,7 +34,7 @@ notes, the day cycle (morning / open / short twilight evening / closing summary,
 Collection and Dream Dollhouse v0 (M6), and M7 (Mia the cashier, three upgrades, the shopkeeper
 creator, walking out to the Window Display and the greeter spot, Pip's rescue box).
 
-- **M8 (Polish pass), built 2026-10-09, waiting for the user's feedback on the phone** (GDD v0.15,
+- **M8 (Polish pass), built 2026-10-09; the user approved the sounds, other feedback still to come** (GDD v0.15,
   decisions #45-50):
   - **Juice:** coins, tips and hearts pop at the register; hearts float up from happy customers;
     stocked items squash and stretch onto the shelf with a sparkle; an emptied box goes *poof*;
@@ -50,8 +50,7 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
     in Chrome with a 4× slower CPU at Pixel size (`docs/TECH.md` §5.4). Not yet checked on the real Pixel.
   - **PWA:** PNG app icons, network-first service worker (`sw.js`), so it installs to the home screen
     and opens offline (`docs/TECH.md` §9.3).
-  - Things to ask the user about: are the sounds too loud, too many, or annoying (the door bell rings
-    for every customer)? Does the home-screen install work on the Pixel? Does the fps stay smooth?
+  - Still to hear from the user: does the home-screen install work on the Pixel, and does the fps stay smooth?
 
 **Next:** the user's M8 feedback, then pick from "Not scheduled yet" below or the GDD §17 "Next" list.
 The MVP list in GDD §17 is complete.
@@ -61,6 +60,7 @@ The MVP list in GDD §17 is complete.
 - Show the sell price and profit in the order book (§18 #4).
 - Demand-based pricing vs fixed prices (§18 #5).
 - Background music (a music-box loop by time of day, GDD §15).
+- Stocker helper (Bea) who carries and unpacks delivery boxes (GDD #51, proposal in §10).
 
 ## How the code is organized
 
