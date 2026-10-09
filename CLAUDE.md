@@ -58,6 +58,7 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   shopkeeper is heading for; waits by the right wall. Code: `js/sim/stocker.js`, drawn in
   `js/render/views/helpers.js`. Stock events carry `by: 'keeper' | 'stocker'`. Save version 11.
 - **Midday mark** on the day bar for Lunchtime Delivery (#52), done.
+- **Order book** cards show the sell price per item and a mint "+🪙 12 profit" tag for the box (#54), done.
 - **Fixed:** boxes floating when you take one from the bottom of a stack (`settleBoxes`, docs/ISSUES.md).
 
 **Next:** the user's M8 feedback, then pick from "Not scheduled yet" below or the GDD §17 "Next" list.
@@ -65,7 +66,6 @@ The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Boy or girl shopkeeper choice in the creator (#43).
-- Show the sell price and profit in the order book (§18 #4).
 - Demand-based pricing vs fixed prices (§18 #5).
 - Background music (a music-box loop by time of day, GDD §15).
 - An Orderer helper who re-orders what sells (GDD §10, not decided).

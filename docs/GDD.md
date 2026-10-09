@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.18 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.19 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -60,6 +60,7 @@
 | 51 | **Stocker helper** (planned, not built yet): a second one-time hire who carries delivery boxes from the doorstep to the shelves and unpacks them, so stocking can run on its own like checkout does with Mia. Details are a proposal in §10, open for feedback | v0.16 |
 | 52 | **Midday mark on the day bar** (user request): with Lunchtime Delivery owned, a small mark sits halfway along the HUD's day bar during open hours. It **glows butter yellow and pulses** while a lunch order is on its way, and fades once midday has passed. Without the upgrade, no mark. (A mark, not a countdown, so it keeps #34) | v0.17 |
 | 53 | **Bea the stocker** (builds #51): one-time hire, **🪙 200**. She carries boxes from the doorstep to the shelves and unpacks them, slower than you, in the **morning, open hours and evening**. She unpacks **wished-for items first**, then items that aren't on the shelves yet, onto the emptiest shelf; uses the Stock Cart too. She never takes the box your shopkeeper is heading for; when there's nothing to do she waits by the right wall | v0.18 |
+| 54 | **Order book shows what you'll earn** (user, resolves §18 #4): each card shows the **sell price per item** ("Sells for 🪙 10 each") and the **profit for the whole box** as a mint tag ("+🪙 12 profit"), so you can see which items earn the most. Tips aren't counted | v0.19 |
 
 ## 1. Pitch
 
@@ -125,7 +126,7 @@ Each job is a short, playful interaction. Early on, you do them all. As the shop
 ### 5.1 Ordering stock
 - Open the **order book**, a picture catalog of cute items, and tap what you'd like.
 - **Pip the delivery bunny** 💡 brings the boxes the **next morning**. The **Lunchtime delivery** upgrade (#37) lets Pip come at midday too: orders placed in the morning or the first half of open hours arrive when the day bar reaches halfway. A mark at the halfway point of the day bar shows when, and glows while a lunch order is on its way (#52).
-- The main choice is what to get with your coins. Fancier items cost more and earn more.
+- The main choice is what to get with your coins. Fancier items cost more and earn more. Each card shows the box cost, the sell price per item, and the profit for the box (#54).
 - New catalog pages unlock as you grow and through story events.
 
 ### 5.2 Stocking shelves
@@ -381,5 +382,5 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 1. Monetization model for the store builds (§16), which can wait until then.
 2. **Early economy is too tight** (playtest, Day 1): with 50 coins and 18 shelf slots you can sell out in the first minute of a 3-minute day. Options for the upgrades milestone: bigger or extra shelves, a lunchtime delivery, more starting coins or stock, cheaper bulk boxes, slower browsing. **Resolved in v0.12 (decision #39):** no change. Close early covers it, and the user says early progress feels good.
 3. ~~**Evening is too long**~~ (playtest after M6, 2026-10-09). **Resolved in v0.10 (decision #33):** 5 s of twilight, then the day closes once the shop is empty. The user tried it and approved it.
-4. **Order book shows only the cost** (user, 2026-10-09): you can't see what an item sells for, so you can't tell which items earn the most. 💡 Show the sale price and the profit per item on each order card (e.g. "Sells for 🪙 10 · +4 each"). Not scheduled yet.
+4. ~~**Order book shows only the cost**~~ (user, 2026-10-09). **Resolved in v0.19 (decision #54):** cards show the sell price per item and the profit per box.
 5. **Changing prices with demand?** (user, 2026-10-09): could prices go up when lots of customers want something? This pulls against **fixed prices** (#14, §5.5), which keep the game from feeling like a spreadsheet. 💡 Ways to reward demand without setting prices: wished-for items earn a bonus tip when they're back on the shelf, a "Popular! ⭐" tag on items that sell out a lot (customers pay a little extra), or the Sparkle Sale / special days (§5.4). Not decided.

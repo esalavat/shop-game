@@ -1,7 +1,8 @@
-// The order book: a bottom sheet of item cards. Ordering a box spends coins now;
+// The order book: a bottom sheet of item cards showing the box cost, the sell price per item, and the
+// profit for the box (GDD #54). Ordering a box spends coins now;
 // the box arrives the next morning (or at lunchtime, with the Lunchtime Delivery upgrade).
 
-import { ITEMS, boxCost } from '../data/items.js';
+import { ITEMS, boxCost, boxProfit } from '../data/items.js';
 import { placeOrder, canAfford, lunchDeliveryOpen } from '../sim/orders.js';
 import { events } from '../core/events.js';
 
@@ -18,6 +19,8 @@ export function createOrderBook(state, thumbs) {
       <img alt="" src="${thumbs.get(id)}">
       <div class="card-name">${item.name}</div>
       <div class="card-sub">Box of ${item.perBox}</div>
+      <div class="card-sub">Sells for 🪙 ${item.price} each</div>
+      <div class="card-profit">+🪙 ${boxProfit(id)} profit</div>
       <button class="buy"><span aria-hidden="true">🪙</span> ${boxCost(id)}</button>`;
     card.querySelector('.buy').addEventListener('click', () => placeOrder(state, id));
     list.append(card);

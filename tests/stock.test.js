@@ -6,7 +6,7 @@ import { placeOrder } from '../js/sim/orders.js';
 import { startNextDay } from '../js/sim/day.js';
 import { walkToBox, walkToFixture, tickKeeper } from '../js/sim/keeper.js';
 import { pickUpBox, stockShelf, freeSlots, dropBox, BOX_SPOTS } from '../js/sim/stock.js';
-import { boxCost, ITEMS } from '../js/data/items.js';
+import { boxCost, boxProfit, ITEMS } from '../js/data/items.js';
 
 const run = (state, seconds = 8) => { for (let t = 0; t < seconds; t += 0.1) tickKeeper(state, 0.1); };
 const shelves = (s) => s.building.rooms[0].fixtures.filter((f) => f.kind === 'shelf');
@@ -89,4 +89,9 @@ test('every box spot can be reached and picked up', () => {
     run(s);
     assert.equal(s.keeper.carrying?.id, box.id, `spot ${i}`);
   }
+});
+
+test('a box earns its sell price minus its cost, for every item in it', () => {
+  assert.equal(boxProfit('teaset'), (10 - 6) * 3);
+  for (const id of Object.keys(ITEMS)) assert.ok(boxProfit(id) > 0, `${id} should make a profit`);
 });

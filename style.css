@@ -337,7 +337,8 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 
 .card img { width: 84px; height: 84px; }
 .card-name { font-weight: 800; font-size: 14px; text-align: center; }
-.card-sub { font-size: 12px; opacity: 0.7; margin-bottom: 6px; }
+.card-sub { font-size: 12px; opacity: 0.7; text-align: center; }
+.card-profit { margin: 4px 0 6px; padding: 1px 8px; border-radius: 999px; background: #d4f3e6; font-size: 12px; font-weight: 800; }
 
 .card .buy {
   width: 100%;

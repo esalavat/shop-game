@@ -21,3 +21,5 @@ export const SETS = {
 };
 
 export const boxCost = (itemId) => ITEMS[itemId].cost * ITEMS[itemId].perBox;
+/** What a whole box earns once every item sells (before tips). */
+export const boxProfit = (itemId) => (ITEMS[itemId].price - ITEMS[itemId].cost) * ITEMS[itemId].perBox;
