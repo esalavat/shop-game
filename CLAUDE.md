@@ -28,41 +28,36 @@ Before ending a session or pushing, re-read Status and make sure it's true.
 
 ## Status
 
-M0-M7 are done: skeleton, furnished shop and shopkeeper, the stock loop (order book, doorstep
-deliveries, carrying boxes to shelves), customers with checkout and wish notes, the day cycle
-(morning / open / short twilight evening / closing summary, plus close early), Collection and
-Dream Dollhouse v0 (M6, approved), and M7:
+M0-M7 are done and approved by the user: skeleton, furnished shop and shopkeeper, the stock loop
+(order book, doorstep deliveries, carrying boxes to shelves), customers with checkout and wish
+notes, the day cycle (morning / open / short twilight evening / closing summary, plus close early),
+Collection and Dream Dollhouse v0 (M6), and M7.
 
-- **M7 (Helpers, upgrades, creator), built 2026-10-09 (GDD v0.12 decisions #35-39), waiting for the
-  user to try it on their phone.**
+- **M7 (Helpers, upgrades, creator), approved 2026-10-09** (GDD v0.12-v0.14, decisions #35-44):
   - The toolbar has 5 buttons once the Window Display is built: Order / Album / day / Dollhouse / Grow.
     The Grow sheet lists rooms, helpers and upgrades.
   - **Mia the cashier** (🪙 150, one-time) rings people up without tips. She steps aside when the
     shopkeeper comes to the counter.
   - **Upgrades:** Stock Cart (🪙 60, carry 2 boxes), Comfy Shoes (🪙 80, walk faster), Lunchtime
-    Delivery (🪙 100, orders placed before midday arrive at midday).
-  - **Shopkeeper creator:** hair, colors, outfit, accessory. It shows on a new game and once for old
-    saves. Tap the shopkeeper in the morning to change it.
-  - **Fixed:** delivery boxes no longer block the register; they sit on the right of the doorstep.
-  - Numbers to tune with feedback are in `js/data/upgrades.js`.
-- **Walking between rooms + creator 🎲 (GDD v0.14 #41-42), built 2026-10-09, waiting for the user's
-  feedback** (playtest: with Mia at the register the shopkeeper had nowhere good to stand).
-  - She can walk out onto the sidewalk and into the Window Display.
-  - In the Window Display, more passers-by peek in the window, and they want what they saw.
-  - Tap the sidewalk by the shop door and she waits there as a greeter; greeted customers often
-    pick up a second item.
-  - The rest of the sidewalk has no bonus.
-  - The creator has a 🎲 randomize button.
-  - **Bonus spots are marked (GDD #44):** a glowing ring and a bobbing icon (👋 by the shop door, ✨ beside the
-    dollhouse once something is on show). Tap one to send her there. She faces the camera after a floor walk.
-- **Planned, not built: boy or girl shopkeeper** in the creator (GDD #43).
-- The early economy stays as it is (decision #39): closing early covers selling out.
-- **Pip's rescue box (GDD v0.13 #40), built 2026-10-09:** if a morning starts with nothing to sell,
-  nothing ordered, and too few coins for the cheapest box, Pip brings a free one, so you can never get stuck.
+    Delivery (🪙 100, orders placed before midday arrive at midday). Numbers are in `js/data/upgrades.js`.
+  - **Shopkeeper creator** with a 🎲 randomize button. It shows on a new game; tap the shopkeeper in
+    the morning to change it.
+  - **The shopkeeper can walk out to the sidewalk and into the Window Display** (#41). Bonus spots are
+    marked with a glowing ring and a bobbing icon (#44):
+    - ✨ beside the dollhouse: more window-peekers, who want what they saw
+    - 👋 the greeter spot by the shop door: greeted customers often pick up a second item
+  - **Pip's rescue box** (#40): if a morning starts with nothing to sell, nothing ordered, and too few
+    coins, Pip brings a free box, so you can never get stuck.
+  - **Fixed:** boxes blocking the register; flickering rings and street edge on the phone.
+  - The early economy stays as it is (#39): closing early covers selling out.
 
-**Next:** get the user's feedback on M7, then M8 (Polish pass: juice, first sounds, phone perf, PWA
-manifest). Open design questions from the user are in GDD §18 #4 (show sell price / profit in the order
-book) and #5 (demand-based pricing vs fixed prices); neither is scheduled yet.
+**Next: M8 (Polish pass)**: juice (pops, sparkles), first sounds, phone perf check, PWA manifest
+(`docs/TECH.md` §11). Discuss the plan with the user first.
+
+**Not scheduled yet (ideas the user raised, in the GDD):**
+- Boy or girl shopkeeper choice in the creator (#43).
+- Show the sell price and profit in the order book (§18 #4).
+- Demand-based pricing vs fixed prices (§18 #5).
 
 ## How the code is organized
 
@@ -70,7 +65,9 @@ book) and #5 (demand-based pricing vs fixed prices); neither is scheduled yet.
   can be unit-tested in Node. `js/render/` draws state with three.js; `js/ui/` is the DOM overlay.
   The sim emits events (`js/core/events.js`) that render and UI react to.
 - Content lives in `js/data/` (items, fixtures, rooms, customers, dollhouse slots / Sparkle /
-  expansions).
+  expansions, upgrades and helpers).
+- Walking between rooms and onto the street is in `js/sim/route.js`. During such a walk the keeper
+  uses shop-room coordinates and switches rooms on arrival (`docs/TECH.md` §4.3.3).
 - Positions are room-local: x across the room, z from the back wall (-D/2) to the open front (+D/2).
   Room size is `ROOM_SIZE` in `js/data/rooms.js`. Customers keep shop-room coordinates even on the
   sidewalk in front of other rooms (e.g. peeking at the Window Display, `windowX` in
