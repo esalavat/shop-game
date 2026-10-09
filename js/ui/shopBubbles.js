@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { events } from '../core/events.js';
 import { keeperAtCounter } from '../sim/checkout.js';
+import { cashierReady } from '../sim/helpers.js';
 
 const WISH_SECONDS = 3;
 const PEEK_WORDS = ['ooh! ✨', 'so cute! 💖', 'wow ✨', 'aww 💖'];
@@ -25,7 +26,7 @@ export function createShopBubbles({ state, overlay, customersView, checkoutView,
     const p = checkoutView.counterTop();
     if (!p) return;
     overlay.float(p.clone().add(new THREE.Vector3(0, 0.75, 0)), `+${amount} 🪙`, 'coins');
-    overlay.float(p.clone().add(new THREE.Vector3(0.55, 0.35, 0)), `+${tip} tip!`, 'tip');
+    if (tip) overlay.float(p.clone().add(new THREE.Vector3(0.55, 0.35, 0)), `+${tip} tip!`, 'tip');
     overlay.float(p.clone().add(new THREE.Vector3(-0.55, 0.35, 0)), '❤️ +1', 'heart');
   });
 
@@ -54,13 +55,13 @@ export function createShopBubbles({ state, overlay, customersView, checkoutView,
       }
 
       const front = state.customers.find((c) => c.id === state.queue[0]);
-      if (front?.state === 'queued' && !keeperAtCounter(state)) {
+      if (front?.state === 'queued' && !cashierReady(state)) {
         overlay.bubble('waiting', () => customersView.headPosition(front.id), '🛎️', 'waiting');
       } else {
         overlay.removeBubble('waiting');
       }
 
-      if (state.checkout) {
+      if (state.checkout && keeperAtCounter(state)) { // Mia needs no prompt
         const left = state.checkout.items.filter((i) => !i.scanned).length;
         overlay.bubble('checkout', counterAbove, left ? `Tap to scan · ${left} left` : 'Tap to ring up! 🛎️', 'prompt');
       } else {

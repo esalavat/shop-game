@@ -12,7 +12,8 @@ import { CUSTOMER, LOOKS, ADULT_SCALE, KID_SCALE } from '../data/customers.js';
 import { findPath } from './nav.js';
 import { stepAlong } from './walker.js';
 import { newId, shopRoomId, findFixture } from './stock.js';
-import { keeperAtCounter, startCheckout } from './checkout.js';
+import { startCheckout } from './checkout.js';
+import { cashierReady } from './helpers.js';
 import { recordWish } from './day.js';
 import { SPARKLE } from '../data/dollhouse.js';
 import { peekChance, trafficBoost, windowX, dollhouseItems } from './collection.js';
@@ -235,7 +236,7 @@ export function tickCustomers(state, navs, dt, rand = Math.random) {
         if (!walking) c.state = 'queued';
         break;
       case 'queued':
-        if (state.queue[0] === c.id && !state.checkout && keeperAtCounter(state)) startCheckout(state, c);
+        if (state.queue[0] === c.id && !state.checkout && cashierReady(state)) startCheckout(state, c);
         break;
       case 'paid':
         leave(state, c, nav);

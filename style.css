@@ -400,6 +400,9 @@ button {
 #toolbar button.passive { opacity: 0.85; }
 .tb-label { font-variant-numeric: tabular-nums; }
 #toolbar #btn-day { flex: 1 1 120px; }
+#toolbar.five { gap: 6px; padding-left: 8px; padding-right: 8px; }
+#toolbar.five button { font-size: 12px; padding-left: 2px; padding-right: 2px; }
+#toolbar button[hidden] { display: none; }
 #toolbar button.ready { background: var(--butter); box-shadow: 0 4px 0 #e0b452; animation: nudge 1.6s ease-in-out infinite; }
 
 @keyframes nudge {
@@ -475,7 +478,10 @@ button {
 .sticker.locked .card-name { opacity: 0.55; }
 .sticker .badge { position: absolute; top: 4px; right: 6px; font-style: normal; font-size: 16px; }
 
-/* ---------- Grow (build) sheet ---------- */
+/* ---------- Grow sheet: rooms, helpers, upgrades ---------- */
+.grow-list { overflow-y: auto; margin: 0 -4px; padding: 0 4px 4px; }
+.grow-section { margin: 12px 0 2px; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.6; }
+
 .grow-card {
   margin-top: 10px;
   padding: 14px;
@@ -488,6 +494,13 @@ button {
 .grow-art { font-size: 44px; }
 .grow-card h3 { margin: 4px 0; font-size: 18px; }
 .grow-card p { margin: 0 0 12px; font-size: 14px; line-height: 1.4; }
+.grow-card.small { display: grid; grid-template-columns: 44px 1fr; gap: 4px 10px; padding: 12px; text-align: left; }
+.grow-card.small .grow-art { font-size: 32px; line-height: 44px; text-align: center; grid-row: span 2; }
+.grow-card.small h3 { margin: 0; font-size: 16px; }
+.grow-card.small p { margin: 0 0 8px; font-size: 13px; }
+.grow-card.small .grow-build { grid-column: 2; padding: 9px 0; font-size: 15px; }
+.grow-card.owned { opacity: 0.75; }
+.grow-done { padding: 10px; font-size: 14px; font-weight: 700; opacity: 0.7; text-align: center; }
 
 .grow-build {
   width: 100%;
@@ -502,6 +515,44 @@ button {
 }
 
 .grow-build:disabled { background: var(--shadow); color: rgba(90, 58, 85, 0.6); box-shadow: none; }
+.grow-card.owned .grow-build:disabled { background: #d4f3e6; color: var(--ink); }
+
+/* ---------- Shopkeeper creator (a bottom panel, like decorate mode) ---------- */
+#creator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 12px calc(env(safe-area-inset-bottom) + 12px);
+  border-radius: 24px 24px 0 0;
+  background: var(--cream);
+  box-shadow: 0 -3px 0 rgba(90, 58, 85, 0.12);
+  animation: slide-up 0.25s ease-out;
+}
+
+#creator[hidden] { display: none; }
+.creator-rows { display: flex; flex-direction: column; gap: 8px; }
+.creator-row { display: flex; flex-direction: column; gap: 4px; }
+.creator-row > span { font-size: 12px; font-weight: 800; opacity: 0.65; }
+.creator-opts { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.creator-opts button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 13px;
+  box-shadow: 0 2px 0 var(--shadow);
+}
+
+.creator-opts button.swatch { width: 36px; padding: 0; border-radius: 50%; }
+.creator-opts button.on { border-color: var(--pink-dark); box-shadow: 0 0 0 2px #fff inset, 0 2px 0 var(--shadow); }
 
 /* ---------- Decorate mode ---------- */
 #decorate {

@@ -115,3 +115,21 @@ test('the Dream Dollhouse round-trips through a save', () => {
   assert.equal(loaded.dollhouse.slots.tearoom, 'teaset');
   assert.equal(loaded.sparkle, 3);
 });
+
+test('a v7 save gets upgrades, helpers, an accessory, and sees the creator once', () => {
+  const store = memoryStorage();
+  const v7 = { ...createState(0), version: 7, shopkeeper: { hair: 'bob', hairColor: '#6b3e2e', skin: '#e0a37c', outfit: '#ff9ec4' } };
+  delete v7.upgrades;
+  delete v7.helpers;
+  delete v7.keeper.spare;
+  store.setItem(SAVE_KEY, JSON.stringify(v7));
+  const s = loadGame(store);
+  assert.equal(s.version, STATE_VERSION);
+  assert.deepEqual(s.upgrades, {});
+  assert.deepEqual(s.helpers, {});
+  assert.equal(s.shopkeeper.hair, 'bob');
+  assert.equal(s.shopkeeper.accessory, 'none');
+  assert.equal(s.shopkeeper.created, false);
+  assert.equal(s.keeper.spare, null);
+  assert.equal(s.cashier, null);
+});

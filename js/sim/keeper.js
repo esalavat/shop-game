@@ -7,6 +7,8 @@ import { findPath } from './nav.js';
 import { stepAlong } from './walker.js';
 import { boxSpot } from './stock.js';
 import { performTask } from './tasks.js';
+import { hasUpgrade } from './upgrades.js';
+import { SHOES_SPEED } from '../data/upgrades.js';
 
 export const KEEPER_SPEED = 1.7; // room units per second
 const DOORWAY_Z = 1.1; // she leans out from the front edge of the shop to grab doorstep boxes
@@ -16,6 +18,7 @@ export function createKeeper(roomId) {
     roomId, x: -1.05, z: -0.42, facing: Math.PI / 6, // behind the shop counter
     path: [], fixtureId: null, arriveFacing: null, task: null,
     carrying: null, // a box { id, itemId, qty } while she holds one
+    spare: null,    // a second box on the Stock Cart, unpacked once the first is empty
   };
 }
 
@@ -43,7 +46,8 @@ export function walkToBox(state, nav, box) {
 }
 
 export function tickKeeper(state, dt) {
-  if (stepAlong(state.keeper, KEEPER_SPEED, dt)) arrive(state);
+  const speed = KEEPER_SPEED * (hasUpgrade(state, 'shoes') ? SHOES_SPEED : 1);
+  if (stepAlong(state.keeper, speed, dt)) arrive(state);
 }
 
 function arrive(state) {

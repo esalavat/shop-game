@@ -10,6 +10,8 @@ export const DAY_LENGTH = {
   evening: 5,   // seconds of twilight fading in; then it closes as soon as the shop is empty
 };
 
+export const MIDDAY = 0.5; // fraction of open hours when Pip's lunchtime delivery comes (upgrade)
+
 export function emptyStats() {
   return { coins: 0, tips: 0, served: 0, hearts: 0, sold: {}, wishes: [] };
 }
@@ -36,14 +38,17 @@ export function closeEarly(state) {
 /** Nothing left to sell: empty shelves, no boxes waiting, nothing in the shopkeeper's hands. */
 export function soldOut(state) {
   const shelvesEmpty = state.building.rooms.every((r) => r.fixtures.every((f) => !f.slots || f.slots.every((s) => !s)));
-  return shelvesEmpty && state.boxes.length === 0 && !state.keeper.carrying;
+  return shelvesEmpty && state.boxes.length === 0 && !state.keeper.carrying && !state.keeper.spare;
 }
 
 /** Advance the clock. Closing waits until the last customer has gone home. */
 export function tickDay(state, dt) {
   const d = state.day;
   if (d.phase === 'open') {
+    const before = d.time;
     d.time += dt;
+    // Pip's lunchtime delivery (upgrade): today's lunch orders arrive halfway through the day.
+    if (before < DAY_LENGTH.open * MIDDAY && d.time >= DAY_LENGTH.open * MIDDAY) deliverLunch(state);
     if (d.time >= DAY_LENGTH.open) setPhase(state, 'evening');
   } else if (d.phase === 'evening') {
     d.time = Math.min(DAY_LENGTH.evening, d.time + dt);
@@ -75,11 +80,19 @@ export function startNextDay(state) {
   events.emit('dayStarted', { day: state.day.number, delivered });
 }
 
+/** Lunch orders that missed midday (the shop closed early) come the next morning instead. */
+const dueInMorning = (o, day) => o.arrivesDay < day || (o.arrivesDay === day && !o.lunch);
+
+function deliverLunch(state) {
+  const delivered = deliverOrders(state, (o) => o.lunch && o.arrivesDay <= state.day.number);
+  if (delivered.boxes) events.emit('lunchDelivery', { delivered });
+}
+
 /** Turn due orders into boxes on the doorstep. New kinds of items join the Collection. */
-export function deliverOrders(state) {
-  const due = state.orders.filter((o) => o.arrivesDay <= state.day.number);
+export function deliverOrders(state, isDue = (o) => dueInMorning(o, state.day.number)) {
+  const due = state.orders.filter(isDue);
   if (!due.length) return { boxes: 0, discovered: [] };
-  state.orders = state.orders.filter((o) => o.arrivesDay > state.day.number);
+  state.orders = state.orders.filter((o) => !due.includes(o));
   const discovered = [];
   for (const o of due) {
     dropBox(state, o.itemId, o.qty);

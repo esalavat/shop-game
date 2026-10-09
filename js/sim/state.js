@@ -6,16 +6,17 @@ import { createKeeper } from './keeper.js';
 import { dropBox } from './stock.js';
 import { emptyStats } from './day.js';
 
-export const STATE_VERSION = 7;
+export const STATE_VERSION = 8;
 
 /** Live-only fields: never saved, reset on every load (customers just walk in again). */
-export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer'];
+export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer', 'cashier'];
 
 export function resetTransient(state) {
   state.customers = [];
   state.queue = [];
   state.checkout = null;
   state.spawnTimer = 2; // first visitor shortly after opening
+  state.cashier = null; // Mia's spot behind the counter (sim/helpers.js), once she's hired
   return state;
 }
 
@@ -46,7 +47,10 @@ export function createState(now = Date.now()) {
     collection: {},
     dollhouse: { slots: {} }, // slotId -> itemId (data/dollhouse.js); on show once the Window Display is built
     wishes: [],
-    shopkeeper: { hair: 'bun', hairColor: '#c2563a', skin: '#ffd9c2', outfit: '#9fe0c8' },
+    // Her look (the creator, ui/creator.js); `created` is false until the player has seen the creator.
+    shopkeeper: { hair: 'bun', hairColor: '#c2563a', skin: '#ffd9c2', outfit: '#9fe0c8', accessory: 'none', created: false },
+    upgrades: {}, // id -> true (data/upgrades.js)
+    helpers: {},  // id -> true
     settings: { muted: false },
     lastSeen: now,
   };

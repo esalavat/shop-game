@@ -50,6 +50,16 @@ const MIGRATIONS = {
   5: (d) => ({ ...d, version: 6, day: { number: d.day.number, phase: 'morning', time: 0, stats: emptyStats() } }),
   // v7: the Dream Dollhouse gets decorating slots; Sparkle comes from what's placed in it (none yet).
   6: (d) => ({ ...d, version: 7, dollhouse: { slots: {} }, sparkle: 0 }),
+  // v8: upgrades and helpers; the shopkeeper gets an accessory, a second box spot (the Stock Cart),
+  // and the creator shows once for existing shops.
+  7: (d) => ({
+    ...d,
+    version: 8,
+    upgrades: {},
+    helpers: {},
+    shopkeeper: { accessory: 'none', ...d.shopkeeper, created: false },
+    keeper: { ...d.keeper, spare: null },
+  }),
 };
 
 export function migrate(data) {

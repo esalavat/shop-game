@@ -28,28 +28,28 @@ Before ending a session or pushing, re-read Status and make sure it's true.
 
 ## Status
 
-M0-M6 are done: skeleton, furnished shop and shopkeeper, the stock loop (order book, doorstep
+M0-M7 are done: skeleton, furnished shop and shopkeeper, the stock loop (order book, doorstep
 deliveries, carrying boxes to shelves), customers with checkout and wish notes, the day cycle
-(morning / open / twilight evening / closing summary, plus close early), and M6:
+(morning / open / short twilight evening / closing summary, plus close early), Collection and
+Dream Dollhouse v0 (M6, approved), and M7:
 
-- **M6 (Collection & Dream Dollhouse v0), pushed 2026-10-09. The user tried it and approved it
-  ("M6 is good").** Toolbar is now Order / Album / day button / Grow. Grow builds the Window Display
-  (🪙 100, right of the shop) and then becomes the Dollhouse button. Decorate mode zooms in on the
-  dollhouse with a bottom panel: 4 rooms (one slot each) and the Collection items that fit. Sparkle
-  comes from placed items, speeds up visitor arrivals, and makes some visitors stop beside the
-  window ("ooh!"); some of them want an item they saw there. Design: GDD v0.9 decisions #27-32.
-  Numbers to tune with feedback: expansion cost (`js/data/dollhouse.js` `EXPANSIONS`), item
-  Sparkle (`js/data/items.js`), traffic and peek rates (`SPARKLE` in `js/data/dollhouse.js`).
+- **M7 (Helpers, upgrades, creator), built 2026-10-09 (GDD v0.12 decisions #35-39), waiting for the
+  user to try it on their phone.**
+  - The toolbar has 5 buttons once the Window Display is built: Order / Album / day / Dollhouse / Grow.
+    The Grow sheet lists rooms, helpers and upgrades.
+  - **Mia the cashier** (🪙 150, one-time) rings people up without tips. She steps aside when the
+    shopkeeper comes to the counter.
+  - **Upgrades:** Stock Cart (🪙 60, carry 2 boxes), Comfy Shoes (🪙 80, walk faster), Lunchtime
+    Delivery (🪙 100, orders placed before midday arrive at midday).
+  - **Shopkeeper creator:** hair, colors, outfit, accessory. It shows on a new game and once for old
+    saves. Tap the shopkeeper in the morning to change it.
+  - **Fixed:** delivery boxes no longer block the register; they sit on the right of the doorstep.
+  - Numbers to tune with feedback are in `js/data/upgrades.js`.
+- The early economy stays as it is (decision #39): closing early covers selling out.
 
-- **Short evening (GDD v0.10 decision #33), built 2026-10-09:**
-  twilight fades in over 5 s (`DAY_LENGTH.evening` in `js/sim/day.js`), then the day closes as
-  soon as the shop is empty. Customers still inside finish first. The user tried it and approved it.
-- **No digital timers (GDD v0.11 decision #34):** the Close button just says "Close"; the HUD bar
-  is the only sign of time left.
-
-**Next: M7 (Helpers, upgrades, creator)**: hire a cashier, a few upgrades, a simple shopkeeper
-creator. Before or during M7, revisit the early economy (GDD §18 #2): players sell out within the
-first minute. Also fix the open bugs in `docs/ISSUES.md` (delivery boxes blocking the register).
+**Next:** get the user's feedback on M7, then M8 (Polish pass: juice, first sounds, phone perf, PWA
+manifest). Open design questions from the user are in GDD §18 #4 (show sell price / profit in the order
+book) and #5 (demand-based pricing vs fixed prices); neither is scheduled yet.
 
 ## How the code is organized
 

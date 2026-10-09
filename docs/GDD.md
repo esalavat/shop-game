@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.11 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.12 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -41,6 +41,11 @@
 | 32 | **Collection album** (toolbar button) shows every item as a sticker: found ones in color, the rest as silhouettes. Album pages and page rewards wait until there are more items per theme | v0.9 |
 | 33 | **Short evening:** twilight fades in over **5 seconds**, then the day closes as soon as the shop is empty. Customers still inside finish first, however long that takes (playtest: the 25 s evening was mostly waiting) | v0.10 |
 | 34 | **No digital timers anywhere.** Time of day shows only as the progress bar at the top; the Close button just says "Close" (it used to show a countdown like 2:15) | v0.11 |
+| 35 | **Grow stays in the toolbar for good.** Once the Window Display is built, a separate **Dollhouse** button appears, so the toolbar is Order / Album / day / Dollhouse / Grow. The Grow sheet lists **Rooms**, **Helpers**, and **Upgrades** | v0.12 |
+| 36 | **Cashier helper (Mia):** a **one-time hire** (🪙 150), no wages. She stands at the register and rings customers up at a steady pace, with no tips. When your shopkeeper steps behind the counter, Mia steps aside and you ring people up yourself (with tips). Hearts count either way | v0.12 |
+| 37 | **First upgrades** (one-time buys in the Grow sheet): **Lunchtime delivery** (🪙 100; orders placed before midday arrive when the day bar reaches halfway), **Stock cart** (🪙 60; carry **2 boxes** per trip), **Comfy shoes** (🪙 80; your shopkeeper walks faster). More shelf space waits for a new shop room (a third shelf would hide things in the straight-on view) | v0.12 |
+| 38 | **Shopkeeper creator:** hair style, hair color, skin tone, outfit color, and one accessory (none, bow, glasses, or hat). Shown on a new game and once for existing saves; tap your shopkeeper in the morning to change it any time | v0.12 |
+| 39 | **Early economy stays as it is.** Selling out on Day 1 is fine now that you can close early (#25, #33); early progress feels good (playtest) | v0.12 |
 
 ## 1. Pitch
 
@@ -105,7 +110,7 @@ Each job is a short, playful interaction. Early on, you do them all. As the shop
 
 ### 5.1 Ordering stock
 - Open the **order book**, a picture catalog of cute items, and tap what you'd like.
-- **Pip the delivery bunny** 💡 brings the boxes the **next morning** (an upgrade lets Pip come at lunchtime too).
+- **Pip the delivery bunny** 💡 brings the boxes the **next morning**. The **Lunchtime delivery** upgrade (#37) lets Pip come at midday too: orders placed in the morning or the first half of open hours arrive when the day bar reaches halfway.
 - The main choice is what to get with your coins. Fancier items cost more and earn more.
 - New catalog pages unlock as you grow and through story events.
 
@@ -117,7 +122,7 @@ Each job is a short, playful interaction. Early on, you do them all. As the shop
 ### 5.3 Ringing up customers
 - A customer brings their treasures to the counter. Tap each item to scan it (*beep!*), then tap the register (*cha-ching!*). That's 2–4 taps.
 - No making change.
-- **The tedium fix:** hire a cashier helper any time. If you ring customers up yourself, you get **tips**, and sometimes a sweet moment (a kid hugging her new doll, a drawing pinned to your wall).
+- **The tedium fix:** hire a cashier helper any time (Mia, 🪙 150 once; #36). If you ring customers up yourself, you get **tips**, and sometimes a sweet moment (a kid hugging her new doll, a drawing pinned to your wall).
 
 ### 5.4 Spreading the word
 - **The Dream Dollhouse window** (§6) is always on and is the biggest draw.
@@ -253,8 +258,9 @@ Your very own dollhouse, displayed in the shop's front window.
 - Hire helpers for any job: **Stocker**, **Cashier**, **Orderer** (re-orders favorites), **Poster Hanger**.
 - Helpers are named, cute characters; they work at a steady pace and can be upgraded.
 - Hiring is about choosing what *you* want to do.
+- **Helpers are one-time hires** (no wages), bought from the Grow sheet. First one (v0.12): **Mia the cashier** (#36). She works the register at a steady pace without tips; whenever your shopkeeper steps behind the counter, Mia steps aside so you can ring people up yourself.
 - Your shopkeeper is always there and walks to whatever you tap.
-- **Customizable shopkeeper (decided):** hairstyle, hair color, skin tone, outfits, accessories (bows, glasses, aprons, hats). Set up in a quick character creator at the start, and changeable anytime.
+- **Customizable shopkeeper (decided):** hairstyle, hair color, skin tone, outfits, accessories (bows, glasses, aprons, hats). Set up in a quick character creator at the start, and changeable anytime. **v0.12 creator (#38):** hair style (bob, bun, pigtails, ponytail), hair color, skin tone, outfit color, accessory (none, bow, glasses, hat). Tap your shopkeeper in the morning to reopen it.
 - Outfits and accessories are earned through Collection pages, story moments, special days, and seasons. They're great rewards because they're about self-expression, not power.
 - 💡 Matching **shop uniforms** for helpers that you design.
 
@@ -264,6 +270,7 @@ Your very own dollhouse, displayed in the shop's front window.
 - Costs scale gently; early on, something new should be affordable every day or so.
 - You can't go broke. Unsold stock just waits on the shelf.
 - Goals: gentle milestone lists, Collection pages, regulars' stories, and room unlocks.
+- **Upgrades (v0.12, #37)** are one-time buys in the Grow sheet: Lunchtime delivery (🪙 100), Stock cart (🪙 60, carry 2 boxes), Comfy shoes (🪙 80, walk faster). Costs to tune with feedback (`js/data/upgrades.js`).
 
 ## 12. Controls (Portrait, Touch)
 
@@ -277,7 +284,7 @@ Your very own dollhouse, displayed in the shop's front window.
 | Tap & hold | See what something is |
 | Decorate mode | Tap a slot → pick an item from your Collection |
 
-Big buttons sit at the **bottom of the screen**: order book, posters, helpers, decorate, Collection. Today (v0.9): **Order**, **Album**, the **day button**, and **Grow** (which becomes **Dollhouse** once built). The top shows coins, Hearts, Sparkle, and the day's progress bar. **No digital timers anywhere** (decision #34): time shows as the bar and the light, never as numbers.
+Big buttons sit at the **bottom of the screen**: order book, posters, helpers, decorate, Collection. Today (v0.12): **Order**, **Album**, the **day button**, **Dollhouse** (once the Window Display is built), and **Grow** (rooms, helpers, upgrades; #35). The top shows coins, Hearts, Sparkle, and the day's progress bar. **No digital timers anywhere** (decision #34): time shows as the bar and the light, never as numbers.
 
 ## 13. Camera
 
@@ -325,9 +332,9 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - [x] **Collection:** items unlock when first received; sticker album
 - [x] **First expansion → Window Display room with Dream Dollhouse v0:** 4 rooms with one slot each; Sparkle increases visitors
 - [x] Customers browse, buy, and leave wish notes
-- [ ] Hire one cashier helper
-- [ ] Simple shopkeeper creator (a few hairstyles, colors, outfits)
-- [ ] Coins, a few upgrades, local save
+- [x] Hire one cashier helper
+- [x] Simple shopkeeper creator (a few hairstyles, colors, outfits)
+- [x] Coins, a few upgrades, local save
 - [x] Toon-shaded low-poly placeholder art in the pastel palette
 - [x] Playable on a phone browser
 
@@ -351,5 +358,7 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 ## 18. Open Questions
 
 1. Monetization model for the store builds (§16), which can wait until then.
-2. **Early economy is too tight** (playtest, Day 1): with 50 coins and 18 shelf slots you can sell out in the first minute of a 3-minute day. Options for the upgrades milestone: bigger or extra shelves, a lunchtime delivery, more starting coins or stock, cheaper bulk boxes, slower browsing.
+2. **Early economy is too tight** (playtest, Day 1): with 50 coins and 18 shelf slots you can sell out in the first minute of a 3-minute day. Options for the upgrades milestone: bigger or extra shelves, a lunchtime delivery, more starting coins or stock, cheaper bulk boxes, slower browsing. **Resolved in v0.12 (decision #39):** no change. Close early covers it, and the user says early progress feels good.
 3. ~~**Evening is too long**~~ (playtest after M6, 2026-10-09). **Resolved in v0.10 (decision #33):** 5 s of twilight, then the day closes once the shop is empty. The user tried it and approved it.
+4. **Order book shows only the cost** (user, 2026-10-09): you can't see what an item sells for, so you can't tell which items earn the most. 💡 Show the sale price and the profit per item on each order card (e.g. "Sells for 🪙 10 · +4 each"). Not scheduled yet.
+5. **Changing prices with demand?** (user, 2026-10-09): could prices go up when lots of customers want something? This pulls against **fixed prices** (#14, §5.5), which keep the game from feeling like a spreadsheet. 💡 Ways to reward demand without setting prices: wished-for items earn a bonus tip when they're back on the shelf, a "Popular! ⭐" tag on items that sell out a lot (customers pay a little extra), or the Sparkle Sale / special days (§5.4). Not decided.

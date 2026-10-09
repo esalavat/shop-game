@@ -10,7 +10,7 @@
 <title>My Dream Dollhouse Shop</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=9">
+<link rel="stylesheet" href="style.css?v=10">
 <script type="importmap">
 { "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
 </script>
@@ -35,7 +35,8 @@
     <button id="btn-order"><span class="tb-ico" aria-hidden="true">📖</span>Order</button>
     <button id="btn-album"><span class="tb-ico" aria-hidden="true">🌟</span>Album</button>
     <button id="btn-day"><span class="tb-ico" aria-hidden="true"></span><span class="tb-label"></span></button>
-    <button id="btn-grow"><span class="tb-ico" aria-hidden="true">🔨</span><span class="tb-label">Grow</span></button>
+    <button id="btn-dollhouse" hidden><span class="tb-ico" aria-hidden="true">🏠</span>Dollhouse</button>
+    <button id="btn-grow"><span class="tb-ico" aria-hidden="true">🔨</span>Grow</button>
   </div>
 
   <div id="orderbook" class="sheet" hidden>
@@ -66,13 +67,7 @@
         <h2>Grow your shop</h2>
         <button class="close" aria-label="Close">✕</button>
       </div>
-      <div class="grow-card">
-        <div class="grow-art" aria-hidden="true">🪟🏠✨</div>
-        <h3>Window Display</h3>
-        <p>A sunny shop window right next door, with your very own <b>Dream Dollhouse</b> inside.
-          Decorate it with treasures from your Collection. The more it sparkles, the more visitors stop by!</p>
-        <button class="grow-build"></button>
-      </div>
+      <div class="grow-list"></div>
     </div>
   </div>
 
@@ -84,6 +79,14 @@
     <div class="deco-rooms"></div>
     <div class="deco-hint"></div>
     <div class="deco-items"></div>
+  </div>
+
+  <div id="creator" hidden>
+    <div class="deco-head">
+      <h2 class="creator-title"></h2>
+      <button class="deco-done creator-done">Done</button>
+    </div>
+    <div class="creator-rows"></div>
   </div>
 
   <div id="boot-error" hidden>
@@ -119,6 +122,6 @@
     location.replace(location.pathname + '?fresh=' + Date.now());
   });
 </script>
-<script type="module" src="js/main.js?v=10" onerror="showBootError()"></script>
+<script type="module" src="js/main.js?v=11" onerror="showBootError()"></script>
 </body>
 </html>

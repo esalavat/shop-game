@@ -47,7 +47,7 @@ js/
     dollhouse.js        # Dream Dollhouse slots, Sparkle tuning, shop expansions (costs)
     customers.js        # Customer types: wants, budgets, looks
     story.js            # Regulars, story beats, triggers
-    upgrades.js
+    upgrades.js         # Upgrades (Stock Cart, Comfy Shoes, Lunchtime Delivery) and helpers (Mia): costs, tuning
   sim/                  # Pure game logic. No three.js, no DOM.
     state.js            # Creates a fresh game state; schema version
     day.js              # Day phases: morning → open → evening → close
@@ -57,7 +57,8 @@ js/
     checkout.js         # Queue, scanning, tips
     marketing.js        # Morning picks, special days, Sparkle → foot traffic
     collection.js       # Dream Dollhouse placing, Sparkle, foot-traffic boost, window spot (unlocks happen in day.js)
-    helpers.js          # Hired helpers doing jobs
+    helpers.js          # Hired helpers doing jobs: Mia the cashier (state.cashier, live-only)
+    upgrades.js         # Buying upgrades / hiring helpers (one-time; state.upgrades, state.helpers)
     economy.js          # Coins, Hearts, Sparkle, costs
     story.js            # Checks triggers, queues story moments
     offline.js          # Offline earnings on return
@@ -69,15 +70,15 @@ js/
     building.js         # Builds the room grid shell from state
     rooms/              # Room interior builders per room type
     models/             # Procedural low-poly model builders (items, characters, furniture)
-    views/              # Sync state → scene: shelves, customers, boxes, checkout, dollhouse (items in its rooms)
+    views/              # Sync state → scene: shelves, customers, boxes, checkout, dollhouse (items in its rooms), keeper, helpers (Mia)
     pick.js             # Raycast taps → interactable objects
     fx.js               # Coin pops, sparkles, hearts, confetti
   ui/                   # DOM overlay
     hud.js              # Coins / Hearts / Sparkle / day progress bar (no digital timers)
     toolbar.js          # Bottom buttons
-    orderbook.js, album.js, grow.js (build sheet / Dollhouse button), decorate.js, day.js (summary)
+    orderbook.js, album.js, grow.js (Grow sheet: rooms, helpers, upgrades; Dollhouse button), decorate.js, day.js (summary)
     story.js            # Dialogue cards for story moments
-    creator.js          # Shopkeeper creator
+    creator.js          # Shopkeeper creator (bottom panel; camera frames the shopkeeper above it)
   input/
     touch.js            # Pointer events → tap / drag / pinch gestures
   audio/
@@ -116,8 +117,10 @@ docs/                   # GDD, tech plan
   customers: [{ id, type, state, pos, wants, cart, ... }],   // transient, not saved
   collection: { itemId: true },
   dollhouse: { slots: { slotId: itemId } },   // v0: 4 fixed rooms (data/dollhouse.js); later rooms/wallpaper
-  helpers: [{ id, job, level, look }],
-  shopkeeper: { hair, hairColor, skin, outfit, accessories },
+  helpers: { cashier: true },          // one-time hires (v8); Mia's position is live-only in `cashier`
+  upgrades: { cart: true, shoes: true, lunch: true },
+  keeper: { ..., carrying, spare },    // `spare` = second box on the Stock Cart
+  shopkeeper: { hair, hairColor, skin, outfit, accessory, created },
   story: { seen: [...], flags: {...} },
   settings: { muted: false },
   lastSeen: 1760000000000
@@ -133,6 +136,17 @@ docs/                   # GDD, tech plan
 - `ui/decorate.js` is a bottom panel (not a dimmed sheet) so the 3D dollhouse stays visible and tappable above it.
   `main.js` frames the camera with `rig.frame(..., lift)`, where `lift` raises the target above the panel.
 - While decorating, taps only hit the dollhouse's room hitboxes (`views/dollhouse.js`); the shop sim keeps running.
+
+### 4.3.2 Helpers & upgrades (M7)
+- `sim/helpers.js`: Mia stands at the counter's use spot (the till). When the shopkeeper is at the counter or walking
+  to it, Mia walks to a spot beside it; `cashierReady()` (keeper at counter, or Mia at the till) lets the next
+  customer start checkout. Mia scans one item every `scanTime` and rings up with `completeSale(..., { tip: false })`.
+  Whoever is at the till serves; if the shopkeeper leaves mid-checkout, Mia finishes it.
+- Lunchtime Delivery: orders placed before `MIDDAY` (in `sim/day.js`) get `lunch: true, arrivesDay: today` and are delivered
+  when the open-hours clock crosses midday; if the day closes earlier they come the next morning.
+- Stock Cart: `keeper.spare` holds a second box; `stockShelf` moves it into her hands when the first one empties.
+- The shopkeeper creator edits `state.shopkeeper`; `views/keeper.js` `setLook()` rebuilds her model. In the morning the
+  keeper has a tap hitbox that opens it.
 
 ### 4.4 Customers & movement
 - Each customer is a small **state machine**: `enter → browse(shelf) → pick → queue → checkout → leave` (plus `peekWindow`, `wishNote`).
@@ -221,7 +235,7 @@ docs/                   # GDD, tech plan
 | M4 | **Customers & checkout** ✅ | Customers browse, pick, queue; tap-to-scan checkout; coins and tips; wish notes |
 | M5 | **Day cycle** ✅ | Morning → Open → Evening → Close with lighting changes and a day summary |
 | M6 | **Collection & Dream Dollhouse v0** ✅ | Items unlock on delivery; first expansion builds the Window Display room; dollhouse with fixed slots; Sparkle drives foot traffic |
-| M7 | **Helpers, upgrades, creator** | Hire a cashier; a few upgrades; simple shopkeeper creator |
+| M7 | **Helpers, upgrades, creator** ✅ | Hire a cashier; a few upgrades; simple shopkeeper creator |
 | M8 | **Polish pass** | Juice (pops, sparkles), first sounds, phone perf check, PWA manifest |
 
 Each milestone ends with a push so it's playable on your phone.

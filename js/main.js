@@ -19,11 +19,15 @@ import { makeThumbnails } from './render/thumbs.js';
 import { createCustomersView } from './render/views/customers.js';
 import { createCheckoutView } from './render/views/checkout.js';
 import { createDollhouseView } from './render/views/dollhouse.js';
+import { createHelpersView } from './render/views/helpers.js';
 import { DOLLHOUSE } from './render/models/furniture.js';
 import { buildNav } from './sim/nav.js';
 import { walkTo, walkToFixture, walkToBox, tickKeeper } from './sim/keeper.js';
 import { tickDay, twilightFor } from './sim/day.js';
 import { tickCustomers } from './sim/customers.js';
+import { tickHelpers } from './sim/helpers.js';
+import { canCarryMore } from './sim/stock.js';
+import { UPGRADES, HELPERS } from './data/upgrades.js';
 import { separate } from './sim/crowd.js';
 import { checkoutTap, keeperAtCounter } from './sim/checkout.js';
 import { displayRoom } from './sim/collection.js';
@@ -38,6 +42,7 @@ import { createDayUI } from './ui/day.js';
 import { createAlbum } from './ui/album.js';
 import { createGrow } from './ui/grow.js';
 import { createDecorate } from './ui/decorate.js';
+import { createCreator } from './ui/creator.js';
 
 const AUTOSAVE_SECONDS = 15;
 
@@ -112,8 +117,9 @@ const shelvesView = createShelvesView(state, roomOrigin, () => keeperView.handPo
 const customersView = createCustomersView(state, roomOrigin);
 const checkoutView = createCheckoutView(state, roomOrigin);
 const dollhouseView = createDollhouseView(state, roomOrigin);
+const helpersView = createHelpersView(state, roomOrigin);
 const bubbles = createShopBubbles({ state, overlay, customersView, checkoutView, thumbs });
-scene.add(keeperView.object, boxesView.group, shelvesView.group, customersView.group, checkoutView.group, dollhouseView.group);
+scene.add(keeperView.object, helpersView.group, boxesView.group, shelvesView.group, customersView.group, checkoutView.group, dollhouseView.group);
 boxesView.rebuild();
 shelvesView.rebuild();
 dollhouseView.rebuild();
@@ -154,18 +160,44 @@ function enterDecorate(slotId) {
 }
 
 // ---------------------------------------------------------------------------
+// Shopkeeper creator
+// ---------------------------------------------------------------------------
+const creator = createCreator(state, {
+  onChange: (look) => keeperView.setLook(look),
+  onOpen() {
+    orderBook.close();
+    if (decorate.isOpen) decorate.close();
+    const o = roomOrigin(state.keeper.roomId);
+    const cover = creator.coverFraction();
+    if (!state.keeper.path.length) state.keeper.facing = 0; // turn to face you
+    focusedRoomId = state.keeper.roomId;
+    rig.frame(o.x + state.keeper.x, o.y + 0.75, 2.2, 1.9 / (1 - cover) + 0.4, false, cover / 2);
+  },
+  onClose(first) {
+    focusRoom(roomById(state.keeper.roomId));
+    save();
+    if (first && state.day.number === 1 && state.day.phase === 'morning') toast('Stock your shelves, then tap Open shop ☀️');
+    else if (first) toast('Looking lovely! Tap yourself in the morning to change it ✨');
+  },
+});
+
+// ---------------------------------------------------------------------------
 // Input & layout
 // ---------------------------------------------------------------------------
 attachGestures(canvas, {
   onTap(x, y) {
+    if (creator.isOpen) return;
     if (decorate.isOpen) {
       const hit = pickAt(rig.camera, canvas, x, y, dollhouseView.hitTargets);
       if (hit) decorate.select(hit.object.userData.dollSlot);
       return;
     }
-    const targets = [...world.building.hitTargets, ...boxesView.hitTargets, ...customersView.hitTargets];
+    // In the morning, tapping the shopkeeper herself opens the creator.
+    const keeperTargets = state.day.phase === 'morning' && state.keeper.roomId === focusedRoomId ? keeperView.hitTargets : [];
+    const targets = [...keeperTargets, ...world.building.hitTargets, ...boxesView.hitTargets, ...customersView.hitTargets];
     const hit = pickAt(rig.camera, canvas, x, y, targets);
     if (!hit) return;
+    if (hit.object.userData.keeper) return creator.open();
     const { roomId, fixtureId, boxId, customerId, floor } = hit.object.userData;
     const room = roomById(roomId);
     // The Dream Dollhouse opens decorate mode straight away.
@@ -186,7 +218,7 @@ attachGestures(canvas, {
     } else if (customerId) {
       // Browsing customers: nothing to do yet.
     } else if (boxId) {
-      if (state.keeper.carrying) return toast('Hands full! Tap a shelf to unpack this box first.');
+      if (!canCarryMore(state)) return toast(state.keeper.spare ? 'The cart is full! Tap a shelf to unpack.' : 'Hands full! Tap a shelf to unpack this box first.');
       if (walkToBox(state, nav, state.boxes.find((b) => b.id === boxId))) tapFeedback(o, state.keeper.path.at(-1));
     } else if (fixtureId) {
       const fixture = room.fixtures.find((f) => f.id === fixtureId);
@@ -207,13 +239,23 @@ attachGestures(canvas, {
 document.getElementById('btn-order').addEventListener('click', () => orderBook.open());
 document.getElementById('btn-album').addEventListener('click', () => album.open());
 
-events.on('orderPlaced', ({ order }) => toast(`Ordered ${ITEMS[order.itemId].name}! Pip brings it tomorrow 📦`));
+events.on('orderPlaced', ({ order }) => toast(`Ordered ${ITEMS[order.itemId].name}! Pip brings it ${order.lunch ? 'at lunchtime 🥪' : 'tomorrow 📦'}`));
+events.on('lunchDelivery', ({ delivered }) => {
+  toast(`Lunchtime! Pip delivered ${delivered.boxes} box${delivered.boxes > 1 ? 'es' : ''} 📦`);
+  for (const id of delivered.discovered) toast(`✨ New in your Collection: ${ITEMS[id].name}`);
+});
+events.on('upgradeBought', ({ id }) => toast(`${UPGRADES[id].icon} ${UPGRADES[id].name}: yours!`));
+events.on('helperHired', ({ id }) => toast(`${HELPERS[id].name} joined your shop! 💖 She'll mind the register.`));
 events.on('dayStarted', ({ day, delivered }) => {
   const boxes = delivered.boxes ? ` Pip delivered ${delivered.boxes} box${delivered.boxes > 1 ? 'es' : ''} 📦` : '';
   toast(`Good morning! Day ${day}.${boxes}`);
   for (const id of delivered.discovered) toast(`✨ New in your Collection: ${ITEMS[id].name}`);
 });
-events.on('boxPicked', () => toast('Now tap a shelf to unpack it!'));
+events.on('boxPicked', ({ spare }) => {
+  if (spare) toast('Two boxes on the cart! Tap a shelf to unpack 🛒');
+  else if (canCarryMore(state) && state.boxes.length) toast('Grab another box for the cart, or tap a shelf to unpack!');
+  else toast('Now tap a shelf to unpack it!');
+});
 events.on('phaseChanged', ({ phase }) => {
   if (phase === 'open') toast("We're open! ☀️ Here come the customers.");
   if (phase === 'evening') toast('The sun is setting 🌙 Last customers of the day!');
@@ -255,7 +297,7 @@ const save = () => { if (!resetting) saveGame(state); };
 setInterval(save, AUTOSAVE_SECONDS * 1000);
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 addEventListener('pagehide', save);
-for (const e of ['orderPlaced', 'dayStarted', 'stocked', 'sale', 'phaseChanged', 'dayClosed', 'expanded', 'dollhouseChanged']) events.on(e, save);
+for (const e of ['orderPlaced', 'dayStarted', 'stocked', 'sale', 'phaseChanged', 'dayClosed', 'expanded', 'dollhouseChanged', 'upgradeBought', 'helperHired', 'lunchDelivery']) events.on(e, save);
 
 // ---------------------------------------------------------------------------
 // Debug (?debug)
@@ -280,15 +322,18 @@ if (new URLSearchParams(location.search).has('debug')) {
 // Loop
 // ---------------------------------------------------------------------------
 dayUI.resume();
-if (state.day.number === 1 && state.day.phase === 'morning') toast('Stock your shelves, then tap Open shop ☀️');
+if (!state.shopkeeper.created) creator.open(); // new game, or the first time after the update
+else if (state.day.number === 1 && state.day.phase === 'morning') toast('Stock your shelves, then tap Open shop ☀️');
 window.__booted = true; // tells the loading guard in index.html the game started
 
 startLoop({
   tickRate: 10,
   tick(dt) {
     keeperView.beforeTick();
+    helpersView.beforeTick();
     customersView.beforeTick();
     tickKeeper(state, dt);
+    tickHelpers(state, dt);
     tickCustomers(state, navs, dt);
     separate(state, navs);
     tickDay(state, dt);
@@ -297,6 +342,7 @@ startLoop({
     lighting.setTwilight(twilightFor(state.day));
     lighting.update(dt);
     keeperView.frame(dt, alpha);
+    helpersView.frame(dt, alpha);
     boxesView.update(dt);
     shelvesView.update(dt);
     customersView.frame(dt, alpha);

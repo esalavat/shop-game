@@ -39,18 +39,19 @@ export function scanNext(state) {
   return c.items.filter((i) => !i.scanned).length;
 }
 
-export function completeSale(state, rand = Math.random) {
+/** Ring up the sale. Tips only come when you ring them up yourself (not Mia, `tip: false`). */
+export function completeSale(state, rand = Math.random, { tip: tips = true, by = 'keeper' } = {}) {
   const c = state.checkout;
   if (!c || c.items.some((i) => !i.scanned)) return null;
   const customer = state.customers.find((x) => x.id === c.customerId);
   const amount = c.items.reduce((sum, i) => sum + ITEMS[i.itemId].price, 0);
   const [lo, hi] = CUSTOMER.tip;
-  const tip = lo + Math.floor(rand() * (hi - lo + 1));
+  const tip = tips ? lo + Math.floor(rand() * (hi - lo + 1)) : 0;
   addCoins(state, amount + tip);
   state.hearts += 1;
   recordSale(state, { amount, tip, items: c.items.map((i) => i.itemId) });
   state.checkout = null;
-  events.emit('sale', { amount, tip, customerId: c.customerId });
+  events.emit('sale', { amount, tip, by, customerId: c.customerId });
   if (customer) {
     customer.basket = [];
     customer.state = 'paid';

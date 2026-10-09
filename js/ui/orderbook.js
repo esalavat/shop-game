@@ -1,8 +1,8 @@
 // The order book: a bottom sheet of item cards. Ordering a box spends coins now;
-// the box arrives the next morning.
+// the box arrives the next morning (or at lunchtime, with the Lunchtime Delivery upgrade).
 
 import { ITEMS, boxCost } from '../data/items.js';
-import { placeOrder, canAfford } from '../sim/orders.js';
+import { placeOrder, canAfford, lunchDeliveryOpen } from '../sim/orders.js';
 import { events } from '../core/events.js';
 
 export function createOrderBook(state, thumbs) {
@@ -27,18 +27,24 @@ export function createOrderBook(state, thumbs) {
   function refresh() {
     for (const [id, card] of cards) card.querySelector('.buy').disabled = !canAfford(state, id);
     if (!state.orders.length) {
-      pending.textContent = 'Pick something lovely — Pip brings it tomorrow morning.';
+      pending.textContent = `Pick something lovely — Pip brings it ${lunchDeliveryOpen(state) ? 'at lunchtime 🥪' : 'tomorrow morning'}.`;
       return;
     }
-    const counts = {};
-    for (const o of state.orders) counts[o.itemId] = (counts[o.itemId] ?? 0) + 1;
-    const parts = Object.entries(counts).map(([id, n]) => `${ITEMS[id].name}${n > 1 ? ` ×${n}` : ''}`);
-    pending.textContent = `Arriving tomorrow: ${parts.join(', ')}`;
+    const list = (orders) => {
+      const counts = {};
+      for (const o of orders) counts[o.itemId] = (counts[o.itemId] ?? 0) + 1;
+      return Object.entries(counts).map(([id, n]) => `${ITEMS[id].name}${n > 1 ? ` ×${n}` : ''}`).join(', ');
+    };
+    const lunch = state.orders.filter((o) => o.lunch && o.arrivesDay === state.day.number && state.day.phase !== 'evening' && state.day.phase !== 'close');
+    const later = state.orders.filter((o) => !lunch.includes(o));
+    pending.textContent = [lunch.length && `Arriving at lunchtime: ${list(lunch)}`, later.length && `Arriving tomorrow: ${list(later)}`].filter(Boolean).join(' · ');
   }
 
   events.on('coins', refresh);
   events.on('orderPlaced', refresh);
   events.on('dayStarted', refresh);
+  events.on('phaseChanged', refresh);
+  events.on('lunchDelivery', refresh);
   sheet.querySelector('.close').addEventListener('click', () => close());
   sheet.addEventListener('click', (e) => { if (e.target === sheet) close(); });
 
