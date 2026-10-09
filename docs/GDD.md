@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.22 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.23 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -64,6 +64,9 @@
 | 55 | **Boy or girl shopkeeper built** (#43): the creator's first row is **Girl 👧 / Boy 👦**. Boys' hair: **short, spiky, curly, swoop**; boys' accessories: **bow tie, glasses, cap** (girls keep bob / bun / pigtails / ponytail and bow / glasses / sun hat). Switching keeps whatever fits both (colors, glasses). Outfit colors are the same for both. 🎲 randomizes within your choice. Existing shops keep a girl | v0.20 |
 | 56 | **Public game and test build** (user): the game is shared at the main link, which only changes on a **release** (about once a day, `npm run release`). Every change goes to the **test build at `/dev/`** first. The test build has a DEV badge, installs as its own app ("Dollhouse Shop DEV"), and plays on a **copy** of your real save, so testing never touches real progress. **Saves are never lost**: a save from a newer version is never overwritten (the game asks you to update instead), and every release must still load sample saves from all earlier versions (docs/TECH.md §9.1, §9.4) | v0.21 |
 | 57 | **First-day guide** (user): in a brand-new game, once the creator closes, a bouncing pink arrow with a short label points at the next thing to do: **a doorstep box** ("Tap a box!") → **a shelf** ("Tap a shelf to unpack!") → **Open shop** ("Open your shop!") → **the counter** when the first customer lines up ("Tap the register!"; the "Tap to scan" prompt takes over once you're there). It ends with the first sale and never comes back; it only moves forward and skips ahead if you do. Existing shops don't see it. **Morning nudge:** any morning, if nothing has happened for **5 seconds** (no taps, shopkeeper standing still), the "Open your shop!" arrow appears until the next tap | v0.22 |
+| 58 | **More rooms, themed and upstairs** (user; planned, §9): **Grow → Build a room → pick a theme → tap a glowing ＋ spot** on the building. Six **theme rooms**, one per Collection theme (Tea Time, Cozy Parlor, Fairy Garden, Sweet Dreams, Doll Friends, Little Houses), each with **3 shelves** and its own wallpaper. Any item can go anywhere, but **items sell better in their matching room** (a theme bonus on each sale). Customers walk to the room that has what they want and pay at the one counter in the main shop. **Upstairs:** build a **Stairwell** once (a room column with a spiral staircase in the back corner and one shelf beside it, on both floors); then ＋ spots appear upstairs next to it, and upstairs rooms connect through doorways. One upstairs floor for now. Built in two steps: ground-floor theme rooms first, then the Stairwell and upstairs | v0.23 |
+| 59 | **Lots of items, and a Collection that pays off** (user; planned after #58, §6.2, §5.1): aim for **100+ items** over time. Prices **scale up** like today, projected forward: fancier items cost more and make more profit. Many items come in **color variants** (the same chair in mint, pink and lilac), each its own sticker. Each theme is an **album page**; the **order book grows as you collect** (new catalog pages open as you find more items, fancier ones last). **Collection bonus:** each item found brings a few percent more customers; **completing a page** gives a bigger customer boost, a **coin gift with confetti**, and a **shopkeeper style** (an outfit color or accessory). 💡 Later: special things that unlock at **Heart and Sparkle milestones** (§18 #6) | v0.23 |
+| 60 | **Smarter and more stockers** (user; planned with #58, §10): a **Sorting Smarts** upgrade makes stockers unpack each box into its **matching theme room** when there's one with space (otherwise the emptiest shelf, as now). Later, **hire more than one stocker**, each costing more | v0.23 |
 
 ## 1. Pitch
 
@@ -177,6 +180,8 @@ Your very own dollhouse, displayed in the shop's front window.
 - **v0 album (v0.9):** one page with every item as a sticker (found = in color, not yet = silhouette with "Order one to find it"), a "4 of 6 found" count, and a 🏠 badge on items in your dollhouse. Themed pages and page rewards come when each theme has several items.
 - Anything in your Collection can be placed in the Dream Dollhouse **for free and forever**. It doesn't use up shop stock.
 - Collection pages fill in by theme (Tea Time, Sweet Dreams Bedroom, Pet Friends, Princess Castle…). Completing a page gives a reward.
+- **Growing to 100+ items (v0.23, #59):** prices scale up the way they do now (fancier = costs more, more profit). Many items come in **color variants**, each its own sticker. New **catalog pages open in the order book as you find more items**; the fanciest come last.
+- **Collection bonus (#59):** each item found brings a few percent more customers (stacks with Sparkle). **Completing a page** gives a bigger customer boost, a coin gift with confetti, and a shopkeeper style (an outfit color or accessory).
 - Some **special treasures** only come from story events and can't be bought.
 - That makes ordering new kinds of stock exciting twice: once for the shop, and once for your Collection.
 
@@ -249,12 +254,16 @@ Your very own dollhouse, displayed in the shop's front window.
 - The shop is a **grid of rooms**, seen front-on like a dollhouse with the wall open.
 - Expand **sideways** (new wings) and **upward** (new floors), so it becomes a wide, charming building and not a tower.
 - Each new room costs coins and unlocks through milestones.
+- **Building rooms (v0.23, #58):** **Grow → Build a room → pick a theme**, then tap one of the glowing **＋ spots** on the building: either end of the ground floor, or upstairs next to the Stairwell or another upstairs room. Costs rise with each room (🪙 250, 400, 600, 850, 1150, 1500; tune with play). **Built (step 1):** theme rooms open once the Window Display is built; the theme bonus is **+25% of the price** (rounded up), shown as "theme bonus ✨" at the register; each theme room also makes room for 2 more customers at a time. Sorting Smarts costs 🪙 120 and shows up once Bea is hired and a theme room is built.
+- **Upstairs (#58):** the **Stairwell** (built once, 💡 🪙 350, after your first theme room) is a room column with a spiral staircase in the back corner and one shelf beside it, on the ground floor and upstairs. Upstairs rooms open into each other through doorways; customers, helpers and your shopkeeper walk up the stairs and across. One upstairs floor for now.
 - The outside (roof, colors, sign, awning, flower boxes) is customizable and visible when zoomed out.
 
 ### 9.2 Room types
 | Room | Purpose |
 |---|---|
-| **Shop room** | Shelves and customers. Can be themed (Doll Corner, Tiny Furniture, Princess Room, Pet Friends). Themed rooms attract matching visitors. |
+| **Shop room** | Shelves, the counter and customers. Sells anything. |
+| **Theme rooms (#58)** | One per Collection theme: Tea Time, Cozy Parlor, Fairy Garden, Sweet Dreams, Doll Friends, Little Houses. 3 shelves and their own wallpaper. Any item can go there; **items from the room's theme sell better there** (a theme bonus on each sale). Customers walk over to what they want and pay at the main counter. |
+| **Stairwell (#58)** | Spiral staircase plus one shelf, on both floors. Needed for upstairs rooms. |
 | **Front window** | Holds the Dream Dollhouse. Ground floor, facing the street. |
 | **Counter** | Checkout. A second counter comes later for busy days. |
 | **Stockroom** | Where boxes go; holds more stock. |
@@ -264,6 +273,7 @@ Your very own dollhouse, displayed in the shop's front window.
 
 ### 9.3 Getting around (portrait)
 - Drag to move around; pinch to zoom out to the whole building or into one room.
+- Characters go between ground-floor rooms along the sidewalk, and up the Stairwell to upstairs rooms (#58).
 - Double-tap a room to zoom to it. A little room map at the bottom lets you jump around.
 - The default view shows ~1–2 rooms; zooming out shows the whole building.
 
@@ -277,7 +287,7 @@ Your very own dollhouse, displayed in the shop's front window.
 - Helpers are named, cute characters; they work at a steady pace and can be upgraded.
 - Hiring is about choosing what *you* want to do.
 - **Helpers are one-time hires** (no wages), bought from the Grow sheet. First one (v0.12): **Mia the cashier** (#36). She works the register at a steady pace without tips; whenever your shopkeeper steps behind the counter, Mia steps aside so you can ring people up yourself.
-- **Bea the stocker (v0.18, #51, #53):** a **one-time hire** (🪙 200). She works in the morning, during open hours and in the evening: picks up a box from the doorstep, walks it to the emptiest shelf with free space, and unpacks it, at a steady pace a bit slower than you. She uses the Stock Cart too. **Smart picks:** wished-for items first, then items that aren't on the shelves yet. **You can always jump in:** she never takes the box your shopkeeper is heading for, and when there's nothing to do she waits by the right wall. With Mia and Bea both hired, your shopkeeper is free for the bonus spots or decorating. 💡 Later: an **Orderer** helper who re-orders what sells (not decided; ordering may be too fun to hand over).
+- **Bea the stocker (v0.18, #51, #53):** a **one-time hire** (🪙 200). She works in the morning, during open hours and in the evening: picks up a box from the doorstep, walks it to the emptiest shelf with free space, and unpacks it, at a steady pace a bit slower than you. She uses the Stock Cart too. **Smart picks:** wished-for items first, then items that aren't on the shelves yet. **You can always jump in:** she never takes the box your shopkeeper is heading for, and when there's nothing to do she waits by the right wall. With Mia and Bea both hired, your shopkeeper is free for the bonus spots or decorating. **Planned (#60):** a **Sorting Smarts** upgrade so stockers put each box in its matching theme room (#58) when one has space, and later **more stockers** (each one costs more). 💡 Later: an **Orderer** helper who re-orders what sells (not decided; ordering may be too fun to hand over).
 - Your shopkeeper is always there and walks to whatever you tap.
 - **Where she goes when helpers do the work (v0.14, #41):** she can walk out to the sidewalk and into other ground-floor rooms. Each room can give a bonus while she's in it. First ones: the **Window Display** (more window-peekers, and they want what they saw more often) and the **greeter spot** by the shop door (greeted customers often pick up a second item). Bonus spots are marked with a **glowing ring** on the ground; tap it to go there (#44). Future rooms get their own bonus (💡 Stockroom: unpack faster; Tea Corner: customers stay longer).
 - **Customizable shopkeeper (decided):** hairstyle, hair color, skin tone, outfits, accessories (bows, glasses, aprons, hats). Set up in a quick character creator at the start, and changeable anytime. **v0.12 creator (#38):** hair style (bob, bun, pigtails, ponytail), hair color, skin tone, outfit color, accessory (none, bow, glasses, hat). Tap your shopkeeper in the morning to reopen it. A 🎲 button picks a random look (#42). **Boy or girl (v0.20, #43, #55):** the first row picks girl or boy; boys get short / spiky / curly / swoop hair and a bow tie or cap. Game text says "your shopkeeper", never "she".
@@ -291,6 +301,7 @@ Your very own dollhouse, displayed in the shop's front window.
 - You can't go broke. Unsold stock just waits on the shelf. If you ever spend everything with nothing left to sell, Pip brings a free box the next morning (#40).
 - Goals: gentle milestone lists, Collection pages, regulars' stories, and room unlocks.
 - **Upgrades (v0.12, #37)** are one-time buys in the Grow sheet: Lunchtime delivery (🪙 100), Stock cart (🪙 60, carry 2 boxes), Comfy shoes (🪙 80, walk faster). Costs to tune with feedback (`js/data/upgrades.js`).
+- 💡 **Future upgrade ideas (user, 2026-10-09):** **Instant Delivery**: orders arrive right away instead of next morning or at lunch (a pricier upgrade, or maybe a per-order option). **Sorting Smarts** and more stockers are planned (#60).
 
 ## 12. Controls (Portrait, Touch)
 
@@ -364,6 +375,11 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - [x] **First-day guide** arrows and the morning Open-shop nudge (#57)
 
 ### Next
+- [x] **Theme rooms on the ground floor** with ＋ spots and a theme bonus (#58, step 1)
+- [x] **Sorting Smarts** upgrade: stockers use the matching theme room (#60)
+- [ ] **Stairwell and upstairs rooms** (#58, step 2)
+- [ ] More than one stocker (#60, later)
+- [ ] **More items, color variants, catalog pages that open as you collect, Collection bonus and page rewards** (#59)
 - Building grid expansion (X and Y), room types, pan/zoom
 - More morning picks and special days
 - First regulars and story moments
@@ -387,3 +403,4 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 3. ~~**Evening is too long**~~ (playtest after M6, 2026-10-09). **Resolved in v0.10 (decision #33):** 5 s of twilight, then the day closes once the shop is empty. The user tried it and approved it.
 4. ~~**Order book shows only the cost**~~ (user, 2026-10-09). **Resolved in v0.19 (decision #54):** cards show the sell price per item and the profit per box.
 5. **Changing prices with demand?** (user, 2026-10-09): could prices go up when lots of customers want something? This pulls against **fixed prices** (#14, §5.5), which keep the game from feeling like a spreadsheet. 💡 Ways to reward demand without setting prices: wished-for items earn a bonus tip when they're back on the shelf, a "Popular! ⭐" tag on items that sell out a lot (customers pay a little extra), or the Sparkle Sale / special days (§5.4). Not decided.
+6. **Heart and Sparkle milestones** (user, 2026-10-09): special things could unlock at Heart milestones (from happy customers) or Sparkle milestones (from the Dream Dollhouse), alongside the Collection unlocks (#59). Ideas: rare items, decorations, story moments, shopkeeper styles. Not designed yet.

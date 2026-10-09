@@ -76,6 +76,16 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   `state.tutorial`, save version 13, existing saves skip it). Plus an "Open your shop!" arrow any morning after
   5 s of nothing happening. On `/dev/` only until the user releases it.
 
+- **Theme rooms, step 1 built 2026-10-09, waiting for the user's feedback** (GDD v0.23 #58, #60): Grow → Build a
+  theme room → pick one of six themes → tap a ＋ at either end of the ground floor (after the Window Display;
+  🪙 250, 400, 600…). Three shelves each and a theme sign; matching items earn +25% at the register. Customers walk
+  to the room with what they want and back to the shop counter; Bea stocks every room; **Sorting Smarts** (🪙 120)
+  sends boxes to their theme room. Save version 14. On `/dev/` only.
+- **Planned next, in order:** (#58 step 2) the **Stairwell and upstairs rooms**; then (#59) **more items** (toward
+  100+, color variants, catalog pages that open as you collect), the **Collection bonus** and page rewards (coins,
+  confetti, a shopkeeper style). Later: more stockers (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone
+  unlocks (§18 #6). Open issue: delivery boxes stack too high (docs/ISSUES.md, delivery-bin idea).
+
 **Next:** the user's M8 feedback, then pick from "Not scheduled yet" below or the GDD §17 "Next" list.
 The MVP list in GDD §17 is complete.
 

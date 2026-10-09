@@ -3,6 +3,20 @@
 /** Interior size of every room: width, height, depth, and wall/floor thickness. */
 export const ROOM_SIZE = { W: 3.4, H: 2.5, D: 2.6, T: 0.16 };
 
+function themeRoom(theme, name, icon, colors) {
+  return {
+    name, theme, icon, floor: '#e8b98a', ...colors,
+    window: null, // the shelves fill the back wall; a sign with the theme sits above them
+    fixtures: [
+      { kind: 'rug', x: 0, z: 0.25 },
+      { kind: 'shelf', x: -1.15, z: -1.06 },
+      { kind: 'shelf', x: 0, z: -1.06 },
+      { kind: 'shelf', x: 1.15, z: -1.06 },
+      { kind: 'plant', x: -1.45, z: 0.8 },
+    ],
+  };
+}
+
 export const ROOM_TYPES = {
   shop: {
     name: 'Shop',
@@ -35,16 +49,19 @@ export const ROOM_TYPES = {
     window: { x: -0.9, w: 0.8, h: 0.7 },
     fixtures: [],
   },
-  dolls: {
-    name: 'Doll Corner',
-    paper: '#ece3ff', stripe: '#e0d4ff', floor: '#e8b98a', curtain: '#c8b6ff',
-    window: { x: 0, w: 1.0, h: 0.75 },
-    fixtures: [],
-  },
-  tea: {
-    name: 'Tea Corner',
-    paper: '#fff3c9', stripe: '#ffeab0', floor: '#e3b07f', curtain: '#ffd98a',
-    window: { x: 0.7, w: 1.0, h: 0.75 },
-    fixtures: [],
-  },
+  // Theme rooms (GDD #58): one per Collection theme (ITEMS[id].set), three shelves along the back wall.
+  // Items of the room's theme sell better there (THEME_BONUS).
+  tea: themeRoom('tea', 'Tea Time', '🫖', { paper: '#e4f1ff', stripe: '#d2e7ff', curtain: '#a8d8ff' }),
+  parlor: themeRoom('parlor', 'Cozy Parlor', '🛋️', { paper: '#e3f6ea', stripe: '#d3efdd', curtain: '#9fe0c8' }),
+  fairy: themeRoom('fairy', 'Fairy Garden', '🍄', { paper: '#eef8dc', stripe: '#e1f1c8', curtain: '#ff8f8f' }),
+  bedroom: themeRoom('bedroom', 'Sweet Dreams', '🛏️', { paper: '#ece3ff', stripe: '#e0d4ff', curtain: '#c8b6ff' }),
+  dolls: themeRoom('dolls', 'Doll Friends', '🎀', { paper: '#fff4dc', stripe: '#ffeabf', curtain: '#ffd98a' }),
+  houses: themeRoom('houses', 'Little Houses', '🏡', { paper: '#ffe9df', stripe: '#ffdacb', curtain: '#ffb8a0' }),
 };
+
+/** Theme room types, in the order the Grow sheet lists them. */
+export const THEME_ROOMS = Object.keys(ROOM_TYPES).filter((t) => ROOM_TYPES[t].theme);
+/** What each theme room costs: the first one built, the second, ... (the last repeats). */
+export const THEME_ROOM_COSTS = [250, 400, 600, 850, 1150, 1500];
+/** Items sold from their own theme room earn this much extra (a share of the price, rounded up). */
+export const THEME_BONUS = 0.25;

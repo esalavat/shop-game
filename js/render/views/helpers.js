@@ -8,6 +8,7 @@ import { buildBox } from '../models/items.js';
 import { HELPERS } from '../../data/upgrades.js';
 import { BOX_SIZE } from '../../sim/stock.js';
 import { events } from '../../core/events.js';
+import { groundAt } from '../../sim/route.js';
 
 const lerp = (a, b, t) => a + (b - a) * t;
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
@@ -18,6 +19,7 @@ function createHelper(id, agent) {
   const { root, inner } = createCharacter({ ...HELPERS[id].look, apron: true });
   root.visible = false;
   const prev = { x: 0, z: 0 };
+  let prevRoom = null;
   let facing = 0, idlePhase = 0, walkPhase = 0, placed = false;
   let carried = [], carriedKey = null;
   const h = { root, hop: 0 };
@@ -45,6 +47,7 @@ function createHelper(id, agent) {
     if (!a) return;
     prev.x = a.x;
     prev.z = a.z;
+    prevRoom = a.roomId;
   };
 
   h.handPosition = () => {
@@ -59,7 +62,9 @@ function createHelper(id, agent) {
       placed = false;
       return;
     }
-    if (!placed) { // first frame after hiring (or loading): no sliding in from the origin
+    // First frame after hiring (or loading), or she switched rooms (and coordinates) this tick: no sliding.
+    if (!placed || a.roomId !== prevRoom) {
+      prevRoom = a.roomId;
       prev.x = a.x;
       prev.z = a.z;
       facing = a.facing;
@@ -68,7 +73,8 @@ function createHelper(id, agent) {
     if ('carrying' in a) syncCarried(a);
     const o = roomOrigin(a.roomId);
     const walking = a.path.length > 0;
-    root.position.set(o.x + lerp(prev.x, a.x, alpha), o.y, o.z + lerp(prev.z, a.z, alpha));
+    const z = lerp(prev.z, a.z, alpha);
+    root.position.set(o.x + lerp(prev.x, a.x, alpha), o.y + groundAt(z), o.z + z); // steps down to the sidewalk
     facing += wrap(a.facing - facing) * Math.min(1, dt * 10);
     root.rotation.y = facing;
     idlePhase += dt * 2.2;

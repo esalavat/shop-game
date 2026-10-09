@@ -1,10 +1,13 @@
 // Customers: walk in, browse shelves for what they want, take it, queue at the counter, pay, leave.
 // If something they want isn't on the shelves, they leave a wish note instead (never upset).
+// With theme rooms (GDD #58) they head for the room that has what they want, walk over along the
+// sidewalk (sim/route.js), and come back to the shop's counter to pay. Items taken from their own
+// theme room earn a theme bonus at the register.
 //
 // States: [toWindow -> peeking (stop at the Window Display first)] -> arriving (walking in from the
-//         street) -> entering -> toShelf -> browsing -> (next want...)
-//         -> toQueue -> queued -> paying -> paid -> leaving (out the door and off along the street)
-//         waitingQueue when the line is full; straight to leaving if they found nothing.
+//         street) -> entering -> toShelf -> browsing -> (next want...; toRoom -> entering to try
+//         another room) -> toQueue -> queued -> paying -> paid -> leaving (out the door and off
+//         along the street). waitingQueue when the line is full; straight to leaving if they found nothing.
 
 import { events } from '../core/events.js';
 import { ITEMS } from '../data/items.js';
@@ -12,6 +15,9 @@ import { CUSTOMER, LOOKS, ADULT_SCALE, KID_SCALE } from '../data/customers.js';
 import { findPath } from './nav.js';
 import { stepAlong } from './walker.js';
 import { newId, shopRoomId, findFixture } from './stock.js';
+import { sellingRooms, themeRoomFor, isThemeRoom } from './building.js';
+import { ROOM_TYPES, THEME_BONUS } from '../data/rooms.js';
+import { doorOf, finishRoute, roomOffset, routeTo, streetBounds } from './route.js';
 import { startCheckout } from './checkout.js';
 import { cashierReady } from './helpers.js';
 import { recordWish } from './day.js';
@@ -25,7 +31,7 @@ export const ENTRY = { x: 0.4, z: 1.1 };
  * The sidewalk in front of the shop (room-local; below floor level). People walk in from off-screen
  * along one lane and leave along the other, then disappear near the end of the road.
  */
-export const STREET = { inLane: 2.25, outLane: 2.65, farX: 8, edgeZ: 1.3 };
+export const STREET = { inLane: 2.25, outLane: 2.65, offEnd: 6.5, edgeZ: 1.3 }; // offEnd: how far past the building they appear / vanish
 /**
  * The line for the counter; spot 0 is being served. They come up to the counter's end, side-on,
  * so they don't hide the counter (or the shopkeeper) from the camera, then the line snakes forward.
@@ -56,8 +62,44 @@ function findSlot(state, roomId, itemId) {
   return stockedSlots(state, roomId).find((s) => s.itemId === itemId && !reserved.has(`${s.fixture.id}:${s.slot}`)) ?? null;
 }
 
-function chooseWants(state, roomId, rand) {
-  const stocked = [...new Set(stockedSlots(state, roomId).map((s) => s.itemId))];
+/** Everything on the shelves, in every room customers shop in. */
+const stockedItems = (state) => [...new Set(sellingRooms(state).flatMap((r) => stockedSlots(state, r.id).map((s) => s.itemId)))];
+
+const roomById = (state, id) => state.building.rooms.find((r) => r.id === id);
+
+/** Where to look for an item: right here if it's here, else its theme room, else any room with one. */
+function roomWith(state, hereId, itemId) {
+  if (findSlot(state, hereId, itemId)) return hereId;
+  const theme = themeRoomFor(state, ITEMS[itemId].set);
+  if (theme && findSlot(state, theme.id, itemId)) return theme.id;
+  return sellingRooms(state).find((r) => findSlot(state, r.id, itemId))?.id ?? null;
+}
+
+/** How much extra an item earns when it's taken from its own theme room (GDD #58), else 0. */
+export function themeBonus(state, roomId, itemId) {
+  const theme = ROOM_TYPES[roomById(state, roomId)?.type]?.theme;
+  return theme && ITEMS[itemId].set === theme ? Math.ceil(ITEMS[itemId].price * THEME_BONUS) : 0;
+}
+
+/** Off-screen along the street, on one side of the building or the other (shop coordinates). */
+function roadEnd(state, side) {
+  const b = streetBounds(state);
+  return side < 0 ? b.minX - STREET.offEnd : b.maxX + STREET.offEnd;
+}
+
+/** In from the sidewalk through the front of the room that has what they want first. */
+function headInside(state, c) {
+  const shopId = shopRoomId(state);
+  const room = roomById(state, (c.wants[0] && roomWith(state, shopId, c.wants[0])) ?? shopId);
+  const off = roomOffset(state, room), door = doorOf(room);
+  c.path = [{ x: door.x + off, z: STREET.inLane }, { x: door.x + off, z: door.z }];
+  c.arriveRoom = room.id === shopId ? null : { roomId: room.id, offset: off, from: shopId };
+  c.arriveFacing = null;
+  c.state = 'arriving';
+}
+
+function chooseWants(state, rand) {
+  const stocked = stockedItems(state);
   const all = Object.keys(ITEMS);
   const first = stocked.length && rand() < CUSTOMER.wantsStocked ? pick(rand, stocked) : pick(rand, all);
   const wants = [first];
@@ -75,16 +117,19 @@ export function spawnCustomer(state, rand = Math.random) {
   };
   const side = rand() < 0.5 ? -1 : 1;
   const c = {
-    id: newId(state, 'c'), roomId, x: side * STREET.farX, z: STREET.inLane, facing: -side * Math.PI / 2,
-    path: [{ x: ENTRY.x, z: STREET.inLane }, { x: ENTRY.x, z: ENTRY.z }], arriveFacing: null,
-    side, state: 'arriving', timer: 0.3, look, wants: chooseWants(state, roomId, rand), basket: [], target: null,
-    windowWant: null,
+    id: newId(state, 'c'), roomId, x: 0, z: STREET.inLane, facing: -side * Math.PI / 2,
+    path: [], arriveFacing: null,
+    side, state: 'arriving', timer: 0.3, look, wants: chooseWants(state, rand), basket: [], target: null,
+    windowWant: null, bonus: 0, arriveRoom: null,
   };
+  c.x = roadEnd(state, side);
+  headInside(state, c);
   // Drawn in by the Dream Dollhouse: look in the window first, and maybe want something from it.
   const chance = peekChance(state);
   if (chance && rand() < chance) {
     // Off to the side they came from, so they don't block the view of the dollhouse.
     c.path = [{ x: windowX(state) + side * between(rand, SPARKLE.peekOffset), z: STREET.inLane }];
+    c.arriveRoom = null; // they pick a room to go in once they've looked (headInside)
     c.arriveFacing = Math.PI;
     c.state = 'toWindow';
     const onShow = [...dollhouseItems(state)];
@@ -98,7 +143,7 @@ export function spawnCustomer(state, rand = Math.random) {
 /** Welcomed at the door by the shopkeeper: often they'll pick up one more thing while they're here. */
 function greet(state, c, rand) {
   c.greeted = true;
-  const stocked = [...new Set(stockedSlots(state, c.roomId).map((s) => s.itemId))];
+  const stocked = stockedItems(state);
   if (c.wants.length < 2 && stocked.length && rand() < CUSTOMER.greetedSecondItem) c.wants.push(pick(rand, stocked));
   events.emit('greeted', { customerId: c.id });
 }
@@ -116,9 +161,19 @@ function addWish(state, c, itemId) {
 }
 
 /** Head for the next thing on the list, or to the line / the door when done. */
-function nextWant(state, c, nav, rand) {
+function nextWant(state, c, navs, rand) {
   const itemId = c.wants[0];
   if (itemId) {
+    const where = roomWith(state, c.roomId, itemId);
+    if (where && where !== c.roomId) { // it's in another room: walk over
+      const door = doorOf(roomById(state, where));
+      if (routeTo(state, navs, c, { roomId: where, x: door.x, z: door.z - 0.3 })) {
+        c.arriveFacing = null;
+        c.state = 'toRoom';
+        return;
+      }
+    }
+    const nav = navs.get(c.roomId);
     const found = findSlot(state, c.roomId, itemId);
     const shelves = shelvesIn(state, c.roomId);
     const shelf = found?.fixture ?? pick(rand, shelves);
@@ -131,29 +186,30 @@ function nextWant(state, c, nav, rand) {
     }
     c.wants.shift();
     addWish(state, c, itemId);
-    return nextWant(state, c, nav, rand);
+    return nextWant(state, c, navs, rand);
   }
-  if (c.basket.length) joinQueue(state, c, nav);
-  else leave(state, c, nav);
+  if (c.basket.length) joinQueue(state, c, navs);
+  else leave(state, c, navs);
 }
 
 /** Done looking at a shelf: take the item, or try elsewhere, or wish for it. */
-function finishBrowsing(state, c, nav, rand) {
+function finishBrowsing(state, c, navs, rand) {
   const t = c.target;
   c.target = null;
   const shelf = t && findFixture(state, t.fixtureId)?.fixture;
   if (t && shelf && t.slot != null && shelf.slots[t.slot] === t.itemId) {
     shelf.slots[t.slot] = null;
     c.basket.push(t.itemId);
+    c.bonus += themeBonus(state, c.roomId, t.itemId);
     c.wants.shift();
     events.emit('itemTaken', { roomId: c.roomId, fixtureId: shelf.id, slot: t.slot, itemId: t.itemId, customerId: c.id });
-  } else if (t && findSlot(state, c.roomId, t.itemId)) {
-    // Someone else took it, but there's another one: go look there.
+  } else if (t && roomWith(state, c.roomId, t.itemId)) {
+    // Someone else took it, but there's another one (here or in another room): go look there.
   } else if (t) {
     c.wants.shift();
     addWish(state, c, t.itemId);
   }
-  nextWant(state, c, nav, rand);
+  nextWant(state, c, navs, rand);
 }
 
 function queueFace(i) {
@@ -162,38 +218,41 @@ function queueFace(i) {
   return Math.atan2(ahead.x - me.x, ahead.z - me.z);
 }
 
-function joinQueue(state, c, nav) {
+function joinQueue(state, c, navs) {
   if (state.queue.length >= QUEUE_SPOTS.length) {
     c.state = 'waitingQueue';
     return;
   }
   state.queue.push(c.id);
-  goToQueueSpot(c, state.queue.length - 1, nav);
+  goToQueueSpot(state, c, state.queue.length - 1, navs);
 }
 
-function goToQueueSpot(c, i, nav) {
+/** To their place in line at the shop's counter (from another room: along the sidewalk). */
+function goToQueueSpot(state, c, i, navs) {
   const s = QUEUE_SPOTS[i];
-  walk(c, nav, s.x, s.z, queueFace(i));
   c.state = 'toQueue';
+  if (c.arriveRoom) return; // still walking over from another room: they find their place on arrival
+  const shopId = shopRoomId(state);
+  if (c.roomId === shopId) walk(c, navs.get(shopId), s.x, s.z, queueFace(i));
+  else if (routeTo(state, navs, c, { roomId: shopId, x: s.x, z: s.z })) c.arriveFacing = queueFace(i);
 }
 
-function leave(state, c, nav) {
+function leave(state, c, navs) {
   const i = state.queue.indexOf(c.id);
   if (i >= 0) {
     state.queue.splice(i, 1);
     // Everyone behind steps up.
     state.queue.forEach((id, j) => {
       const other = state.customers.find((x) => x.id === id);
-      if (j >= i && other && (other.state === 'toQueue' || other.state === 'queued')) goToQueueSpot(other, j, nav);
+      if (j >= i && other && (other.state === 'toQueue' || other.state === 'queued')) goToQueueSpot(state, other, j, navs);
     });
   }
-  // Out the door, onto the sidewalk, and off the far end of the road from where they came.
-  const side = -c.side;
-  c.path = [
-    ...(findPath(nav, c, ENTRY) ?? []),
-    { x: ENTRY.x, z: STREET.outLane },
-    { x: side * STREET.farX, z: STREET.outLane },
-  ];
+  // Out the front of their room, onto the sidewalk, and off the far end of the road from where they came.
+  const far = roadEnd(state, -c.side);
+  const room = roomById(state, c.arriveRoom?.roomId ?? c.roomId);
+  const doorX = doorOf(room).x + roomOffset(state, room);
+  if (routeTo(state, navs, c, { street: true, x: doorX, z: STREET.outLane })) c.path.push({ x: far, z: STREET.outLane });
+  else c.path = [{ x: far, z: STREET.outLane }];
   c.arriveFacing = null;
   c.state = 'leaving';
 }
@@ -201,15 +260,18 @@ function leave(state, c, nav) {
 export function tickCustomers(state, navs, dt, rand = Math.random) {
   // New visitors only arrive while the shop is open.
   if (state.day.phase === 'open' && (state.spawnTimer -= dt) <= 0) {
-    const anyStock = stockedSlots(state, shopRoomId(state)).length > 0;
-    if (state.customers.length < CUSTOMER.maxInShop) spawnCustomer(state, rand);
+    const anyStock = stockedItems(state).length > 0;
+    const max = CUSTOMER.maxInShop + CUSTOMER.perThemeRoom * state.building.rooms.filter(isThemeRoom).length;
+    if (state.customers.length < max) spawnCustomer(state, rand);
     state.spawnTimer = between(rand, anyStock ? CUSTOMER.spawnEvery : CUSTOMER.spawnEveryEmpty) / trafficBoost(state);
   }
 
   for (const c of [...state.customers]) {
-    const nav = navs.get(c.roomId);
     const speed = c.z > STREET.edgeZ ? CUSTOMER.streetSpeed : CUSTOMER.speed;
-    if (stepAlong(c, speed, dt) && c.arriveFacing !== null) c.facing = c.arriveFacing;
+    if (stepAlong(c, speed, dt)) {
+      finishRoute(c); // walked over from another room (or in from the street)
+      if (c.arriveFacing !== null) c.facing = c.arriveFacing;
+    }
     const walking = c.path.length > 0;
     switch (c.state) {
       case 'toWindow':
@@ -220,39 +282,48 @@ export function tickCustomers(state, navs, dt, rand = Math.random) {
         }
         break;
       case 'peeking':
-        if ((c.timer -= dt) <= 0) {
-          c.path = [{ x: ENTRY.x, z: STREET.inLane }, { x: ENTRY.x, z: ENTRY.z }];
-          c.arriveFacing = null;
-          c.state = 'arriving';
-        }
+        if ((c.timer -= dt) <= 0) headInside(state, c);
         break;
       case 'arriving':
         if (!walking) {
           c.state = 'entering';
           events.emit('customerEntered', { customerId: c.id });
-          if (keeperGreeting(state)) greet(state, c, rand);
+          if (c.roomId === shopRoomId(state) && keeperGreeting(state)) greet(state, c, rand);
         }
         break;
+      case 'toRoom':
+        if (!walking) { c.state = 'entering'; c.timer = 0.2; }
+        break;
       case 'entering':
-        if ((c.timer -= dt) <= 0) nextWant(state, c, nav, rand);
+        if ((c.timer -= dt) <= 0) nextWant(state, c, navs, rand);
         break;
       case 'toShelf':
         if (!walking) { c.state = 'browsing'; c.timer = between(rand, CUSTOMER.browseTime); }
         break;
       case 'browsing':
-        if ((c.timer -= dt) <= 0) finishBrowsing(state, c, nav, rand);
+        if ((c.timer -= dt) <= 0) finishBrowsing(state, c, navs, rand);
         break;
       case 'waitingQueue':
-        if (state.queue.length < QUEUE_SPOTS.length) joinQueue(state, c, nav);
+        if (state.queue.length < QUEUE_SPOTS.length) joinQueue(state, c, navs);
         break;
       case 'toQueue':
-        if (!walking) c.state = 'queued';
+        if (!walking) {
+          // Walked over from another room: the line may have moved up while they were on the way.
+          const i = state.queue.indexOf(c.id), s = QUEUE_SPOTS[i];
+          if (s && !c.requeued && Math.hypot(c.x - s.x, c.z - s.z) > 0.05) {
+            c.requeued = true;
+            goToQueueSpot(state, c, i, navs);
+          } else {
+            c.requeued = false;
+            c.state = 'queued';
+          }
+        }
         break;
       case 'queued':
         if (state.queue[0] === c.id && !state.checkout && cashierReady(state)) startCheckout(state, c);
         break;
       case 'paid':
-        leave(state, c, nav);
+        leave(state, c, navs);
         break;
       case 'leaving':
         if (!walking) {

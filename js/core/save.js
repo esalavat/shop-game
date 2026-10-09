@@ -81,6 +81,8 @@ const MIGRATIONS = {
   11: (d) => ({ ...d, version: 12, shopkeeper: { body: 'girl', ...d.shopkeeper } }),
   // v13: the first-day guide (GDD #57), for new games only: existing shops already know the way.
   12: (d) => ({ ...d, version: 13, tutorial: 'done' }),
+  // v14: Bea can walk to other rooms (stocker.arriveRoom while on the way; GDD #58).
+  13: (d) => ({ ...d, version: 14, stocker: d.stocker && { ...d.stocker, arriveRoom: null } }),
 };
 
 export function migrate(data) {

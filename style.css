@@ -421,6 +421,22 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 .bubble.spot::after { display: none; }
 .bubble.spot-showoff { border-color: #e8b64a; }
 @keyframes bob { 50% { margin-top: -5px; } }
+/* + spots for a new room (GDD #58, main.js placement mode): tappable, unlike other bubbles. */
+.bubble.place { padding: 0; background: none; box-shadow: none; pointer-events: auto; transform-origin: center; }
+.bubble.place::after { display: none; }
+.bubble.place button {
+  width: 64px; height: 64px; margin-bottom: -32px; border: 3px dashed #fff; border-radius: 50%;
+  background: rgba(224, 103, 154, 0.85); color: #fff; font-size: 34px; font-weight: 800;
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.35); animation: bob 1.1s ease-in-out infinite;
+}
+#place-banner {
+  position: absolute; top: calc(env(safe-area-inset-top) + 92px); left: 16px; right: 16px;
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 16px;
+  background: var(--cream); box-shadow: 0 3px 0 var(--shadow); font-weight: 800; font-size: 15px;
+}
+#place-banner[hidden] { display: none; }
+#place-banner span { flex: 1; }
+#place-banner button { border: 0; border-radius: 12px; padding: 8px 12px; background: var(--shadow); color: var(--ink); font-weight: 800; }
 /* First-day guide (ui/guide.js): a bouncing pink label with a big arrow underneath. */
 .bubble.guide { background: var(--pink); color: #fff; font-size: 15px; animation: bob 0.9s ease-in-out infinite; }
 .bubble.guide::after { bottom: -14px; margin-left: -12px; border-width: 14px 12px 0; border-top-color: var(--pink); }
@@ -576,6 +592,15 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 .grow-card.small p { margin: 0 0 8px; font-size: 13px; }
 .grow-card.small .grow-build { grid-column: 2; padding: 9px 0; font-size: 15px; }
 .grow-card.owned { opacity: 0.75; }
+.grow-cost { margin: -4px 0 10px; font-size: 14px; font-weight: 800; }
+.grow-themes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.grow-theme {
+  display: flex; align-items: center; gap: 6px; padding: 10px 8px;
+  border: 2px solid var(--edge); border-radius: 14px; background: var(--tint);
+  color: var(--ink); font-weight: 800; font-size: 14px; text-align: left;
+}
+.grow-theme span { font-size: 20px; }
+.grow-theme:disabled { opacity: 0.5; }
 .grow-done { padding: 10px; font-size: 14px; font-weight: 700; opacity: 0.7; text-align: center; }
 
 .grow-build {

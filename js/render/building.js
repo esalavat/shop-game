@@ -79,7 +79,8 @@ function furnishRoom(group, room, cx, fy, lighting) {
   box(group, W, 0.05, 0.06, P.cream, cx, fy + 0.6, wallZ + 0.03);
 
   const win = look.window;
-  addWindow(group, cx + win.x, fy + 1.55, wallZ + 0.03, win.w, win.h, look.curtain, lighting.glassMat);
+  if (win) addWindow(group, cx + win.x, fy + 1.55, wallZ + 0.03, win.w, win.h, look.curtain, lighting.glassMat);
+  if (look.theme) addThemeSign(group, cx + 1.1, fy + 1.86, wallZ + 0.03, look); // over the right shelf, clear of the lamp in the view
   lighting.addPendant(group, cx, fy + H, 0.1);
 
   for (const f of room.fixtures) {
@@ -107,9 +108,18 @@ function addWindow(group, x, y, z, w, h, curtain, glassMat) {
   box(group, 0.2, h + 0.2, 0.04, curtain, x + w / 2 + 0.05, y, z + 0.06);
 }
 
-function signTexture(lines) {
+/** A theme room's sign above its shelves (GDD #58): the theme's icon and name. */
+function addThemeSign(group, x, y, z, look) {
+  const w = 1.0, h = 0.3;
+  box(group, w + 0.08, h + 0.08, 0.04, look.curtain, x, y, z);
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: signTexture([`${look.icon} ${look.name}`], 300) }));
+  sign.position.set(x, y, z + 0.025);
+  group.add(sign);
+}
+
+function signTexture(lines, height = 400) {
   const c = document.createElement('canvas');
-  c.width = 1024; c.height = 400;
+  c.width = 1024; c.height = height;
   const g = c.getContext('2d');
   g.fillStyle = P.cream;
   g.fillRect(0, 0, c.width, c.height);

@@ -56,7 +56,7 @@ export function createCustomersView(state, roomOrigin) {
     hitTargets,
 
     beforeTick() {
-      for (const e of shown.values()) { e.prev.x = e.c.x; e.prev.z = e.c.z; }
+      for (const e of shown.values()) { e.prev.x = e.c.x; e.prev.z = e.c.z; e.prevRoom = e.c.roomId; }
     },
 
     /** World position just above a customer's head (for speech bubbles). */
@@ -79,6 +79,10 @@ export function createCustomersView(state, roomOrigin) {
           e.t = Math.min(POP_TIME, e.t + dt);
         }
         const c = e.c;
+        if (e.prevRoom && e.prevRoom !== c.roomId) { // switched rooms (and coordinates) this tick: don't slide across
+          e.prev.x = c.x; e.prev.z = c.z; e.prevRoom = c.roomId;
+        }
+        e.hit.userData.roomId = c.roomId;
         const o = roomOrigin(c.roomId);
         const z = lerp(e.prev.z, c.z, alpha);
         e.root.position.set(o.x + lerp(e.prev.x, c.x, alpha), o.y + groundAt(z), o.z + z);

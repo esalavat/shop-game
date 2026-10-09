@@ -45,7 +45,7 @@ js/
   data/                 # Content as plain data (no logic)
     items.js            # Products: id, set, price, cost, shelfType, slotType, rarity, model
     shelves.js          # Shelf types and capacities
-    rooms.js            # Room types, sizes
+    rooms.js            # Room types and sizes; theme rooms (THEME_ROOMS, THEME_ROOM_COSTS, THEME_BONUS)
     dollhouse.js        # Dream Dollhouse slots, Sparkle tuning, shop expansions (costs)
     customers.js        # Customer types: wants, budgets, looks
     story.js            # Regulars, story beats, triggers
@@ -55,15 +55,15 @@ js/
     day.js              # Day phases: morning → open → evening → close
     orders.js           # Order book, deliveries
     stock.js            # Boxes, shelves, inventory
-    customers.js        # Spawning, browsing, buying, wish notes (state machines)
+    customers.js        # Spawning, browsing, buying, wish notes (state machines); walk to the room that has their item
     checkout.js         # Queue, scanning, tips
     marketing.js        # Morning picks, special days, Sparkle → foot traffic
     collection.js       # Dream Dollhouse placing, Sparkle, foot-traffic boost, window spot (unlocks happen in day.js)
     helpers.js          # Hired helpers doing jobs: Mia the cashier (state.cashier, live-only)
     tutorial.js         # First-day guide steps (state.tutorial: box → shelf → open → register → done), advanced each tick
-    stocker.js          # Bea the stocker: fetches doorstep boxes and unpacks them (state.stocker, saved so held boxes survive a reload)
+    stocker.js          # Bea the stocker: fetches doorstep boxes and unpacks them in any room; Sorting Smarts (state.stocker, saved)
     upgrades.js         # Buying upgrades / hiring helpers (one-time; state.upgrades, state.helpers)
-    route.js            # Walking between rooms and onto the street (sidewalk lane, doors, greeter spot)
+    route.js            # Walking between rooms and onto the street (planRoute, startRoute/finishRoute/settleRoute/routeTo, doors)
     economy.js          # Coins, Hearts, Sparkle, costs
     story.js            # Checks triggers, queues story moments
     offline.js          # Offline earnings on return
@@ -158,13 +158,25 @@ docs/                   # GDD, tech plan
 - The shopkeeper creator edits `state.shopkeeper`; `views/keeper.js` `setLook()` rebuilds her model. In the morning the
   keeper has a tap hitbox that opens it.
 
-### 4.3.3 Walking between rooms and the street (GDD #41)
+### 4.3.3 Walking between rooms and the street (GDD #41, #58)
 - `walkTo(state, navs, dest)` takes the map of all room walk grids. `dest` is `{ roomId, x, z }` (room-local) or
   `{ street: true, x, z }` (shop coordinates). `sim/route.js` `planRoute` uses the room's grid when it can; otherwise
   she goes out her room's door, along `SIDEWALK.lane`, and in the other room's door.
 - During such a walk the keeper is in **shop coordinates** (`roomId` = shop, like customers on the street), with
   `keeper.arriveRoom = { roomId, offset, from }`. On arrival she switches to the target room's coordinates. If a new walk
-  starts mid-way, `settle()` first puts her back in whichever room she's actually standing in.
+  starts mid-way, `settleRoute()` first puts her back in whichever room she's actually standing in.
+- **Everyone walks this way** (#58): `startRoute` / `finishRoute` / `settleRoute` / `routeTo` in `sim/route.js` work on
+  anything with `roomId, x, z, path, arriveRoom`: the shopkeeper, customers and Bea (`stocker.arriveRoom` is saved,
+  save v14). Their views reset interpolation when `roomId` changes mid-tick, so nobody slides across the building.
+- **Theme rooms** (`sim/building.js`): `roomSpots` (either end of the ground floor), `buildThemeRoom(state, type, col,
+  floor)`, `themeRoomCost`, `sellingRooms` (rooms with shelves), `themeRoomFor(state, theme)`. Customers pick the room
+  for each want with `roomWith` (here, else the item's theme room, else any room with one), come in through that
+  room's door from the street (`headInside`), walk between rooms with `routeTo`, and line up at the shop counter
+  (`goToQueueSpot` re-checks their place in line on arrival). `customer.bonus` collects the theme bonus
+  (`themeBonus`, `THEME_BONUS` of the price, rounded up) and `completeSale` adds it. Bea's `shelfFor` picks the emptiest
+  shelf in any room, or the matching theme room with `upgrades.sorting`.
+- **Placement mode** (`main.js`): the Grow sheet's theme buttons call `startPlacing(type)`, which zooms out to show
+  the + spots (overlay bubbles with class `place`, the only tappable ones) and a banner with Cancel.
 - Bonuses: `keeperShowingOff()` (in the Window Display) raises `peekChance` / `peekWantChance` (`SPARKLE.keeper*`).
   `keeperGreeting()` (standing at `GREETER`) makes customers who reach the door `greeted`, often adding a second want
   (`CUSTOMER.greetedSecondItem`).

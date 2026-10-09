@@ -4,8 +4,7 @@
 
 import { events } from '../core/events.js';
 import { useSpot } from '../data/fixtures.js';
-import { planRoute, shopRoom, roomOffset, onStreet, GREETER, SHOWOFF } from './route.js';
-import { ROOM_SIZE } from '../data/rooms.js';
+import { planRoute, startRoute, finishRoute, settleRoute, shopRoom, GREETER, SHOWOFF } from './route.js';
 import { stepAlong } from './walker.js';
 import { boxSpot, findFixture, DOORWAY_Z } from './stock.js';
 import { performTask } from './tasks.js';
@@ -31,18 +30,11 @@ export function createKeeper(roomId) {
  */
 export function walkTo(state, navs, dest, { fixtureId = null, face = null, task = null } = {}) {
   const k = state.keeper;
-  settle(state);
+  const entered = settleRoute(state, k);
+  if (entered) events.emit('keeperEnteredRoom', { roomId: entered });
   const route = planRoute(state, navs, k, dest.street ? dest : { roomId: k.roomId, ...dest });
   if (!route) return false;
-  if (route.fromOffset || route.arriveRoomId !== k.roomId) {
-    // Leaving her room: switch to shop coordinates for the walk; she joins the new room on arrival.
-    k.arriveRoom = { roomId: route.arriveRoomId, offset: route.arriveOffset, from: k.roomId };
-    k.x += route.fromOffset;
-    k.roomId = shopRoom(state).id;
-  } else {
-    k.arriveRoom = null;
-  }
-  k.path = route.path;
+  startRoute(state, k, route); // to another room: shop coordinates on the way, the new room on arrival
   k.fixtureId = fixtureId;
   k.arriveFacing = face;
   k.task = task;
@@ -60,24 +52,6 @@ export function walkToFixture(state, navs, fixture, task = null) {
 export function walkToBox(state, navs, box) {
   const { x } = boxSpot(box.spot);
   return walkTo(state, navs, { roomId: box.roomId, x, z: DOORWAY_Z }, { face: 0, task: { type: 'pickup', boxId: box.id } });
-}
-
-/**
- * Mid-walk between rooms she's in shop coordinates. Before planning a new walk, put her back in the
- * room she's actually standing in (or leave her on the street), in that room's own coordinates.
- */
-function settle(state) {
-  const k = state.keeper;
-  if (!k.arriveRoom) return;
-  const from = k.arriveRoom.from;
-  k.arriveRoom = null;
-  if (onStreet(state, k)) return;
-  const half = ROOM_SIZE.W / 2;
-  const room = state.building.rooms.find((r) => r.floor === 0 && Math.abs(k.x - roomOffset(state, r)) <= half);
-  if (!room) return;
-  k.x -= roomOffset(state, room);
-  k.roomId = room.id;
-  if (room.id !== from) events.emit('keeperEnteredRoom', { roomId: room.id });
 }
 
 /** Out to the greeter spot by the shop door (GDD #41). */
@@ -105,13 +79,7 @@ export function tickKeeper(state, dt) {
 
 function arrive(state) {
   const k = state.keeper;
-  if (k.arriveRoom) { // walked over from another room
-    const roomChanged = k.arriveRoom.roomId !== k.arriveRoom.from;
-    k.x -= k.arriveRoom.offset;
-    k.roomId = k.arriveRoom.roomId;
-    k.arriveRoom = null;
-    if (roomChanged) events.emit('keeperEnteredRoom', { roomId: k.roomId });
-  }
+  if (finishRoute(k)) events.emit('keeperEnteredRoom', { roomId: k.roomId }); // walked over from another room
   if (k.arriveFacing !== null) k.facing = k.arriveFacing;
   const { fixtureId, task } = k;
   k.fixtureId = null;

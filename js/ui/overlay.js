@@ -23,6 +23,8 @@ export function createOverlay(canvas, getCamera) {
   }
 
   return {
+    root,
+
     /** Show (or update) a bubble that follows `pos()`. `html` is trusted markup built by the game. */
     bubble(key, pos, html, cls = '') {
       let b = bubbles.get(key);

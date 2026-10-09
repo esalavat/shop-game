@@ -6,7 +6,7 @@ import { createKeeper } from './keeper.js';
 import { dropBox } from './stock.js';
 import { emptyStats } from './day.js';
 
-export const STATE_VERSION = 13;
+export const STATE_VERSION = 14;
 
 /** Live-only fields: never saved, reset on every load (customers just walk in again). */
 export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer', 'cashier'];

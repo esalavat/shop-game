@@ -1,8 +1,8 @@
-// Getting around the building (GDD #41). Inside one room the walk grid (nav.js) finds the way. To
-// another room, or out onto the street, she walks out the front of her room, along the sidewalk, and
-// in the front of the other room. The street uses the shop room's local coordinates (as customers
-// do), so a walk between rooms is planned entirely in shop coordinates and she only switches rooms
-// when she arrives.
+// Getting around the building (GDD #41, #58). Inside one room the walk grid (nav.js) finds the way.
+// To another room, or out onto the street, people walk out the front of their room, along the
+// sidewalk, and in the front of the other room. The street uses the shop room's local coordinates,
+// so a walk between rooms is planned entirely in shop coordinates and they only switch rooms when
+// they arrive. The shopkeeper, customers and Bea all walk this way (startRoute / finishRoute).
 
 import { ROOM_SIZE } from '../data/rooms.js';
 import { findPath } from './nav.js';
@@ -83,4 +83,56 @@ export function planRoute(state, navs, from, dest) {
   if (!inside) return null;
   path.push({ x: door.x + toOffset, z: SIDEWALK.lane }, { x: door.x + toOffset, z: door.z }, ...shift(inside, toOffset));
   return { path, fromOffset, arriveRoomId: toRoom.id, arriveOffset: toOffset };
+}
+
+/**
+ * Set someone (the shopkeeper, a customer, Bea: anything with roomId, x, z, path) off on a planned
+ * route. When it changes rooms they walk in shop coordinates, with `arriveRoom` saying where they'll be.
+ */
+export function startRoute(state, agent, route) {
+  if (route.fromOffset || route.arriveRoomId !== agent.roomId) {
+    agent.arriveRoom = { roomId: route.arriveRoomId, offset: route.arriveOffset, from: agent.roomId };
+    agent.x += route.fromOffset;
+    agent.roomId = shopRoom(state).id;
+  } else {
+    agent.arriveRoom = null;
+  }
+  agent.path = route.path;
+}
+
+/** At the end of a route: back into the destination room's coordinates. True if they changed rooms. */
+export function finishRoute(agent) {
+  const a = agent.arriveRoom;
+  if (!a) return false;
+  agent.x -= a.offset;
+  agent.roomId = a.roomId;
+  agent.arriveRoom = null;
+  return a.roomId !== a.from;
+}
+
+/**
+ * Mid-walk between rooms they're in shop coordinates. Before planning a new walk, put them back in
+ * the room they're actually standing in (or leave them on the street). Returns the room they've just
+ * stepped into, if it's a different one, else null.
+ */
+export function settleRoute(state, agent) {
+  if (!agent.arriveRoom) return null;
+  const from = agent.arriveRoom.from;
+  agent.arriveRoom = null;
+  if (onStreet(state, agent)) return null;
+  const half = ROOM_SIZE.W / 2;
+  const room = state.building.rooms.find((r) => r.floor === 0 && Math.abs(agent.x - roomOffset(state, r)) <= half);
+  if (!room) return null;
+  agent.x -= roomOffset(state, room);
+  agent.roomId = room.id;
+  return room.id !== from ? room.id : null;
+}
+
+/** Plan and start a walk to `dest` (see planRoute), from wherever they are. False if there's no way. */
+export function routeTo(state, navs, agent, dest) {
+  settleRoute(state, agent);
+  const route = planRoute(state, navs, agent, dest);
+  if (!route) return false;
+  startRoute(state, agent, route);
+  return true;
 }

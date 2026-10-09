@@ -225,3 +225,19 @@ test('a v12 save skips the first-day guide', () => {
   assert.equal(s.version, STATE_VERSION);
   assert.equal(s.tutorial, 'done');
 });
+
+test('a v13 save lets Bea walk between rooms', () => {
+  const store = memoryStorage();
+  const v13 = { ...createState(0), version: 13, helpers: { stocker: true }, stocker: { roomId: 'r1', x: 1.4, z: 0.7, facing: 0, path: [], arriveFacing: null, carrying: null, spare: null, job: null, timer: 0 } };
+  store.setItem(SAVE_KEY, JSON.stringify(v13));
+  const s = loadGame(store);
+  assert.equal(s.version, STATE_VERSION);
+  assert.equal(s.stocker.arriveRoom, null);
+  assert.equal(s.stocker.x, 1.4);
+});
+
+test('a v13 save without Bea stays without her', () => {
+  const store = memoryStorage();
+  store.setItem(SAVE_KEY, JSON.stringify({ ...createState(0), version: 13 }));
+  assert.equal(loadGame(store).stocker, null);
+});

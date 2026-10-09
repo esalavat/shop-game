@@ -6,7 +6,15 @@ Design questions (not bugs) belong in [GDD.md](GDD.md) §18.
 
 ## Open
 
-_(none)_
+### Delivery boxes stack too high and hide the shelves (2026-10-09, user)
+- The doorstep has four box spots (`BOX_SPOTS` in `js/sim/stock.js`); every box after that stacks on top. A big
+  delivery (or a few days of orders left unpacked) builds tall towers in front of the shop that hide the shelves
+  behind them and get in the way of tapping them.
+- **Idea (user):** a **delivery bin** on the doorstep instead of loose stacks. Tap it to open a window listing every
+  box waiting (item picture, how many); tap one there to send your shopkeeper to fetch it. The bin could show a few
+  boxes poking out, or a count, so you can still see at a glance that deliveries came. Bea would take boxes from
+  the bin the same way. Needs a design pass (GDD) before building: where the bin sits, whether some boxes still
+  show on the doorstep, and how the first-day guide's "Tap a box!" arrow (#57) points at the bin.
 
 ## Fixed
 
