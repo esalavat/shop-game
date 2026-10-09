@@ -16,7 +16,8 @@ import { startCheckout } from './checkout.js';
 import { cashierReady } from './helpers.js';
 import { recordWish } from './day.js';
 import { SPARKLE } from '../data/dollhouse.js';
-import { peekChance, trafficBoost, windowX, dollhouseItems } from './collection.js';
+import { peekChance, peekWantChance, trafficBoost, windowX, dollhouseItems } from './collection.js';
+import { keeperGreeting } from './keeper.js';
 
 /** Just inside the shop's open front, where customers step in and out (room-local). */
 export const ENTRY = { x: 0.4, z: 1.1 };
@@ -87,11 +88,19 @@ export function spawnCustomer(state, rand = Math.random) {
     c.arriveFacing = Math.PI;
     c.state = 'toWindow';
     const onShow = [...dollhouseItems(state)];
-    if (onShow.length && rand() < SPARKLE.peekWant) c.wants[0] = c.windowWant = pick(rand, onShow);
+    if (onShow.length && rand() < peekWantChance(state)) c.wants[0] = c.windowWant = pick(rand, onShow);
   }
   state.customers.push(c);
   events.emit('customerArrived', { customer: c });
   return c;
+}
+
+/** Welcomed at the door by the shopkeeper: often they'll pick up one more thing while they're here. */
+function greet(state, c, rand) {
+  c.greeted = true;
+  const stocked = [...new Set(stockedSlots(state, c.roomId).map((s) => s.itemId))];
+  if (c.wants.length < 2 && stocked.length && rand() < CUSTOMER.greetedSecondItem) c.wants.push(pick(rand, stocked));
+  events.emit('greeted', { customerId: c.id });
 }
 
 function walk(c, nav, x, z, face = null) {
@@ -218,7 +227,10 @@ export function tickCustomers(state, navs, dt, rand = Math.random) {
         }
         break;
       case 'arriving':
-        if (!walking) c.state = 'entering';
+        if (!walking) {
+          c.state = 'entering';
+          if (keeperGreeting(state)) greet(state, c, rand);
+        }
         break;
       case 'entering':
         if ((c.timer -= dt) <= 0) nextWant(state, c, nav, rand);

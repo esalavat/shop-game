@@ -45,6 +45,15 @@ Dream Dollhouse v0 (M6, approved), and M7:
     saves. Tap the shopkeeper in the morning to change it.
   - **Fixed:** delivery boxes no longer block the register; they sit on the right of the doorstep.
   - Numbers to tune with feedback are in `js/data/upgrades.js`.
+- **Walking between rooms + creator 🎲 (GDD v0.14 #41-42), built 2026-10-09, waiting for the user's
+  feedback** (playtest: with Mia at the register the shopkeeper had nowhere good to stand).
+  - She can walk out onto the sidewalk and into the Window Display.
+  - In the Window Display, more passers-by peek in the window, and they want what they saw.
+  - Tap the sidewalk by the shop door and she waits there as a greeter; greeted customers often
+    pick up a second item.
+  - The rest of the sidewalk has no bonus.
+  - The creator has a 🎲 randomize button.
+- **Planned, not built: boy or girl shopkeeper** in the creator (GDD #43).
 - The early economy stays as it is (decision #39): closing early covers selling out.
 - **Pip's rescue box (GDD v0.13 #40), built 2026-10-09:** if a morning starts with nothing to sell,
   nothing ordered, and too few coins for the cheapest box, Pip brings a free one, so you can never get stuck.

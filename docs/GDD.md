@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.13 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.14 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -47,6 +47,9 @@
 | 38 | **Shopkeeper creator:** hair style, hair color, skin tone, outfit color, and one accessory (none, bow, glasses, or hat). Shown on a new game and once for existing saves; tap your shopkeeper in the morning to change it any time | v0.12 |
 | 39 | **Early economy stays as it is.** Selling out on Day 1 is fine now that you can close early (#25, #33); early progress feels good (playtest) | v0.12 |
 | 40 | **Pip's rescue box:** if a morning starts with nothing to sell (empty shelves, no boxes, nothing ordered) and not enough coins for the cheapest box, Pip brings a free box of the cheapest item, "just because". You can never get stuck (#6, §11) | v0.13 |
+| 41 | **The shopkeeper can leave the shop room** (playtest: once Mia has the register there was nowhere good to stand). She walks out the front, along the sidewalk, and into another ground-floor room. **Each room can give a bonus while she's in it**: the **Window Display** makes window-peekers more common and more likely to want something from the dollhouse. The sidewalk is free to walk (no bonus), except the **greeter spot** by the shop door: customers she greets are more likely to pick up a second item | v0.14 |
+| 42 | **Randomize button** (🎲) in the shopkeeper creator | v0.14 |
+| 43 | **Boy or girl shopkeeper** (planned, not built yet): the creator gets a first choice between a male and a female shopkeeper, with matching hair styles and outfits. Game text should say "your shopkeeper" rather than "she" | v0.14 |
 
 ## 1. Pitch
 
@@ -261,7 +264,8 @@ Your very own dollhouse, displayed in the shop's front window.
 - Hiring is about choosing what *you* want to do.
 - **Helpers are one-time hires** (no wages), bought from the Grow sheet. First one (v0.12): **Mia the cashier** (#36). She works the register at a steady pace without tips; whenever your shopkeeper steps behind the counter, Mia steps aside so you can ring people up yourself.
 - Your shopkeeper is always there and walks to whatever you tap.
-- **Customizable shopkeeper (decided):** hairstyle, hair color, skin tone, outfits, accessories (bows, glasses, aprons, hats). Set up in a quick character creator at the start, and changeable anytime. **v0.12 creator (#38):** hair style (bob, bun, pigtails, ponytail), hair color, skin tone, outfit color, accessory (none, bow, glasses, hat). Tap your shopkeeper in the morning to reopen it.
+- **Where she goes when helpers do the work (v0.14, #41):** she can walk out to the sidewalk and into other ground-floor rooms. Each room can give a bonus while she's in it. First ones: the **Window Display** (more window-peekers, and they want what they saw more often) and the **greeter spot** by the shop door (greeted customers often pick up a second item). Future rooms get their own bonus (💡 Stockroom: unpack faster; Tea Corner: customers stay longer).
+- **Customizable shopkeeper (decided):** hairstyle, hair color, skin tone, outfits, accessories (bows, glasses, aprons, hats). Set up in a quick character creator at the start, and changeable anytime. **v0.12 creator (#38):** hair style (bob, bun, pigtails, ponytail), hair color, skin tone, outfit color, accessory (none, bow, glasses, hat). Tap your shopkeeper in the morning to reopen it. A 🎲 button picks a random look (#42). **Planned (#43):** a first choice of **boy or girl** shopkeeper, with hair styles and outfits to match (e.g. short cuts, overalls, caps), and game text that says "your shopkeeper" instead of "she".
 - Outfits and accessories are earned through Collection pages, story moments, special days, and seasons. They're great rewards because they're about self-expression, not power.
 - 💡 Matching **shop uniforms** for helpers that you design.
 
@@ -347,6 +351,7 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - **Snapshot sharing** (high priority for this audience)
 - More Dream Dollhouse rooms
 - More shopkeeper outfits and accessories
+- **Boy or girl shopkeeper** in the creator (#43)
 - Offline earnings; audio
 
 ### Later

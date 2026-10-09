@@ -21,6 +21,10 @@ export function createShopBubbles({ state, overlay, customersView, checkoutView,
     const html = itemId ? `<img alt="" src="${thumbs.get(itemId)}"> 💖` : PEEK_WORDS[Math.floor(Math.random() * PEEK_WORDS.length)];
     peeks.set(customerId, { html });
   });
+  events.on('greeted', ({ customerId }) => {
+    const p = customersView.headPosition(customerId);
+    if (p) overlay.float(p, 'Hi! 👋', 'tip');
+  });
   events.on('scanned', () => { const p = checkoutView.counterTop(); if (p) overlay.float(p, 'beep!', 'beep'); });
   events.on('sale', ({ amount, tip }) => {
     const p = checkoutView.counterTop();

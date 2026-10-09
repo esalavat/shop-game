@@ -11,6 +11,7 @@ export const CUSTOMER = {
   secondItem: 0.3,          // chance they want a second thing
   tip: [1, 3],              // coins tipped when you ring them up yourself
   kidChance: 0.35,
+  greetedSecondItem: 0.6,   // chance a customer the shopkeeper greets at the door picks up a second thing (GDD #41)
 };
 
 export const LOOKS = {

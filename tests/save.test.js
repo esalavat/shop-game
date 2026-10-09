@@ -133,3 +133,13 @@ test('a v7 save gets upgrades, helpers, an accessory, and sees the creator once'
   assert.equal(s.keeper.spare, null);
   assert.equal(s.cashier, null);
 });
+
+test('a v8 save lets the shopkeeper walk between rooms', () => {
+  const store = memoryStorage();
+  const v8 = { ...createState(0), version: 8 };
+  delete v8.keeper.arriveRoom;
+  store.setItem(SAVE_KEY, JSON.stringify(v8));
+  const s = loadGame(store);
+  assert.equal(s.version, STATE_VERSION);
+  assert.equal(s.keeper.arriveRoom, null);
+});

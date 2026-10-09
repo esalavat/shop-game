@@ -10,9 +10,9 @@ const run = (state, seconds) => { for (let t = 0; t < seconds; t += 0.1) tickKee
 
 test('walks to a tapped spot at walking speed', () => {
   const s = createState();
-  const nav = buildNav(s.building.rooms[0]);
+  const nav = new Map([['r1', buildNav(s.building.rooms[0])]]);
   s.keeper.x = -0.5; s.keeper.z = 0.3;
-  assert.ok(walkTo(s, nav, 0.3, 0.3));
+  assert.ok(walkTo(s, nav, { x: 0.3, z: 0.3 }));
   tickKeeper(s, 0.1);
   assert.ok(Math.abs(s.keeper.x - (-0.5 + KEEPER_SPEED * 0.1)) < 1e-6);
   run(s, 2);
@@ -21,7 +21,7 @@ test('walks to a tapped spot at walking speed', () => {
 
 test('arriving at furniture faces it and announces arrival', () => {
   const s = createState();
-  const nav = buildNav(s.building.rooms[0]);
+  const nav = new Map([['r1', buildNav(s.building.rooms[0])]]);
   const shelf = s.building.rooms[0].fixtures.find((f) => f.kind === 'shelf');
   let arrived = null;
   const off = events.on('keeperArrived', (e) => (arrived = e.fixtureId));

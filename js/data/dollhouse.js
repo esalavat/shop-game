@@ -17,6 +17,10 @@ export const SPARKLE = {
   peekPer: 1 / 60,    // ...plus this much per Sparkle...
   peekMax: 0.7,       // ...up to this
   peekWant: 0.5,      // chance a window-peeker then wants something from the dollhouse
+  // While the shopkeeper is in the Window Display showing it off (GDD #41):
+  keeperPeek: 0.2,    // ...this much more chance to stop at the window (up to keeperPeekMax)
+  keeperPeekMax: 0.85,
+  keeperPeekWant: 0.8, // ...and this chance they want something they saw
   peekTime: [1.6, 2.4], // seconds spent looking in the window
   peekOffset: [0.7, 1.15], // how far to the side of the window's middle they stand, so the dollhouse stays in view
 };

@@ -25,6 +25,13 @@ export function createCreator(state, { onChange, onOpen, onClose }) {
     render();
   });
   panel.querySelector('.creator-done').addEventListener('click', () => close());
+  // 🎲 A random look: one choice from every row.
+  panel.querySelector('.creator-random').addEventListener('click', () => {
+    const any = (list) => list[Math.floor(Math.random() * list.length)];
+    for (const r of ROWS) state.shopkeeper[r.key] = r.colors ? any(r.colors) : any(r.options)[0];
+    onChange(state.shopkeeper);
+    render();
+  });
 
   function render() {
     const look = state.shopkeeper;

@@ -59,6 +59,7 @@ js/
     collection.js       # Dream Dollhouse placing, Sparkle, foot-traffic boost, window spot (unlocks happen in day.js)
     helpers.js          # Hired helpers doing jobs: Mia the cashier (state.cashier, live-only)
     upgrades.js         # Buying upgrades / hiring helpers (one-time; state.upgrades, state.helpers)
+    route.js            # Walking between rooms and onto the street (sidewalk lane, doors, greeter spot)
     economy.js          # Coins, Hearts, Sparkle, costs
     story.js            # Checks triggers, queues story moments
     offline.js          # Offline earnings on return
@@ -119,7 +120,7 @@ docs/                   # GDD, tech plan
   dollhouse: { slots: { slotId: itemId } },   // v0: 4 fixed rooms (data/dollhouse.js); later rooms/wallpaper
   helpers: { cashier: true },          // one-time hires (v8); Mia's position is live-only in `cashier`
   upgrades: { cart: true, shoes: true, lunch: true },
-  keeper: { ..., carrying, spare },    // `spare` = second box on the Stock Cart
+  keeper: { ..., carrying, spare, arriveRoom }, // `spare` = second box on the Stock Cart; `arriveRoom` while walking between rooms (v9)
   shopkeeper: { hair, hairColor, skin, outfit, accessory, created },
   story: { seen: [...], flags: {...} },
   settings: { muted: false },
@@ -147,6 +148,19 @@ docs/                   # GDD, tech plan
 - Stock Cart: `keeper.spare` holds a second box; `stockShelf` moves it into her hands when the first one empties.
 - The shopkeeper creator edits `state.shopkeeper`; `views/keeper.js` `setLook()` rebuilds her model. In the morning the
   keeper has a tap hitbox that opens it.
+
+### 4.3.3 Walking between rooms and the street (GDD #41)
+- `walkTo(state, navs, dest)` takes the map of all room walk grids. `dest` is `{ roomId, x, z }` (room-local) or
+  `{ street: true, x, z }` (shop coordinates). `sim/route.js` `planRoute` uses the room's grid when it can; otherwise
+  she goes out her room's door, along `SIDEWALK.lane`, and in the other room's door.
+- During such a walk the keeper is in **shop coordinates** (`roomId` = shop, like customers on the street), with
+  `keeper.arriveRoom = { roomId, offset, from }`. On arrival she switches to the target room's coordinates. If a new walk
+  starts mid-way, `settle()` first puts her back in whichever room she's actually standing in.
+- Bonuses: `keeperShowingOff()` (in the Window Display) raises `peekChance` / `peekWantChance` (`SPARKLE.keeper*`).
+  `keeperGreeting()` (standing at `GREETER`) makes customers who reach the door `greeted`, often adding a second want
+  (`CUSTOMER.greetedSecondItem`).
+- Input: an invisible sidewalk strip in `main.js` (`world.street`). Taps near the shop door go to the greeter spot;
+  other sidewalk taps go there (clamped to `streetBounds`). Rooms upstairs aren't reachable yet (no stairs).
 
 ### 4.4 Customers & movement
 - Each customer is a small **state machine**: `enter → browse(shelf) → pick → queue → checkout → leave` (plus `peekWindow`, `wishNote`).

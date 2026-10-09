@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { createCharacter } from '../models/character.js';
 import { disposeTree } from '../models/prims.js';
+import { groundAt } from '../../sim/route.js';
 import { buildBox } from '../models/items.js';
 import { BOX_SIZE } from '../../sim/stock.js';
 import { events } from '../../core/events.js';
@@ -19,6 +20,7 @@ export function createKeeperView(state, roomOrigin) {
   let root, inner;
   const k = state.keeper;
   const prev = { x: k.x, z: k.z };
+  let prevRoom = k.roomId;
   let facing = k.facing, walkPhase = 0, idlePhase = 0, hop = 0;
   let carried = [], carriedKey = null;
 
@@ -50,6 +52,7 @@ export function createKeeperView(state, roomOrigin) {
     beforeTick() {
       prev.x = k.x;
       prev.z = k.z;
+      prevRoom = k.roomId;
     },
 
     /** World position of her hands (where a carried box sits). */
@@ -76,8 +79,14 @@ export function createKeeperView(state, roomOrigin) {
         carriedKey = key;
       }
 
+      if (k.roomId !== prevRoom) { // she switched rooms (and coordinates) this tick: don't slide across
+        prev.x = k.x;
+        prev.z = k.z;
+        prevRoom = k.roomId;
+      }
       const o = roomOrigin(k.roomId);
-      object.position.set(o.x + lerp(prev.x, k.x, alpha), o.y, o.z + lerp(prev.z, k.z, alpha));
+      const z = lerp(prev.z, k.z, alpha);
+      object.position.set(o.x + lerp(prev.x, k.x, alpha), o.y + groundAt(z), o.z + z); // steps down to the sidewalk
       facing += wrap(k.facing - facing) * Math.min(1, dt * 12);
       object.rotation.y = facing;
 

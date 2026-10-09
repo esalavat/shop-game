@@ -4,16 +4,12 @@
 import * as THREE from 'three';
 import { createCharacter } from '../models/character.js';
 import { buildItem } from '../models/items.js';
-import { DOORSTEP_Y } from '../../sim/stock.js';
-import { STREET } from '../../sim/customers.js';
+import { groundAt } from '../../sim/route.js';
 
 const POP_TIME = 0.3;
 const HELD_SCALE = 1.5;
 const lerp = (a, b, t) => a + (b - a) * t;
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
-const STEP_DEPTH = 0.25; // the front step from the shop floor down to the sidewalk
-/** Height above the shop floor at room-local depth z (drops to the sidewalk out front). */
-const groundAt = (z) => DOORSTEP_Y * Math.min(1, Math.max(0, (z - STREET.edgeZ) / STEP_DEPTH));
 
 export function createCustomersView(state, roomOrigin) {
   const group = new THREE.Group();

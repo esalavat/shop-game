@@ -10,7 +10,7 @@
 <title>My Dream Dollhouse Shop</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=11">
 <script type="importmap">
 { "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
 </script>
@@ -84,7 +84,10 @@
   <div id="creator" hidden>
     <div class="deco-head">
       <h2 class="creator-title"></h2>
-      <button class="deco-done creator-done">Done</button>
+      <div class="creator-actions">
+        <button class="creator-random" aria-label="Random look">🎲</button>
+        <button class="deco-done creator-done">Done</button>
+      </div>
     </div>
     <div class="creator-rows"></div>
   </div>
@@ -122,6 +125,6 @@
     location.replace(location.pathname + '?fresh=' + Date.now());
   });
 </script>
-<script type="module" src="js/main.js?v=11" onerror="showBootError()"></script>
+<script type="module" src="js/main.js?v=12" onerror="showBootError()"></script>
 </body>
 </html>

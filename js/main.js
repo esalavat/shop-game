@@ -22,7 +22,8 @@ import { createDollhouseView } from './render/views/dollhouse.js';
 import { createHelpersView } from './render/views/helpers.js';
 import { DOLLHOUSE } from './render/models/furniture.js';
 import { buildNav } from './sim/nav.js';
-import { walkTo, walkToFixture, walkToBox, tickKeeper } from './sim/keeper.js';
+import { walkTo, walkToFixture, walkToBox, walkToGreeter, tickKeeper } from './sim/keeper.js';
+import { GREETER, SIDEWALK, groundAt, shopRoom, streetBounds } from './sim/route.js';
 import { tickDay, twilightFor } from './sim/day.js';
 import { tickCustomers } from './sim/customers.js';
 import { tickHelpers } from './sim/helpers.js';
@@ -89,7 +90,13 @@ function buildWorld() {
   lighting.fitTo(building.layout);
   const { width, roofTop } = building.layout;
   rig.setLimits({ minX: -width / 2 - 1, maxX: width / 2 + 1, minY: 0.5, maxY: roofTop });
-  world = { group, building };
+  // An invisible strip along the sidewalk, so she can be sent out onto the street.
+  const street = new THREE.Mesh(new THREE.PlaneGeometry(width + 1, 0.8), new THREE.MeshBasicMaterial({ visible: false }));
+  street.rotation.x = -Math.PI / 2;
+  street.position.set(0, groundAt(SIDEWALK.lane) + 0.01, ROOM.D / 2 + 0.5); // world z of shop z 1.8
+  street.userData = { street: true };
+  group.add(street);
+  world = { group, building, street };
   navs.clear();
   for (const room of state.building.rooms) navs.set(room.id, buildNav(room));
 }
@@ -171,7 +178,7 @@ const creator = createCreator(state, {
     const cover = creator.coverFraction();
     if (!state.keeper.path.length) state.keeper.facing = 0; // turn to face you
     focusedRoomId = state.keeper.roomId;
-    rig.frame(o.x + state.keeper.x, o.y + 0.75, 2.2, 1.9 / (1 - cover) + 0.4, false, cover / 2);
+    rig.frame(o.x + state.keeper.x, o.y + groundAt(state.keeper.z) + 0.75, 2.2, 1.9 / (1 - cover) + 0.4, false, cover / 2);
   },
   onClose(first) {
     focusRoom(roomById(state.keeper.roomId));
@@ -194,10 +201,11 @@ attachGestures(canvas, {
     }
     // In the morning, tapping the shopkeeper herself opens the creator.
     const keeperTargets = state.day.phase === 'morning' && state.keeper.roomId === focusedRoomId ? keeperView.hitTargets : [];
-    const targets = [...keeperTargets, ...world.building.hitTargets, ...boxesView.hitTargets, ...customersView.hitTargets];
+    const targets = [...keeperTargets, ...world.building.hitTargets, ...boxesView.hitTargets, ...customersView.hitTargets, world.street];
     const hit = pickAt(rig.camera, canvas, x, y, targets);
     if (!hit) return;
     if (hit.object.userData.keeper) return creator.open();
+    if (hit.object.userData.street) return tapStreet(hit.point);
     const { roomId, fixtureId, boxId, customerId, floor } = hit.object.userData;
     const room = roomById(roomId);
     // The Dream Dollhouse opens decorate mode straight away.
@@ -206,26 +214,26 @@ attachGestures(canvas, {
     }
     // First tap on another room just looks at it.
     if (roomId !== focusedRoomId) return focusRoom(room);
-    // Walking between rooms comes later; for now she stays in her room.
-    if (roomId !== state.keeper.roomId) return;
-    const nav = navs.get(roomId), o = roomOrigin(roomId);
+    // No stairs yet: she can walk to any ground-floor room (out the front and along the sidewalk).
+    if (room.floor !== 0) return;
+    const o = roomOrigin(roomId);
     const counter = room.fixtures.find((f) => f.kind === 'counter');
     const tappedCounter = fixtureId === counter?.id || (customerId && customerId === state.queue[0]);
     if (tappedCounter && state.checkout && keeperAtCounter(state)) {
       checkoutTap(state);
     } else if (tappedCounter && counter) {
-      if (walkToFixture(state, nav, counter)) tapFeedback(o, state.keeper.path.at(-1));
+      if (walkToFixture(state, navs, counter)) tapFeedback();
     } else if (customerId) {
       // Browsing customers: nothing to do yet.
     } else if (boxId) {
       if (!canCarryMore(state)) return toast(state.keeper.spare ? 'The cart is full! Tap a shelf to unpack.' : 'Hands full! Tap a shelf to unpack this box first.');
-      if (walkToBox(state, nav, state.boxes.find((b) => b.id === boxId))) tapFeedback(o, state.keeper.path.at(-1));
+      if (walkToBox(state, navs, state.boxes.find((b) => b.id === boxId))) tapFeedback();
     } else if (fixtureId) {
       const fixture = room.fixtures.find((f) => f.id === fixtureId);
       const task = state.keeper.carrying && fixture.slots ? { type: 'stock', fixtureId } : null;
-      if (walkToFixture(state, nav, fixture, task)) tapFeedback(o, state.keeper.path.at(-1));
+      if (walkToFixture(state, navs, fixture, task)) tapFeedback();
     } else if (floor) {
-      if (walkTo(state, nav, hit.point.x - o.x, hit.point.z - o.z)) tapFeedback(o, state.keeper.path.at(-1));
+      if (walkTo(state, navs, { roomId, x: hit.point.x - o.x, z: hit.point.z - o.z })) tapFeedback();
     }
   },
   onDrag: (dx, dy) => rig.pan(dx, dy, canvas.clientHeight),
@@ -271,6 +279,10 @@ events.on('dollhouseChanged', ({ slotId, gained }) => {
   if (p && gained > 0) overlay.float(p, `+${gained} ✨`, 'sparkle');
 });
 events.on('shelfFull', () => toast('That shelf is full! Try another one.'));
+events.on('keeperEnteredRoom', ({ roomId }) => {
+  if (roomById(roomId)?.type === 'display') toast('Showing off the Dream Dollhouse ✨ More window shoppers!');
+});
+events.on('keeperArrived', ({ greeting }) => { if (greeting) toast('Waiting by the door to greet customers 👋'); });
 let toldAboutCounter = false;
 events.on('customerArrived', () => {
   if (toldAboutCounter) return;
@@ -278,8 +290,26 @@ events.on('customerArrived', () => {
   toast('A customer! Stand behind the counter to ring them up 🛎️');
 });
 
-function tapFeedback(origin, spot) {
-  if (spot) fx.tapRing(new THREE.Vector3(origin.x + spot.x, origin.y, origin.z + spot.z));
+/** A ring where she's headed (the end of her path, in her current room's coordinates). */
+function tapFeedback() {
+  const k = state.keeper, spot = k.path.at(-1);
+  if (!spot) return;
+  const o = roomOrigin(k.roomId);
+  fx.tapRing(new THREE.Vector3(o.x + spot.x, o.y + groundAt(spot.z), o.z + spot.z));
+}
+
+/** The sidewalk: in front of the shop door she waits to greet people; anywhere else she just goes there. */
+function tapStreet(point) {
+  const o = roomOrigin(shopRoom(state).id);
+  const x = point.x - o.x;
+  const ok = Math.abs(x - GREETER.x) < 0.75
+    ? walkToGreeter(state, navs)
+    : (() => {
+        const b = streetBounds(state);
+        const z = Math.min(SIDEWALK.maxZ, Math.max(SIDEWALK.minZ, point.z - o.z));
+        return walkTo(state, navs, { street: true, x: Math.min(b.maxX, Math.max(b.minX, x)), z }, { face: 0 });
+      })();
+  if (ok) tapFeedback();
 }
 
 function resize() {

@@ -60,6 +60,8 @@ const MIGRATIONS = {
     shopkeeper: { accessory: 'none', ...d.shopkeeper, created: false },
     keeper: { ...d.keeper, spare: null },
   }),
+  // v9: the shopkeeper can walk to other rooms and the street (keeper.arriveRoom while on the way).
+  8: (d) => ({ ...d, version: 9, keeper: { ...d.keeper, arriveRoom: null } }),
 };
 
 export function migrate(data) {

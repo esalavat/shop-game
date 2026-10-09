@@ -64,7 +64,7 @@ test('Comfy Shoes make the shopkeeper quicker', () => {
   const time = (shoes) => {
     const s = createState();
     if (shoes) s.upgrades.shoes = true;
-    walkToFixture(s, buildNav(s.building.rooms[0]), shelvesOf(s)[1]);
+    walkToFixture(s, new Map([['r1', buildNav(s.building.rooms[0])]]), shelvesOf(s)[1]);
     let t = 0;
     while (s.keeper.path.length && t < 20) { tickKeeper(s, 0.1); t += 0.1; }
     return t;
@@ -139,12 +139,12 @@ test('Mia steps aside when the shopkeeper comes to the counter, and back when sh
   const { s, navs } = cashierShop();
   runShop(s, navs, 1);
   assert.ok(miaAtTill(s));
-  walkToFixture(s, navs.get('r1'), counterOf(s));
+  walkToFixture(s, navs, counterOf(s));
   assert.equal(miaAtTill(s), false);
   runShop(s, navs, 3);
   const m = s.cashier;
   assert.ok(Math.hypot(m.x - s.keeper.x, m.z - s.keeper.z) > 0.3);
-  walkToFixture(s, navs.get('r1'), shelvesOf(s)[1]);
+  walkToFixture(s, navs, shelvesOf(s)[1]);
   runShop(s, navs, 3);
   assert.ok(miaAtTill(s));
 });

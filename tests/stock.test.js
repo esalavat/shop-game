@@ -41,7 +41,7 @@ test('cannot order without enough coins', () => {
 
 test('pick up a box, carry it to a shelf, and the items fill the middle board first', () => {
   const s = createState();
-  const nav = buildNav(s.building.rooms[0]);
+  const nav = new Map([['r1', buildNav(s.building.rooms[0])]]);
   const box = s.boxes[0];
   walkToBox(s, nav, box);
   run(s);
@@ -81,7 +81,7 @@ test('new boxes take the first free spot after one is picked up', () => {
 test('every box spot can be reached and picked up', () => {
   const s = createState();
   s.boxes = [];
-  const nav = buildNav(s.building.rooms[0]);
+  const nav = new Map([['r1', buildNav(s.building.rooms[0])]]);
   for (let i = 0; i < BOX_SPOTS.length; i++) {
     const box = dropBox(s, 'teaset', 3);
     s.keeper.carrying = null;
