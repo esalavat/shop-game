@@ -14,7 +14,7 @@ export const DAY_LENGTH = {
 export const MIDDAY = 0.5; // fraction of open hours when Pip's lunchtime delivery comes (upgrade)
 
 export function emptyStats() {
-  return { coins: 0, tips: 0, served: 0, hearts: 0, sold: {}, wishes: [] };
+  return { coins: 0, tips: 0, served: 0, hearts: 0, sold: {}, wishes: [], record: false };
 }
 
 function setPhase(state, phase) {
@@ -55,9 +55,20 @@ export function tickDay(state, dt) {
     d.time = Math.min(DAY_LENGTH.evening, d.time + dt);
     if (d.time >= DAY_LENGTH.evening && state.customers.length === 0) { // the last ones finish first
       setPhase(state, 'close');
+      recordBest(state);
       events.emit('dayClosed', { day: d.number, stats: d.stats });
     }
   }
+}
+
+/**
+ * Best day for coins (GDD #48). Beating it marks today's stats as a record, but the first day
+ * that earns anything just sets the bar (so Day 1 isn't a "record").
+ */
+export function recordBest(state) {
+  const coins = state.day.stats.coins;
+  state.day.stats.record = state.best.coins > 0 && coins > state.best.coins;
+  state.best.coins = Math.max(state.best.coins, coins);
 }
 
 /** 0..1 through the current timed phase (1 when closed, 0 in the morning). */

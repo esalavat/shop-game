@@ -62,6 +62,8 @@ const MIGRATIONS = {
   }),
   // v9: the shopkeeper can walk to other rooms and the street (keeper.arriveRoom while on the way).
   8: (d) => ({ ...d, version: 9, keeper: { ...d.keeper, arriveRoom: null } }),
+  // v10: the best day's coins (end-of-day record); every save gets settings (mute).
+  9: (d) => ({ ...d, version: 10, best: { coins: 0 }, settings: { muted: false, ...d.settings } }),
 };
 
 export function migrate(data) {

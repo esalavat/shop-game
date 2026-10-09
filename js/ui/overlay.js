@@ -16,9 +16,9 @@ export function createOverlay(canvas, getCamera) {
     return { x: (v.x * 0.5 + 0.5) * canvas.clientWidth, y: (-v.y * 0.5 + 0.5) * canvas.clientHeight, behind: v.z > 1 };
   }
 
-  function place(el, world, dy = 0) {
+  function place(el, world, dy = 0, dx = 0) {
     const s = toScreen(world);
-    el.style.transform = `translate(${s.x}px, ${s.y + dy}px) translate(-50%, -100%)`;
+    el.style.transform = `translate(${s.x + dx}px, ${s.y + dy}px) translate(-50%, -100%)`;
     el.style.visibility = s.behind ? 'hidden' : '';
   }
 
@@ -46,13 +46,18 @@ export function createOverlay(canvas, getCamera) {
 
     hasBubble: (key) => bubbles.has(key),
 
-    /** A short text that pops at a world position and floats up. */
-    float(world, text, cls = '') {
+    /** A short text that pops at a world position and floats up (drifting `drift` px sideways). */
+    float(world, text, cls = '', { drift = 0, delay = 0 } = {}) {
       const el = document.createElement('div');
       el.className = `floater ${cls}`;
-      el.textContent = text;
+      el.style.visibility = 'hidden';
+      // The pop-in animates this inner span: scaling `el` itself would also shrink its position.
+      const pop = document.createElement('span');
+      pop.textContent = text;
+      pop.style.animationDelay = `${delay}s`;
+      el.append(pop);
       root.append(el);
-      floaters.push({ el, world: world.clone(), t: 0 });
+      floaters.push({ el, world: world.clone(), t: -delay, drift });
     },
 
     update(dt) {
@@ -64,8 +69,9 @@ export function createOverlay(canvas, getCamera) {
       for (let i = floaters.length - 1; i >= 0; i--) {
         const f = floaters[i];
         f.t += dt;
+        if (f.t < 0) continue;
         const p = f.t / FLOAT_TIME;
-        place(f.el, f.world, -p * FLOAT_RISE);
+        place(f.el, f.world, -p * FLOAT_RISE, Math.sin(p * Math.PI * 0.5) * f.drift);
         f.el.style.opacity = String(p < 0.6 ? 1 : 1 - (p - 0.6) / 0.4);
         if (p >= 1) { f.el.remove(); floaters.splice(i, 1); }
       }

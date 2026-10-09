@@ -19,8 +19,8 @@
 | UI | **HTML/CSS overlay** on top of the canvas | Crisp text, easy layout, safe-area support, accessible, and much faster to build than in-canvas UI |
 | Module loading | Browser **import map** (`"three": "./vendor/three.module.js"`) | No bundler needed |
 | Saves | `localStorage`, versioned JSON | Simple; works offline; Capacitor-compatible |
-| Audio | Web Audio API (small wrapper) | Unlocked on first tap; respects a mute toggle |
-| Offline / install | PWA manifest + service worker (later) | Home-screen install on phones before store builds |
+| Audio | Web Audio API, **synthesized** sound effects (`js/audio/audio.js`, no sound files) | Unlocked on first tap; respects the 🔊 mute toggle (`state.settings.muted`), which also stops vibration |
+| Offline / install | PWA manifest + **network-first** service worker (`sw.js`) | Home-screen install and offline play; online it always fetches fresh files (see §9.3) |
 | Store builds | Capacitor (iOS + Android) | Reuses the web build unchanged |
 | Tests | `node --test` for pure game logic | Zero dependencies |
 
@@ -30,8 +30,9 @@
 index.html              # Game entry: canvas, UI overlay root, import map
 style.css               # Global styles, UI theme tokens (pastel palette)
 manifest.webmanifest    # PWA manifest (portrait, theme colors, icons)
-sw.js                   # Service worker (later)
-icon.svg
+sw.js                   # Service worker: network first, cache only as an offline fallback (§9.3)
+icon.svg                # Favicon / app icon source
+icons/                  # PNG app icons (192, 512, maskable 512, apple-touch) made from icon.svg / icons/maskable.svg with `sips`
 vendor/                 # Third-party code, checked in (three.js + addons)
 js/
   main.js               # Boot: load save, create systems, start loop
@@ -73,17 +74,21 @@ js/
     models/             # Procedural low-poly model builders (items, characters, furniture)
     views/              # Sync state → scene: shelves, customers, boxes, checkout, dollhouse (items in its rooms), keeper, helpers (Mia)
     pick.js             # Raycast taps → interactable objects
-    fx.js               # Coin pops, sparkles, hearts, confetti
+    fx.js               # 3D effects: tap ring, sparkle bursts, box poof (shared geometry; warmUp() precompiles shaders)
+    quality.js          # Adaptive pixel ratio: steps down (2 → 1.5 → 1.25) if fps stays under 50
   ui/                   # DOM overlay
     hud.js              # Coins / Hearts / Sparkle / day progress bar (no digital timers)
     toolbar.js          # Bottom buttons
     orderbook.js, album.js, grow.js (Grow sheet: rooms, helpers, upgrades; Dollhouse button), decorate.js, day.js (summary)
     story.js            # Dialogue cards for story moments
     creator.js          # Shopkeeper creator (bottom panel; camera frames the shopkeeper above it)
+    juice.js            # Game feel: sim events → sounds, sparkles, hearts, confetti, haptics
+    confetti.js         # Full-screen DOM confetti (Web Animations API)
+    overlay.js          # World-pinned bubbles and floating pop-ups (+12 🪙, hearts)
   input/
     touch.js            # Pointer events → tap / drag / pinch gestures
   audio/
-    audio.js
+    audio.js            # Web Audio synth: named sounds (pop, beep, chaching, bell, sparkle, fanfare…), buzz(), mute
 assets/                 # Later: glTF models, sounds, fonts
 prototypes/             # Throwaway experiments (e.g. camera styles)
 tests/                  # node --test files for js/sim
@@ -197,10 +202,22 @@ docs/                   # GDD, tech plan
 |---|---|
 | Draw calls | < 250 in the default room view |
 | Shadow map | One 2048² directional map; small props don't cast shadows |
-| Pixel ratio | Capped at 2 (drop to 1.5 if fps < 50) |
+| Pixel ratio | Capped at 2; `render/quality.js` drops to 1.5, then 1.25, if fps stays < 50 (never back up) |
 | Point lights | ≤ 6, always present (intensity animated), so shaders don't recompile |
 | Geometry | Merge static room furniture with `BufferGeometryUtils.mergeGeometries`; `InstancedMesh` for repeated shelf items |
 | Off-screen rooms | Hidden or simplified when the camera is zoomed into one room |
+
+**M8 perf check (2026-10-09):** Chrome emulating a Pixel-sized screen (412×915 at 2.625×) with the CPU
+slowed 4×: 60 fps at rest, 56–60 fps with sparkles, poofs and confetti firing every 250 ms. The only
+hitch was ~100 ms the first time a sparkle appeared (shader compile), now removed by `fx.warmUp()` at
+boot. Draw calls are ~280–430 with a full shop and customers, over the 250 budget but not yet a problem;
+merging static furniture (above) is the first fix if a real phone struggles. Check on the Pixel with
+`?debug` (the panel shows fps and the current pixel ratio).
+
+**Gotcha:** the CSS `scale` property multiplies an element's inline `transform` too, so animating `scale`
+on an element positioned with `transform: translate(...)` also slides it toward the corner. World-pinned
+pop-ups (`ui/overlay.js`) animate an inner `<span>` instead. Buttons use `scale` for their squish; that's
+fine because they aren't positioned with transforms.
 
 ## 6. Input
 - Pointer Events only (covers touch and mouse for desktop testing).
@@ -218,7 +235,7 @@ docs/                   # GDD, tech plan
 - Viewport meta: no zoom, `viewport-fit=cover`.
 - Prevent pull-to-refresh and overscroll (`overscroll-behavior: none`).
 - Portrait lock via manifest `"orientation": "portrait"`; show a "please rotate" card if the phone is held landscape.
-- Audio unlocks on the first tap (iOS requirement).
+- Audio unlocks on the first tap (iOS requirement): `main.js` calls `audio.unlock()` on every pointerdown (it also resumes after an interruption).
 - `localStorage` can be wiped by Safari for sites unused for 7+ days (unless installed to the home screen). This is mitigated by the PWA install prompt and save export, and fixed for good in the store builds.
 
 ## 9. Deployment
@@ -235,6 +252,16 @@ docs/                   # GDD, tech plan
 - Add Capacitor (`package.json`, `capacitor.config.json`, `ios/`, `android/`; the native folders are already gitignored, as in *migration*).
 - A tiny copy script assembles `dist/` (index.html, style.css, js/, vendor/, assets/) as Capacitor's `webDir`.
 - Native plugins only where needed (haptics, status bar, splash, and maybe Preferences for saves).
+
+### 9.3 Offline and install (PWA)
+- `manifest.webmanifest` + PNG icons in `icons/` make "Add to Home screen" give a proper app icon
+  (Android uses `icon-maskable-512.png`, cropped to its own shape; iOS uses `apple-touch-icon.png`).
+- `sw.js` is **network first**: online, every request goes to the network as before (so deploys and the
+  stamped `?v=` module URLs work exactly as in §9.1), and each good response is copied into the cache.
+  Only when the network fails does the cache answer. Cache keys drop the query string, so the cache
+  keeps one copy per file instead of growing with each deploy.
+- `index.html` registers it on load. `scripts/stamp.js` publishes `sw.js` and `icons/`.
+- Never switch it to cache-first without a versioning plan: that would bring back the stale-file blank screen.
 
 ## 10. Testing
 - **Sim unit tests** (`node --test tests/`): economy math, day phases, order delivery, customer state transitions, save migrations.
@@ -253,7 +280,7 @@ docs/                   # GDD, tech plan
 | M5 | **Day cycle** ✅ | Morning → Open → Evening → Close with lighting changes and a day summary |
 | M6 | **Collection & Dream Dollhouse v0** ✅ | Items unlock on delivery; first expansion builds the Window Display room; dollhouse with fixed slots; Sparkle drives foot traffic |
 | M7 | **Helpers, upgrades, creator** ✅ | Hire a cashier; a few upgrades; simple shopkeeper creator |
-| M8 | **Polish pass** | Juice (pops, sparkles), first sounds, phone perf check, PWA manifest |
+| M8 | **Polish pass** ✅ | Juice (pops, sparkles), first sounds, phone perf check, PWA manifest |
 
 Each milestone ends with a push so it's playable on your phone.
 

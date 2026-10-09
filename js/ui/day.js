@@ -1,13 +1,15 @@
 // The day's controls: the toolbar day button (Open shop / Close / Summary) and
-// the closing summary.
+// the closing summary, which counts the day's numbers up and celebrates a record day (GDD #48).
 
 import { ITEMS } from '../data/items.js';
 import { openShop, startNextDay, closeEarly, soldOut } from '../sim/day.js';
 import { events } from '../core/events.js';
+import { confetti } from './confetti.js';
 
 const CONFIRM_MS = 3000; // how long "Tap again to close" waits for the second tap
+const COUNT_MS = 450;    // how long each number takes to count up in the summary
 
-export function createDayUI(state, thumbs, orderBook, toast) {
+export function createDayUI(state, thumbs, orderBook, toast, audio) {
   const button = document.getElementById('btn-day');
   const icon = button.querySelector('.tb-ico');
   const label = button.querySelector('.tb-label');
@@ -27,15 +29,49 @@ export function createDayUI(state, thumbs, orderBook, toast) {
     }
   });
 
-  function showSummary() {
+  let counting = 0; // bumps to cancel a count-up that's still running
+
+  /** Count each stat up from 0, one after another, ticking as it goes; then cha-ching. */
+  function countUp(stats, record) {
+    const run = ++counting;
+    const els = [...stats.querySelectorAll('.stat b i')];
+    els.forEach((el) => (el.textContent = '0'));
+    let i = 0, start = performance.now();
+    const step = (now) => {
+      if (run !== counting || sheet.hidden) return;
+      const el = els[i], target = Number(el.dataset.n);
+      const k = target ? Math.min(1, (now - start) / COUNT_MS) : 1;
+      const n = Math.round(target * (1 - (1 - k) ** 2));
+      if (String(n) !== el.textContent) { el.textContent = n; audio.play('tick', i); }
+      if (k === 1) {
+        el.parentElement.parentElement.classList.add('done');
+        if (++i === els.length) return finish();
+        start = now;
+      }
+      requestAnimationFrame(step);
+    };
+    const finish = () => {
+      audio.play('chaching');
+      if (!record) return;
+      sheet.querySelector('.summary-record').hidden = false;
+      confetti();
+      audio.play('fanfare');
+      audio.buzz([20, 50, 20, 50, 40]);
+    };
+    requestAnimationFrame(step);
+  }
+
+  function showSummary({ animate = false } = {}) {
     const d = state.day, st = d.stats;
     sheet.querySelector('.summary-title').textContent = `Day ${d.number} is done! 🌙`;
-    sheet.querySelector('.summary-stats').innerHTML = [
+    const stats = sheet.querySelector('.summary-stats');
+    stats.innerHTML = [
       ['🪙', st.coins, 'coins earned'],
       ['🛍️', st.served, 'happy customers'],
       ['❤️', st.hearts, 'hearts'],
       ['💝', st.tips, 'in tips'],
-    ].map(([ico, n, what]) => `<div class="stat"><b>${ico} ${n}</b><span>${what}</span></div>`).join('');
+    ].map(([ico, n, what]) => `<div class="stat${animate ? '' : ' done'}"><b>${ico} <i data-n="${n}">${n}</i></b><span>${what}</span></div>`).join('');
+    sheet.querySelector('.summary-record').hidden = animate || !st.record;
 
     const row = (counts) => `<div class="thumb-row">${Object.entries(counts)
       .map(([id, n]) => `<div class="thumb" title="${ITEMS[id].name}"><img alt="${ITEMS[id].name}" src="${thumbs.get(id)}">${n > 1 ? `<i>×${n}</i>` : ''}</div>`)
@@ -46,12 +82,13 @@ export function createDayUI(state, thumbs, orderBook, toast) {
     sheet.querySelector('.summary-wishes').innerHTML = st.wishes.length ? `💭 Customers wished for${row(wished)}` : '';
     sheet.querySelector('.summary-next').textContent = `Start Day ${d.number + 1} ☀️`;
     sheet.hidden = false;
+    if (animate) countUp(stats, st.record);
   }
 
   sheet.querySelector('.close').addEventListener('click', () => (sheet.hidden = true));
   sheet.querySelector('.summary-order').addEventListener('click', () => { sheet.hidden = true; orderBook.open(); });
   sheet.querySelector('.summary-next').addEventListener('click', () => { sheet.hidden = true; startNextDay(state); });
-  events.on('dayClosed', showSummary);
+  events.on('dayClosed', () => showSummary({ animate: true }));
 
   return {
     /** If the game was saved after closing, show the summary again on load. */

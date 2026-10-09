@@ -45,6 +45,9 @@ import { createAlbum } from './ui/album.js';
 import { createGrow } from './ui/grow.js';
 import { createDecorate } from './ui/decorate.js';
 import { createCreator } from './ui/creator.js';
+import { createJuice } from './ui/juice.js';
+import { createAudio } from './audio/audio.js';
+import { createQuality } from './render/quality.js';
 
 const AUTOSAVE_SECONDS = 15;
 
@@ -52,16 +55,19 @@ const state = loadGame();
 const app = document.getElementById('app');
 const canvas = document.getElementById('game');
 const renderer = createRenderer(canvas);
+const audio = createAudio(state);
+// Phones only allow sound after a touch; this also wakes the audio back up after an interruption.
+addEventListener('pointerdown', () => audio.unlock(), { capture: true });
 const scene = new THREE.Scene();
 const lighting = createLighting(scene);
 const rig = new CameraRig();
-const hud = createHud(state);
+const hud = createHud(state, audio);
 const fx = createFx(scene);
 const toast = createToaster();
 const thumbs = makeThumbnails(renderer, Object.keys(ITEMS));
 const orderBook = createOrderBook(state, thumbs);
 const overlay = createOverlay(canvas, () => rig.camera);
-const dayUI = createDayUI(state, thumbs, orderBook, toast);
+const dayUI = createDayUI(state, thumbs, orderBook, toast, audio);
 const album = createAlbum(state, thumbs);
 lighting.setTwilight(twilightFor(state.day)); // start in the right light (e.g. reopened after closing)
 
@@ -121,13 +127,14 @@ buildWorld();
 focusRoom(roomById(state.keeper.roomId), true);
 const keeperView = createKeeperView(state, roomOrigin);
 const boxesView = createBoxesView(state, roomOrigin);
-const shelvesView = createShelvesView(state, roomOrigin, () => keeperView.handPosition());
+const shelvesView = createShelvesView(state, roomOrigin, () => keeperView.handPosition(), (p, step) => juice.itemLanded(p, step));
 const customersView = createCustomersView(state, roomOrigin);
 const checkoutView = createCheckoutView(state, roomOrigin);
 const dollhouseView = createDollhouseView(state, roomOrigin);
 const helpersView = createHelpersView(state, roomOrigin);
 const spotsView = createSpotsView(state, roomOrigin);
 const bubbles = createShopBubbles({ state, overlay, customersView, checkoutView, thumbs });
+const juice = createJuice({ audio, fx, overlay, keeperView, customersView, dollhouseView, checkoutView });
 scene.add(keeperView.object, helpersView.group, spotsView.group, boxesView.group, shelvesView.group, customersView.group, checkoutView.group, dollhouseView.group);
 boxesView.rebuild();
 shelvesView.rebuild();
@@ -231,7 +238,7 @@ attachGestures(canvas, {
     } else if (customerId) {
       // Browsing customers: nothing to do yet.
     } else if (boxId) {
-      if (!canCarryMore(state)) return toast(state.keeper.spare ? 'The cart is full! Tap a shelf to unpack.' : 'Hands full! Tap a shelf to unpack this box first.');
+      if (!canCarryMore(state)) return audio.play('boop'), toast(state.keeper.spare ? 'The cart is full! Tap a shelf to unpack.' : 'Hands full! Tap a shelf to unpack this box first.');
       if (walkToBox(state, navs, state.boxes.find((b) => b.id === boxId))) tapFeedback();
     } else if (fixtureId) {
       const fixture = room.fixtures.find((f) => f.id === fixtureId);
@@ -300,6 +307,7 @@ events.on('customerArrived', () => {
 function tapFeedback() {
   const k = state.keeper, spot = k.path.at(-1);
   if (!spot) return;
+  audio.play('tap');
   const o = roomOrigin(k.roomId);
   fx.tapRing(new THREE.Vector3(o.x + spot.x, o.y + groundAt(spot.z), o.z + spot.z));
 }
@@ -341,8 +349,11 @@ function tapStreet(point) {
   if (ok) tapFeedback();
 }
 
+const quality = createQuality(renderer, () => resize());
+
 function resize() {
   const w = app.clientWidth, h = app.clientHeight;
+  renderer.setPixelRatio(quality.pixelRatio);
   renderer.setSize(w, h, false);
   rig.resize(w / h);
 }
@@ -366,7 +377,7 @@ let debug = null;
 if (new URLSearchParams(location.search).has('debug')) {
   import('./ui/debug.js').then(({ createDebug }) => {
     debug = createDebug({
-      state, renderer,
+      state, renderer, quality,
       onViewAll: focusAll,
       onStockChanged: () => shelvesView.rebuild(),
       onReset() {
@@ -384,6 +395,7 @@ if (new URLSearchParams(location.search).has('debug')) {
 dayUI.resume();
 if (!state.shopkeeper.created) creator.open(); // new game, or the first time after the update
 else if (state.day.number === 1 && state.day.phase === 'morning') toast('Stock your shelves, then tap Open shop ☀️');
+fx.warmUp(renderer, rig.camera);
 window.__booted = true; // tells the loading guard in index.html the game started
 
 startLoop({
@@ -417,6 +429,7 @@ startLoop({
     grow.update();
     bubbles.update(dt);
     overlay.update(dt);
+    quality.frame(dt);
     debug?.frame(dt);
     renderer.render(scene, rig.camera);
   },

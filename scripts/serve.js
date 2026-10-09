@@ -6,7 +6,7 @@ import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize, resolve } from 'node:path';
 
-const port = Number(process.argv[2] ?? 8123);
+const port = Number(process.argv[2] ?? process.env.PORT ?? 8123);
 const root = resolve('.');
 const TYPES = {
   '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json',

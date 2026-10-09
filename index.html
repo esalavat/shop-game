@@ -10,6 +10,7 @@
 <title>My Dream Dollhouse Shop</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="stylesheet" href="style.css?v=11">
 <script type="importmap">
 { "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
@@ -25,7 +26,10 @@
       <div class="pill" id="hud-hearts"><span class="ico" aria-hidden="true">❤️</span><b>0</b></div>
       <div class="pill" id="hud-sparkle"><span class="ico" aria-hidden="true">✨</span><b>0</b></div>
     </div>
-    <div class="day-chip"><span id="hud-day"></span><div class="day-bar"><div id="hud-day-fill"></div></div></div>
+    <div class="hud-row2">
+      <div class="day-chip"><span id="hud-day"></span><div class="day-bar"><div id="hud-day-fill"></div></div></div>
+      <button id="btn-mute" aria-label="Sound on" aria-pressed="false">🔊</button>
+    </div>
   </div>
 
   <div id="overlay"></div>
@@ -102,6 +106,7 @@
         <h2 class="summary-title"></h2>
         <button class="close" aria-label="Close">✕</button>
       </div>
+      <div class="summary-record" hidden>🏆 New record! Your best day yet</div>
       <div class="summary-stats"></div>
       <div class="summary-section summary-sold"></div>
       <div class="summary-section summary-wishes"></div>
@@ -124,6 +129,10 @@
   document.getElementById('boot-reload').addEventListener('click', function () {
     location.replace(location.pathname + '?fresh=' + Date.now());
   });
+  // Offline support and home-screen install (sw.js is network-first, so it never serves stale files online).
+  if ('serviceWorker' in navigator) {
+    addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  }
 </script>
 <script type="module" src="js/main.js?v=12" onerror="showBootError()"></script>
 </body>

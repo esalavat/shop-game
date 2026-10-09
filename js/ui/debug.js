@@ -7,7 +7,7 @@ import { ITEMS } from '../data/items.js';
 import { spawnCustomer } from '../sim/customers.js';
 import { openShop, DAY_LENGTH } from '../sim/day.js';
 
-export function createDebug({ state, renderer, onViewAll, onReset, onStockChanged }) {
+export function createDebug({ state, renderer, quality, onViewAll, onReset, onStockChanged }) {
   const root = document.createElement('div');
   root.id = 'debug';
   root.innerHTML = `
@@ -74,7 +74,7 @@ export function createDebug({ state, renderer, onViewAll, onReset, onStockChange
       time += dt;
       if (time < 0.5) return;
       const { calls, triangles } = renderer.info.render;
-      stats.textContent = `${Math.round(frames / time)} fps · ${calls} draws · ${(triangles / 1000).toFixed(1)}k tris`;
+      stats.textContent = `${Math.round(frames / time)} fps · ${quality.pixelRatio}x · ${calls} draws · ${(triangles / 1000).toFixed(1)}k tris`;
       frames = 0;
       time = 0;
     },

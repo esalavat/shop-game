@@ -229,6 +229,7 @@ export function tickCustomers(state, navs, dt, rand = Math.random) {
       case 'arriving':
         if (!walking) {
           c.state = 'entering';
+          events.emit('customerEntered', { customerId: c.id });
           if (keeperGreeting(state)) greet(state, c, rand);
         }
         break;

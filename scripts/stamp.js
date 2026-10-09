@@ -12,7 +12,7 @@ import { join, relative } from 'node:path';
 
 const outDir = process.argv[2] ?? '_site';
 const version = (process.argv[3] ?? process.env.GITHUB_SHA ?? Date.now().toString(36)).slice(0, 10);
-const PUBLISH = ['index.html', 'style.css', 'manifest.webmanifest', 'icon.svg', 'js', 'vendor', 'prototypes'];
+const PUBLISH = ['index.html', 'style.css', 'manifest.webmanifest', 'icon.svg', 'icons', 'sw.js', 'js', 'vendor', 'prototypes'];
 const MODULE_DIRS = ['js', 'vendor'];
 
 rmSync(outDir, { recursive: true, force: true });

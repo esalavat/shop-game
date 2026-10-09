@@ -44,7 +44,12 @@ button {
   font: inherit;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  transition: scale 0.18s cubic-bezier(0.3, 1.8, 0.5, 1);
 }
+
+/* Bouncy UI (GDD #49): every button squishes while pressed and springs back. `scale` stacks
+   with the translate some buttons already use on :active. */
+button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 
 /* ---------- HUD ---------- */
 #hud {
@@ -87,6 +92,23 @@ button {
   0% { transform: scale(1); }
   40% { transform: scale(1.15); }
   100% { transform: scale(1); }
+}
+
+.hud-row2 { position: relative; display: flex; justify-content: center; width: 100%; }
+
+#btn-mute {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 246, 238, 0.94);
+  box-shadow: 0 3px 0 rgba(90, 58, 85, 0.18);
+  font-size: 16px;
+  pointer-events: auto;
 }
 
 .day-chip {
@@ -211,12 +233,12 @@ button {
   font-weight: 800;
   font-size: 14px;
   text-align: center;
-  animation: toast-in 0.25s ease-out;
+  animation: toast-in 0.35s cubic-bezier(0.3, 1.4, 0.5, 1);
 }
 
 .toast.out { animation: toast-out 0.3s ease-in forwards; }
 
-@keyframes toast-in { from { opacity: 0; transform: translateY(-8px) scale(0.95); } }
+@keyframes toast-in { from { opacity: 0; transform: translateY(-8px) scale(0.8); } 60% { opacity: 1; transform: scale(1.06); } }
 @keyframes toast-out { to { opacity: 0; transform: translateY(-8px); } }
 
 /* ---------- Toolbar ---------- */
@@ -276,7 +298,8 @@ button {
   border-radius: 24px 24px 0 0;
   background: var(--cream);
   box-sizing: border-box;
-  animation: slide-up 0.25s ease-out;
+  box-shadow: 0 40px 0 var(--cream);
+  animation: spring-up 0.4s cubic-bezier(0.25, 1.35, 0.5, 1);
 }
 
 .sheet-head { display: flex; align-items: center; justify-content: space-between; }
@@ -333,6 +356,7 @@ button {
 
 @keyframes fade-in { from { opacity: 0; } }
 @keyframes slide-up { from { transform: translateY(40%); } }
+@keyframes spring-up { from { transform: translateY(100%); } }
 
 /* ---------- World-pinned bubbles & pop-ups ---------- */
 #overlay {
@@ -389,6 +413,9 @@ button {
 }
 
 .floater { font-size: 18px; text-shadow: 0 2px 0 #fff, 0 0 6px #fff; }
+.floater > span { display: inline-block; animation: floater-in 0.3s cubic-bezier(0.3, 1.8, 0.5, 1) both; }
+.floater.heart-rise { font-size: 18px; }
+@keyframes floater-in { from { transform: scale(0.2); } }
 .floater.coins { font-size: 22px; color: #c98a1c; }
 .floater.tip { font-size: 15px; color: var(--pink-dark); }
 .floater.heart { font-size: 15px; color: #e0507a; }
@@ -432,6 +459,21 @@ button {
 }
 
 .stat b { display: block; font-size: 22px; }
+.stat b i { font-style: normal; font-variant-numeric: tabular-nums; }
+.stat.done b { animation: pop 0.3s ease-out; }
+
+.summary-record {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: var(--butter);
+  box-shadow: 0 3px 0 #e0b452;
+  font-weight: 800;
+  text-align: center;
+  animation: toast-in 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.summary-record[hidden] { display: none; }
 .stat span { font-size: 12px; font-weight: 700; opacity: 0.7; }
 
 .summary-section { margin: 6px 0; font-size: 13px; font-weight: 700; }
@@ -534,8 +576,8 @@ button {
   padding: 12px 12px calc(env(safe-area-inset-bottom) + 12px);
   border-radius: 24px 24px 0 0;
   background: var(--cream);
-  box-shadow: 0 -3px 0 rgba(90, 58, 85, 0.12);
-  animation: slide-up 0.25s ease-out;
+  box-shadow: 0 -3px 0 rgba(90, 58, 85, 0.12), 0 40px 0 var(--cream);
+  animation: spring-up 0.4s cubic-bezier(0.25, 1.35, 0.5, 1);
 }
 
 #creator[hidden] { display: none; }
@@ -581,8 +623,8 @@ button {
   padding: 12px 12px calc(env(safe-area-inset-bottom) + 12px);
   border-radius: 24px 24px 0 0;
   background: var(--cream);
-  box-shadow: 0 -3px 0 rgba(90, 58, 85, 0.12);
-  animation: slide-up 0.25s ease-out;
+  box-shadow: 0 -3px 0 rgba(90, 58, 85, 0.12), 0 40px 0 var(--cream);
+  animation: spring-up 0.4s cubic-bezier(0.25, 1.35, 0.5, 1);
 }
 
 #decorate[hidden] { display: none; }
@@ -648,3 +690,7 @@ button {
 
 .bubble.peek img { display: inline-block; vertical-align: middle; width: 32px; height: 32px; }
 .floater.sparkle { font-size: 20px; color: #c98a1c; }
+
+/* ---------- Confetti (ui/confetti.js) ---------- */
+.confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.confetti i { position: absolute; left: 0; top: 0; width: 8px; height: 12px; border-radius: 2px; }

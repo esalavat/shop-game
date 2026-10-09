@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createState } from '../js/sim/state.js';
 import { buildNav } from '../js/sim/nav.js';
-import { openShop, tickDay, startNextDay, twilightFor, closeEarly, soldOut, rescueIfStuck, DAY_LENGTH } from '../js/sim/day.js';
+import { openShop, tickDay, startNextDay, twilightFor, closeEarly, soldOut, rescueIfStuck, recordBest, emptyStats, DAY_LENGTH } from '../js/sim/day.js';
 import { tickCustomers, spawnCustomer } from '../js/sim/customers.js';
 import { checkoutTap } from '../js/sim/checkout.js';
 import { events } from '../js/core/events.js';
@@ -153,4 +153,21 @@ test('no rescue box when there is stock, an order, or enough coins', () => {
   assert.equal(rescueIfStuck(s), null); // can afford a tea set box
   s.coins = 17;
   assert.equal(rescueIfStuck(s), 'teaset');
+});
+
+test('beating your best day for coins is a record; the first day only sets the bar', () => {
+  const s = createState(0);
+  const close = (coins) => {
+    s.day.stats.coins = coins;
+    recordBest(s);
+    const record = s.day.stats.record;
+    s.day.stats = emptyStats();
+    return record;
+  };
+  assert.equal(close(30), false); // first day: sets the bar
+  assert.equal(s.best.coins, 30);
+  assert.equal(close(20), false);
+  assert.equal(close(30), false); // a tie isn't a record
+  assert.equal(close(45), true);
+  assert.equal(s.best.coins, 45);
 });

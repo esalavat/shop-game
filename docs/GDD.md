@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.14 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.15 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -51,6 +51,12 @@
 | 42 | **Randomize button** (🎲) in the shopkeeper creator | v0.14 |
 | 43 | **Boy or girl shopkeeper** (planned, not built yet): the creator gets a first choice between a male and a female shopkeeper, with matching hair styles and outfits. Game text should say "your shopkeeper" rather than "she" | v0.14 |
 | 44 | **Bonus spots glow on the ground** (playtest: the bonus spots weren't clear): a soft ring at the greeter spot (pink) and beside the Dream Dollhouse (yellow). Tap a ring to send the shopkeeper there; it stays lit under her while the bonus is on. The Window Display bonus still counts anywhere in the room; the ring marks the best spot (beside the dollhouse, not hiding it). After walking to a spot on the floor or sidewalk, she **turns to face the camera** | v0.14 |
+| 45 | **Polish pass juice** (M8): coins, tips and hearts pop at the register and the counter bumps; hearts float up from happy customers; stocked items hop onto the shelf, **squash and stretch** into place and sparkle; an emptied box goes *poof*; dollhouse items sparkle; window-peekers get a little sparkle; **confetti** when you build a room, hire a helper or buy an upgrade | v0.15 |
+| 46 | **Sound effects are synthesized in code** (Web Audio, no sound files): pop, scan beep, cha-ching, door bell when a customer walks in, sparkle chimes, a confetti fanfare, and little jingles when the shop opens and closes. **No music yet** (it waits for a later milestone). A **🔊 mute button** in the HUD is saved with the game | v0.15 |
+| 47 | **Light haptics:** short vibrations on a sale, stocking a shelf, and confetti moments (Android phones; iPhone Safari can't vibrate). Muting also turns them off | v0.15 |
+| 48 | **End-of-day celebration:** the closing summary counts the numbers up with ticks and a cha-ching. Beating your best day for coins shows **"New record! 🏆"** with confetti (Day 1 just sets the first record) | v0.15 |
+| 49 | **Bouncy UI:** buttons squish when pressed, sheets and panels spring open, toasts pop in, with a soft tap sound | v0.15 |
+| 50 | **Installable and playable offline** (PWA): "Add to Home screen" gives a proper app icon, and the game opens without a connection. Online, it always loads the newest version | v0.15 |
 
 ## 1. Pitch
 
@@ -107,7 +113,7 @@ Ages 11–12 are under 13, so the store versions count as a **mixed-audience** a
 | Performance | 60 fps on a mid-range ~2021 phone; rooms off-screen are simplified or culled |
 | Saves | Local storage now; cloud save considered for store builds (also needed for sharing) |
 | Privacy | No accounts, ads, or analytics in the web build |
-| Offline | Installable PWA ❓ |
+| Offline | Installable PWA; works offline after the first visit (decision #50) |
 
 ## 5. The Shop Jobs
 
@@ -312,8 +318,10 @@ Big buttons sit at the **bottom of the screen**: order book, posters, helpers, d
 
 ## 15. Audio
 
-- Cheerful music-box / ukulele loop that changes with the time of day; *pop*, *beep*, *cha-ching*, door bell, sparkle chimes.
-- Mute toggle from day one.
+- **Sound effects (built in M8, decision #46):** synthesized in code with Web Audio, so there are no sound files to download. Pop (taps, boxes, items landing), beep (scanning), cha-ching (a sale), door bell (a customer walks in), sparkle chimes (stocking, the dollhouse, window-peekers), a fanfare with confetti, and short jingles for opening, evening, and a new morning. Sounds start on your first tap (phones require it).
+- **Haptics (#47):** short vibrations on a sale, stocking, and confetti moments where the phone supports it.
+- **Mute toggle** (🔊 in the HUD, saved) turns off sounds and vibration.
+- **Later:** a cheerful music-box / ukulele loop that changes with the time of day, with its own toggle.
 
 ## 16. Monetization (future store builds)
 
@@ -343,6 +351,7 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - [x] Coins, a few upgrades, local save
 - [x] Toon-shaded low-poly placeholder art in the pastel palette
 - [x] Playable on a phone browser
+- [x] **Polish pass:** juice, sound effects, haptics, bouncy UI, end-of-day celebration, installable offline PWA (#45-50)
 
 ### Next
 - Building grid expansion (X and Y), room types, pan/zoom
@@ -353,7 +362,7 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - More Dream Dollhouse rooms
 - More shopkeeper outfits and accessories
 - **Boy or girl shopkeeper** in the creator (#43)
-- Offline earnings; audio
+- Offline earnings; background music (sound effects are done, #46)
 
 ### Later
 - Workshop and requests

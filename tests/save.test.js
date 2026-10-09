@@ -143,3 +143,14 @@ test('a v8 save lets the shopkeeper walk between rooms', () => {
   assert.equal(s.version, STATE_VERSION);
   assert.equal(s.keeper.arriveRoom, null);
 });
+
+test('a v9 save gets a best day of zero and keeps its mute setting', () => {
+  const store = memoryStorage();
+  const v9 = { ...createState(0), version: 9, settings: { muted: true } };
+  delete v9.best;
+  store.setItem(SAVE_KEY, JSON.stringify(v9));
+  const s = loadGame(store);
+  assert.equal(s.version, STATE_VERSION);
+  assert.deepEqual(s.best, { coins: 0 });
+  assert.equal(s.settings.muted, true);
+});

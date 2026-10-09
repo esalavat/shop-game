@@ -31,33 +31,36 @@ Before ending a session or pushing, re-read Status and make sure it's true.
 M0-M7 are done and approved by the user: skeleton, furnished shop and shopkeeper, the stock loop
 (order book, doorstep deliveries, carrying boxes to shelves), customers with checkout and wish
 notes, the day cycle (morning / open / short twilight evening / closing summary, plus close early),
-Collection and Dream Dollhouse v0 (M6), and M7.
+Collection and Dream Dollhouse v0 (M6), and M7 (Mia the cashier, three upgrades, the shopkeeper
+creator, walking out to the Window Display and the greeter spot, Pip's rescue box).
 
-- **M7 (Helpers, upgrades, creator), approved 2026-10-09** (GDD v0.12-v0.14, decisions #35-44):
-  - The toolbar has 5 buttons once the Window Display is built: Order / Album / day / Dollhouse / Grow.
-    The Grow sheet lists rooms, helpers and upgrades.
-  - **Mia the cashier** (🪙 150, one-time) rings people up without tips. She steps aside when the
-    shopkeeper comes to the counter.
-  - **Upgrades:** Stock Cart (🪙 60, carry 2 boxes), Comfy Shoes (🪙 80, walk faster), Lunchtime
-    Delivery (🪙 100, orders placed before midday arrive at midday). Numbers are in `js/data/upgrades.js`.
-  - **Shopkeeper creator** with a 🎲 randomize button. It shows on a new game; tap the shopkeeper in
-    the morning to change it.
-  - **The shopkeeper can walk out to the sidewalk and into the Window Display** (#41). Bonus spots are
-    marked with a glowing ring and a bobbing icon (#44):
-    - ✨ beside the dollhouse: more window-peekers, who want what they saw
-    - 👋 the greeter spot by the shop door: greeted customers often pick up a second item
-  - **Pip's rescue box** (#40): if a morning starts with nothing to sell, nothing ordered, and too few
-    coins, Pip brings a free box, so you can never get stuck.
-  - **Fixed:** boxes blocking the register; flickering rings and street edge on the phone.
-  - The early economy stays as it is (#39): closing early covers selling out.
+- **M8 (Polish pass), built 2026-10-09, waiting for the user's feedback on the phone** (GDD v0.15,
+  decisions #45-50):
+  - **Juice:** coins, tips and hearts pop at the register; hearts float up from happy customers;
+    stocked items squash and stretch onto the shelf with a sparkle; an emptied box goes *poof*;
+    dollhouse items and window-peekers sparkle; **confetti** for a new room, helper or upgrade.
+  - **Sounds**, all synthesized in code (no files): pop, scan beep, cha-ching, door bell when a
+    customer walks in, sparkle chimes, fanfare, open / evening / morning jingles. **No music yet.**
+    🔊 **mute button** in the HUD (saved; also stops vibration).
+  - **Haptics:** short vibrations on a sale, stocking, and confetti (Android only).
+  - **Bouncy UI:** buttons squish, sheets and panels spring open, toasts and pop-ups pop in.
+  - **End-of-day celebration:** the summary counts up with ticks and a cha-ching; beating your best
+    day for coins shows "New record! 🏆" with confetti (`state.best.coins`; save version 10).
+  - **Perf:** adaptive pixel ratio (`render/quality.js`); shaders for effects compile at boot. 60 fps
+    in Chrome with a 4× slower CPU at Pixel size (`docs/TECH.md` §5.4). Not yet checked on the real Pixel.
+  - **PWA:** PNG app icons, network-first service worker (`sw.js`), so it installs to the home screen
+    and opens offline (`docs/TECH.md` §9.3).
+  - Things to ask the user about: are the sounds too loud, too many, or annoying (the door bell rings
+    for every customer)? Does the home-screen install work on the Pixel? Does the fps stay smooth?
 
-**Next: M8 (Polish pass)**: juice (pops, sparkles), first sounds, phone perf check, PWA manifest
-(`docs/TECH.md` §11). Discuss the plan with the user first.
+**Next:** the user's M8 feedback, then pick from "Not scheduled yet" below or the GDD §17 "Next" list.
+The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Boy or girl shopkeeper choice in the creator (#43).
 - Show the sell price and profit in the order book (§18 #4).
 - Demand-based pricing vs fixed prices (§18 #5).
+- Background music (a music-box loop by time of day, GDD §15).
 
 ## How the code is organized
 
@@ -72,6 +75,9 @@ Collection and Dream Dollhouse v0 (M6), and M7.
   Room size is `ROOM_SIZE` in `js/data/rooms.js`. Customers keep shop-room coordinates even on the
   sidewalk in front of other rooms (e.g. peeking at the Window Display, `windowX` in
   `js/sim/collection.js`).
+- Game feel is event-driven: `js/ui/juice.js` listens to sim events and plays sounds
+  (`js/audio/audio.js`), 3D effects (`js/render/fx.js`), pop-ups (`js/ui/overlay.js`) and confetti
+  (`js/ui/confetti.js`). Add new feedback there rather than in the sim.
 - `js/main.js` wires everything together: a fixed-step 10 Hz sim tick plus per-frame rendering with
   interpolation.
 
@@ -81,7 +87,8 @@ Collection and Dream Dollhouse v0 (M6), and M7.
   a migration in `js/core/save.js` (with a test in `tests/save.test.js`). Live-only fields
   (customers, queue, checkout) are listed in `TRANSIENT` and never saved.
 - **Tests:** `npm test` (node --test, zero dependencies). Add tests for new sim behavior.
-- **Run locally:** `npm run serve`, then open http://localhost:8123. Add `?debug` for the debug
+- **Run locally:** `npm run serve`, then open http://localhost:8123 (`scripts/serve.js` also takes a
+  `PORT` env var; the preview config in `.claude/launch.json` lets it pick a free port). Add `?debug` for the debug
   panel: fill shelves, spawn customer, skip ahead, add rooms, reset save. The local server disables
   caching on purpose.
 - **Verify in the browser at phone size** (375x812) before pushing.
