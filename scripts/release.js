@@ -1,8 +1,10 @@
 // Publishes what's on the test build (/dev/, the tip of main on GitHub) as the public game.
 //
 // It creates a GitHub Release tagged v<year>.<month>.<day> (plus .2, .3... for more the same day)
-// whose notes list the commits since the last release. Publishing it runs the deploy workflow,
-// which puts that release at https://esalavat.github.io/shop-game/ (docs/TECH.md §9.1).
+// whose notes list the commits since the last release, then pushes an empty "Release <tag>" commit
+// to main. That push runs the deploy, which puts the release at https://esalavat.github.io/shop-game/
+// (Pages skips a deploy for a commit it has already deployed, and main's tip usually has been;
+// docs/TECH.md §9.1). Your local main is then one commit behind: git pull.
 //
 // Usage: npm run release [-- --yes] [-- <commit>]
 
@@ -25,8 +27,9 @@ try { run('git', 'merge-base', '--is-ancestor', sha, 'origin/main'); } catch {
 }
 
 const last = tryRun('gh', 'release', 'view', '--json', 'tagName', '--jq', '.tagName');
-if (last && run('git', 'rev-parse', `${last}^{commit}`) === sha) {
-  console.log(`${last} is already this commit; nothing to release.`);
+// Same files as the last release (e.g. only its "Release" marker commit since): nothing new.
+if (last && run('git', 'rev-parse', `${last}^{tree}`) === run('git', 'rev-parse', `${sha}^{tree}`)) {
+  console.log(`Nothing new since ${last}.`);
   process.exit(0);
 }
 
@@ -36,7 +39,8 @@ const tags = new Set(run('git', 'tag', '--list', `${base}*`).split('\n').filter(
 let tag = base;
 for (let n = 2; tags.has(tag); n++) tag = `${base}.${n}`;
 
-const changes = run('git', 'log', '--format=- %s', ...(last ? [`${last}..${sha}`] : ['-15', sha]));
+const changes = run('git', 'log', '--format=- %s', ...(last ? [`${last}..${sha}`] : ['-15', sha]))
+  .split('\n').filter((l) => !/^- Release v[\d.]+$/.test(l)).join('\n');
 console.log(`\nRelease ${tag} (${sha.slice(0, 7)}) to the public game.`);
 console.log(last ? `Changes since ${last}:` : 'First release. Recent changes:');
 console.log(changes.replace(/^/gm, '  '));
@@ -57,4 +61,12 @@ if (!yes) {
 
 const notes = `${last ? `Changes since ${last}:` : 'Recent changes:'}\n\n${changes}`;
 const url = run('gh', 'release', 'create', tag, '--target', sha, '--title', tag, '--latest', '--notes', notes);
-console.log(`\nReleased: ${url}\nThe deploy runs now (gh run watch, or the Actions tab); the public game updates in about a minute.`);
+
+// A fresh commit on main, made without touching your working tree, so the deploy can't be skipped.
+run('git', 'fetch', '--quiet', 'origin', 'main');
+const tip = run('git', 'rev-parse', 'origin/main');
+const marker = run('git', 'commit-tree', `${tip}^{tree}`, '-p', tip, '-m', `Release ${tag}`);
+run('git', 'push', '--quiet', 'origin', `${marker}:refs/heads/main`);
+
+console.log(`\nReleased: ${url}\nPushed "Release ${tag}" to main; its deploy publishes the release in about a minute (gh run watch).`);
+console.log('Run git pull to bring your local main up to date.');

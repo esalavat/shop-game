@@ -257,11 +257,11 @@ One Pages site holds two builds (GDD #56):
   **both**: it checks out the latest release (or `main` before the first release) into a worktree, runs its
   tests and stamps it into `_site/`, then runs `main`'s tests and stamps it into `_site/dev/` with the
   `dev` channel. Failing tests stop the deploy, so the site stays as it was.
-- Pages names each deploy after `GITHUB_SHA` and silently keeps the old files for a name it has already
-  deployed. A release of `main`'s tip has the same commit as the push before it (this bit the first
-  same-day release). `actions/deploy-pages` always uses the triggering commit (and a step can't override
-  `GITHUB_SHA`), so the workflow's last step calls the Pages deployment API itself (via `actions/github-script`)
-  with a version hashed from both builds' commits.
+- Pages names each deploy after `GITHUB_SHA` and silently skips a commit it has already deployed (the
+  API only takes real commits as the version, and `actions/deploy-pages` always uses the triggering one).
+  A release of `main`'s tip has the same commit as the push before it, so its own run deploys nothing new
+  (this bit the first same-day release). The release script therefore also pushes an empty
+  `Release <tag>` commit to `main`; that push's run publishes the release.
 - `scripts/stamp.js <out> <version> [channel]` writes an import map that points every module at
   `file.js?v=<commit>`, and writes `<html data-channel data-version>` (read by `js/core/channel.js`). The
   dev channel also gets "(DEV)" in its title and home-screen app name, and a "DEV · <commit>" badge.
@@ -269,9 +269,11 @@ One Pages site holds two builds (GDD #56):
   `index.html` with old cached modules (blank screen). Stamping makes one deploy's files always load together.
 - **Releasing:** `npm run release` (`scripts/release.js`) takes `origin/main` (what's on /dev/ now), shows
   the commits since the last release, warns if the save version changes, and after a "y" creates a GitHub
-  Release tagged `v<year>.<month>.<day>` (`.2`, `.3`… for more the same day) with those commits as notes.
-  Publishing it triggers the deploy. `-- --yes` skips the question; `-- <commit>` releases an older commit of main.
-- **Rolling back:** `gh release edit <older tag> --latest`, then `gh workflow run pages.yml`. Only when the
+  Release tagged `v<year>.<month>.<day>` (`.2`, `.3`… for more the same day) with those commits as notes,
+  then pushes the empty `Release <tag>` commit (built with `git commit-tree`, so the working tree is
+  untouched; `git pull` afterwards). `-- --yes` skips the question; `-- <commit>` releases an older commit of main.
+- **Rolling back:** `gh release edit <older tag> --latest`, then push any new commit to `main` (an empty
+  one is fine) so the deploy isn't skipped. Only when the
   bad release didn't change the save version: players who opened it already have upgraded saves, and older
   code shows them the "newer version" card (§9.4). In that case fix forward.
 - The `github-pages` environment allows deploys from the `main` branch and `v*` tags (repo settings).
