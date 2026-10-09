@@ -18,7 +18,7 @@ const HAND = new THREE.Vector3(0, 0.5, 0.32); // in front of the chest, characte
 function createHelper(id, agent) {
   const { root, inner } = createCharacter({ ...HELPERS[id].look, apron: true });
   root.visible = false;
-  const prev = { x: 0, z: 0 };
+  const prev = { x: 0, z: 0, y: 0 };
   let prevRoom = null;
   let facing = 0, idlePhase = 0, walkPhase = 0, placed = false;
   let carried = [], carriedKey = null;
@@ -47,6 +47,7 @@ function createHelper(id, agent) {
     if (!a) return;
     prev.x = a.x;
     prev.z = a.z;
+    prev.y = a.y ?? 0;
     prevRoom = a.roomId;
   };
 
@@ -67,6 +68,7 @@ function createHelper(id, agent) {
       prevRoom = a.roomId;
       prev.x = a.x;
       prev.z = a.z;
+      prev.y = a.y ?? 0;
       facing = a.facing;
       placed = true;
     }
@@ -74,7 +76,7 @@ function createHelper(id, agent) {
     const o = roomOrigin(a.roomId);
     const walking = a.path.length > 0;
     const z = lerp(prev.z, a.z, alpha);
-    root.position.set(o.x + lerp(prev.x, a.x, alpha), o.y + groundAt(z), o.z + z); // steps down to the sidewalk
+    root.position.set(o.x + lerp(prev.x, a.x, alpha), o.y + groundAt(z) + lerp(prev.y, a.y ?? 0, alpha), o.z + z); // the sidewalk step, the stairs
     facing += wrap(a.facing - facing) * Math.min(1, dt * 10);
     root.rotation.y = facing;
     idlePhase += dt * 2.2;

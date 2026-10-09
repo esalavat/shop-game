@@ -10,10 +10,9 @@
 import { HELPERS } from '../data/upgrades.js';
 import { useSpot } from '../data/fixtures.js';
 import { ITEMS } from '../data/items.js';
-import { stepAlong } from './walker.js';
 import { hasHelper, hasUpgrade } from './upgrades.js';
 import { sellingRooms, themeRoomFor } from './building.js';
-import { finishRoute, routeTo } from './route.js';
+import { finishRoute, routeTo, walkRoute } from './route.js';
 import { boxSpot, canCarryMore, freeSlots, pickUpBox, shopRoomId, stockShelf, DOORWAY_Z } from './stock.js';
 
 /** Where she waits when there's nothing to do: by the right wall, out of the customers' way. */
@@ -23,7 +22,7 @@ const WORKING = new Set(['morning', 'open', 'evening']);
 export function createStocker(roomId) {
   return {
     roomId, x: STOCKER_WAIT.x, z: STOCKER_WAIT.z, facing: STOCKER_WAIT.face,
-    path: [], arriveFacing: null, arriveRoom: null,
+    path: [], arriveFacing: null, arriveRoom: null, legs: [], y: 0,
     carrying: null, spare: null, // boxes, like the shopkeeper's
     job: null,                    // { type: 'pickup', boxId } | { type: 'stock', fixtureId } on the way / pausing
     timer: 0,                     // the pause before doing the job
@@ -106,7 +105,7 @@ export function tickStocker(state, navs, dt) {
   if (!navs.get(b.roomId)) return;
 
   if (b.path.length) {
-    if (stepAlong(b, H.speed, dt)) {
+    if (walkRoute(state, b, H.speed, dt)) {
       finishRoute(b); // walked over from another room
       if (b.arriveFacing !== null) b.facing = b.arriveFacing;
       b.timer = b.job ? H.pause : 0;

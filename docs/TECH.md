@@ -165,9 +165,24 @@ docs/                   # GDD, tech plan
 - During such a walk the keeper is in **shop coordinates** (`roomId` = shop, like customers on the street), with
   `keeper.arriveRoom = { roomId, offset, from }`. On arrival she switches to the target room's coordinates. If a new walk
   starts mid-way, `settleRoute()` first puts her back in whichever room she's actually standing in.
-- **Everyone walks this way** (#58): `startRoute` / `finishRoute` / `settleRoute` / `routeTo` in `sim/route.js` work on
-  anything with `roomId, x, z, path, arriveRoom`: the shopkeeper, customers and Bea (`stocker.arriveRoom` is saved,
-  save v14). Their views reset interpolation when `roomId` changes mid-tick, so nobody slides across the building.
+- **Everyone walks this way** (#58): `startRoute` / `walkRoute` / `finishRoute` / `settleRoute` / `routeTo` in
+  `sim/route.js` work on anything with `roomId, x, z, y, path, legs, arriveRoom`: the shopkeeper, customers and Bea
+  (saved for the keeper and Bea, save v15). Their views reset interpolation when `roomId` changes mid-tick, so nobody
+  slides across the building, and add `y` (height on the stairs) to their position.
+- **Routes in legs** (#58 step 2): `planRoute` returns `{ legs }`, each `{ frame, path, arrive, climb }`. A leg is
+  walked in `frame`'s room coordinates and ends in `arrive`. Ground walks between rooms use the shop's frame (the street
+  is in shop coordinates); upstairs walks use the room they start in and go through `DOORWAY`s in the side walls;
+  the climb uses the ground Stairwell's frame, with path points carrying `y` (one turn round `STAIRS.center`,
+  `FLOOR_H` high). Frames differ by `(col, floor)` × `(W + T, H + T)`. `beginLeg` / `endLeg` convert x and y;
+  `agent.legs` holds the rest; `walkRoute` moves on to the next leg and returns true only at the very end, then the
+  caller runs `finishRoute`. Someone on the stairs (`onStairs`) finishes the climb before a new walk (`routeStart`
+  plans from the end of it). `routeEnd` / `routeEndPath` give the end of the whole route (tap ring, leaving customers).
+- **Stairwell** (`sim/building.js`): `canBuildStairwell` (after the first theme room, once), `buildStairwell(state,
+  col)` (🪙 `STAIRWELL_COST`) adds a `stairs` room on the ground and a `landing` room above. `roomSpots(state, type)`
+  adds upstairs spots over ground rooms beside the landing or another upstairs room (`TOP_FLOOR` = 1). Fixtures
+  `stairs` / `stairhole` keep the corner off both walk grids. Drawing (`render/building.js`): an L-shaped landing
+  slab and floor, doorways in shared upstairs walls, a front railing upstairs, and stepped roofs (`addRoofs`).
+  Customers whose first want is upstairs come in through the ground Stairwell (`headInside`).
 - **Theme rooms** (`sim/building.js`): `roomSpots` (either end of the ground floor), `buildThemeRoom(state, type, col,
   floor)`, `themeRoomCost`, `sellingRooms` (rooms with shelves), `themeRoomFor(state, theme)`. Customers pick the room
   for each want with `roomWith` (here, else the item's theme room, else any room with one), come in through that
@@ -367,11 +382,14 @@ Each milestone ends with a push so it's playable on your phone.
 | First-day guide and morning Open-shop nudge (#57) | ✅ built, on /dev/ |
 | Theme rooms on the ground floor + Sorting Smarts (#58 step 1, #60) | ✅ built, on /dev/ (user: works, signs look good) |
 | Crowd deadlock fix (customers stuck behind the line) | ✅ on /dev/ |
-| **Stairwell and upstairs rooms (#58 step 2)** | ⏭ next; plan in §11.1 |
-| More items, color variants, catalog pages, Collection bonus and page rewards (#59) | planned after upstairs |
+| Stairwell and upstairs rooms (#58 step 2, #61) | ✅ built, on /dev/ (waiting for the user's feedback); see §4.3.3, §11.1 |
+| **More items, color variants, catalog pages, Collection bonus and page rewards (#59)** | ⏭ next |
 
-### 11.1 Plan: Stairwell and upstairs (#58 step 2) — not started
-Worked out at the end of the 2026-10-09 session; nothing is coded yet. Design is GDD #58 / §9.1.
+### 11.1 Plan: Stairwell and upstairs (#58 step 2) — ✅ built 2026-10-09
+The plan as worked out; it was built this way (GDD #61, §4.3.3). Differences: the upstairs half is its own room
+type `landing`; legs are `{ frame, path, arrive, climb }` and offsets come from the rooms' columns and floors;
+someone told to go elsewhere while on the stairs finishes the climb first (`routeStart`). Doorways are at z = 0.25
+(clear of the stairhole and the theme rooms' plant).
 - **Stairwell = two rooms**, type `stairs`, at `(col, 0)` and `(col, 1)`, built together for 🪙 350 at a ground-floor
   ＋ spot (after the first theme room). Each has one shelf on the right of the back wall (x ≈ +0.85). A `stairs`
   fixture (not walkable, ~1.2 × 1.2) in the back-left corner of the ground part, and a `stairhole` fixture (same

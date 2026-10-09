@@ -6,6 +6,7 @@ import { PALETTE as P } from './toon.js';
 import { ROOM_TYPES, ROOM_SIZE } from '../data/rooms.js';
 import { FIXTURES } from '../data/fixtures.js';
 import { buildFixture, fixtureHitbox } from './models/furniture.js';
+import { STAIRS, DOORWAY } from '../sim/route.js';
 
 export const ROOM = ROOM_SIZE;
 const { W, H, D, T } = ROOM;
@@ -23,6 +24,9 @@ export function layoutRooms(rooms) {
   return { width, height, roofTop: height + T + ROOF_H, roomX, roomY };
 }
 
+/** The hole in the Stairwell top's floor (room-local x0..x1, z0..z1), over the spiral stairs. */
+const STAIR_HOLE = { x0: -W / 2, x1: STAIRS.center.x + 0.6, z0: -D / 2 - 0.1, z1: STAIRS.center.z + 0.6 };
+
 export function createBuilding(rooms, lighting) {
   const group = new THREE.Group();
   const layout = layoutRooms(rooms);
@@ -32,31 +36,78 @@ export function createBuilding(rooms, lighting) {
 
   for (const r of rooms) {
     const cx = layout.roomX(r.col), fy = layout.roomY(r.floor);
-    box(group, T, H, D, P.facade, cx - W / 2 - T / 2, fy + H / 2, 0);
-    if (!has(r.col + 1, r.floor)) box(group, T, H, D, P.facade, cx + W / 2 + T / 2, fy + H / 2, 0);
+    // Upstairs rooms open into each other through doorways (GDD #58).
+    sideWall(group, cx - W / 2 - T / 2, fy, r.floor > 0 && has(r.col - 1, r.floor));
+    if (!has(r.col + 1, r.floor)) sideWall(group, cx + W / 2 + T / 2, fy, false);
     // Floors and ceilings don't cast shadows, so the open-front rooms stay bright inside.
-    box(group, W + 2 * T, T, D + 0.2, P.cream, cx, fy - T / 2, 0).castShadow = false;
+    if (r.type === 'landing') { // an L-shaped slab, open over the stairs
+      const { x1, z1 } = STAIR_HOLE, fullD = D + 0.2, front = D / 2 + 0.1 - z1, right = W / 2 + T - x1;
+      box(group, W + 2 * T, T, front, P.cream, cx, fy - T / 2, z1 + front / 2).castShadow = false;
+      box(group, right, T, fullD - front, P.cream, cx + x1 + right / 2, fy - T / 2, -fullD / 2 + (fullD - front) / 2).castShadow = false;
+    } else {
+      box(group, W + 2 * T, T, D + 0.2, P.cream, cx, fy - T / 2, 0).castShadow = false;
+    }
     if (!has(r.col, r.floor + 1)) box(group, W + 2 * T, T, D + 0.2, P.cream, cx, fy + H + T / 2, 0).castShadow = false;
+    if (r.floor > 0) frontRail(group, cx, fy);
     hitTargets.push(...furnishRoom(group, r, cx, fy, lighting));
   }
 
-  const { width, height } = layout;
+  const { width } = layout;
   box(group, width + 2 * T + 0.1, 0.4 - T, D + 0.3, P.foundation, 0, -0.4 + (0.4 - T) / 2, 0);
-
-  // Roof spans the whole top. (Assumes a rectangular footprint; revisit for stepped buildings.)
-  const roofW = width + 2 * T + 0.6;
-  const roof = prism(group, roofW, ROOF_H, D + 0.6, P.roof);
-  roof.position.y = height + T;
-  roof.castShadow = false;
-  box(group, 0.45, 1.2, 0.45, P.brick, width / 2 - 0.7, height + T + 1.0, -0.3);
-
-  const signZ = (D + 0.6) / 2;
-  box(group, 2.12, 0.9, 0.06, P.cream, 0, height + T + 0.62, signZ + 0.01);
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.78), new THREE.MeshBasicMaterial({ map: signTexture(['My Dream', 'Dollhouse Shop']) }));
-  sign.position.set(0, height + T + 0.62, signZ + 0.05);
-  group.add(sign);
-
+  addRoofs(group, rooms, layout);
   return { group, layout, hitTargets };
+}
+
+/** A side wall between rooms (or at the end), with a doorway in it when `door` is set. */
+function sideWall(group, x, fy, door) {
+  if (!door) return box(group, T, H, D, P.facade, x, fy + H / 2, 0);
+  const z0 = DOORWAY.z - DOORWAY.w / 2, z1 = DOORWAY.z + DOORWAY.w / 2;
+  box(group, T, H, z0 + D / 2, P.facade, x, fy + H / 2, (-D / 2 + z0) / 2);
+  box(group, T, H, D / 2 - z1, P.facade, x, fy + H / 2, (z1 + D / 2) / 2);
+  box(group, T, H - DOORWAY.h, DOORWAY.w, P.facade, x, fy + DOORWAY.h + (H - DOORWAY.h) / 2, DOORWAY.z);
+}
+
+/** A low railing along an upstairs room's open front. */
+function frontRail(group, cx, fy) {
+  const z = D / 2 - 0.02, h = 0.32;
+  box(group, W + T, 0.05, 0.06, P.cream, cx, fy + h, z).castShadow = false;
+  for (let x = -W / 2 + 0.1; x <= W / 2; x += 0.34) box(group, 0.04, h, 0.04, P.cream, cx + x, fy + h / 2, z).castShadow = false;
+}
+
+/**
+ * Roofs: one per run of neighboring columns with the same height, so a building with an upstairs over
+ * part of it gets a stepped roofline. A lower roof stops at the taller wall beside it. The sign sits
+ * over the shop, and the chimney on the tallest roof.
+ */
+function addRoofs(group, rooms, layout) {
+  const top = new Map();
+  for (const r of rooms) top.set(r.col, Math.max(top.get(r.col) ?? -1, r.floor));
+  const cols = [...top.keys()].sort((a, b) => a - b);
+  const runs = [];
+  for (const c of cols) {
+    const last = runs.at(-1);
+    if (last && last.to === c - 1 && last.floor === top.get(c)) last.to = c;
+    else runs.push({ from: c, to: c, floor: top.get(c) });
+  }
+  const tallest = runs.reduce((a, b) => (b.floor > a.floor || (b.floor === a.floor && b.to - b.from > a.to - a.from) ? b : a));
+  const shop = rooms.find((r) => r.type === 'shop') ?? rooms[0];
+  for (const run of runs) {
+    const y = layout.roomY(run.floor) + H + T;
+    const tallerLeft = (top.get(run.from - 1) ?? -1) > run.floor, tallerRight = (top.get(run.to + 1) ?? -1) > run.floor;
+    const left = layout.roomX(run.from) - W / 2 - T - (tallerLeft ? 0 : 0.3);
+    const right = layout.roomX(run.to) + W / 2 + T + (tallerRight ? 0 : 0.3);
+    const roof = prism(group, right - left, ROOF_H, D + 0.6, P.roof);
+    roof.position.set((left + right) / 2, y, 0);
+    roof.castShadow = false;
+    if (run === tallest) box(group, 0.45, 1.2, 0.45, P.brick, right - 1.0, y + 1.0, -0.3);
+    if (shop.col >= run.from && shop.col <= run.to) {
+      const sx = Math.min(Math.max(layout.roomX(shop.col), left + 1.6), right - 1.6), signZ = (D + 0.6) / 2;
+      box(group, 2.12, 0.9, 0.06, P.cream, sx, y + 0.62, signZ + 0.01);
+      const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.78), new THREE.MeshBasicMaterial({ map: signTexture(['My Dream', 'Dollhouse Shop']) }));
+      sign.position.set(sx, y + 0.62, signZ + 0.05);
+      group.add(sign);
+    }
+  }
 }
 
 /**
@@ -66,10 +117,17 @@ export function createBuilding(rooms, lighting) {
 function furnishRoom(group, room, cx, fy, lighting) {
   const look = ROOM_TYPES[room.type];
   const back = box(group, W, H, T, look.paper, cx, fy + H / 2, -D / 2 - T / 2);
-  const floor = box(group, W, 0.02, D, look.floor, cx, fy + 0.01, 0);
-  back.userData.roomId = floor.userData.roomId = room.id;
-  floor.userData.floor = true;
-  const targets = [back, floor];
+  back.userData.roomId = room.id;
+  const floors = [];
+  if (room.type === 'landing') { // around the hole the stairs come up through
+    const { x1, z1 } = STAIR_HOLE, front = D / 2 - z1, right = W / 2 - x1;
+    floors.push(box(group, W, 0.02, front, look.floor, cx, fy + 0.01, z1 + front / 2));
+    floors.push(box(group, right, 0.02, D - front, look.floor, cx + x1 + right / 2, fy + 0.01, -D / 2 + (D - front) / 2));
+  } else {
+    floors.push(box(group, W, 0.02, D, look.floor, cx, fy + 0.01, 0));
+  }
+  for (const f of floors) f.userData = { roomId: room.id, floor: true };
+  const targets = [back, ...floors];
 
   const wallZ = -D / 2;
   for (let x = -W / 2 + 0.2; x < W / 2; x += 0.42) {

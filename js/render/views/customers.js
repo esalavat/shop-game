@@ -25,7 +25,7 @@ export function createCustomersView(state, roomOrigin) {
     root.add(hit);
     hitTargets.push(hit);
     group.add(root);
-    const entry = { c, root, inner, hit, prev: { x: c.x, z: c.z }, facing: c.facing, phase: Math.random() * 6, t: 0, gone: false, held: null, heldItem: null };
+    const entry = { c, root, inner, hit, prev: { x: c.x, z: c.z, y: c.y ?? 0 }, facing: c.facing, phase: Math.random() * 6, t: 0, gone: false, held: null, heldItem: null };
     shown.set(c.id, entry);
     return entry;
   }
@@ -56,7 +56,7 @@ export function createCustomersView(state, roomOrigin) {
     hitTargets,
 
     beforeTick() {
-      for (const e of shown.values()) { e.prev.x = e.c.x; e.prev.z = e.c.z; e.prevRoom = e.c.roomId; }
+      for (const e of shown.values()) { e.prev.x = e.c.x; e.prev.z = e.c.z; e.prev.y = e.c.y ?? 0; e.prevRoom = e.c.roomId; }
     },
 
     /** World position just above a customer's head (for speech bubbles). */
@@ -80,12 +80,12 @@ export function createCustomersView(state, roomOrigin) {
         }
         const c = e.c;
         if (e.prevRoom && e.prevRoom !== c.roomId) { // switched rooms (and coordinates) this tick: don't slide across
-          e.prev.x = c.x; e.prev.z = c.z; e.prevRoom = c.roomId;
+          e.prev.x = c.x; e.prev.z = c.z; e.prev.y = c.y ?? 0; e.prevRoom = c.roomId;
         }
         e.hit.userData.roomId = c.roomId;
         const o = roomOrigin(c.roomId);
         const z = lerp(e.prev.z, c.z, alpha);
-        e.root.position.set(o.x + lerp(e.prev.x, c.x, alpha), o.y + groundAt(z), o.z + z);
+        e.root.position.set(o.x + lerp(e.prev.x, c.x, alpha), o.y + groundAt(z) + lerp(e.prev.y, c.y ?? 0, alpha), o.z + z);
         e.facing += wrap(c.facing - e.facing) * Math.min(1, dt * 10);
         e.root.rotation.y = e.facing;
         const p = e.t / POP_TIME;

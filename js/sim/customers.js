@@ -1,7 +1,7 @@
 // Customers: walk in, browse shelves for what they want, take it, queue at the counter, pay, leave.
 // If something they want isn't on the shelves, they leave a wish note instead (never upset).
 // With theme rooms (GDD #58) they head for the room that has what they want, walk over along the
-// sidewalk (sim/route.js), and come back to the shop's counter to pay. Items taken from their own
+// sidewalk or up the Stairwell (sim/route.js), and come back to the shop's counter to pay. Items taken from their own
 // theme room earn a theme bonus at the register.
 //
 // States: [toWindow -> peeking (stop at the Window Display first)] -> arriving (walking in from the
@@ -13,11 +13,10 @@ import { events } from '../core/events.js';
 import { ITEMS } from '../data/items.js';
 import { CUSTOMER, LOOKS, ADULT_SCALE, KID_SCALE } from '../data/customers.js';
 import { findPath } from './nav.js';
-import { stepAlong } from './walker.js';
 import { newId, shopRoomId, findFixture } from './stock.js';
 import { sellingRooms, themeRoomFor, isThemeRoom } from './building.js';
 import { ROOM_TYPES, THEME_BONUS } from '../data/rooms.js';
-import { doorOf, finishRoute, roomOffset, routeTo, streetBounds } from './route.js';
+import { doorOf, finishRoute, roomOffset, routeTo, streetBounds, stairwell, walkRoute, routeEndPath } from './route.js';
 import { startCheckout } from './checkout.js';
 import { cashierReady } from './helpers.js';
 import { recordWish } from './day.js';
@@ -92,7 +91,8 @@ function roadEnd(state, side) {
 /** In from the sidewalk through the front of the room that has what they want first. */
 function headInside(state, c) {
   const shopId = shopRoomId(state);
-  const room = roomById(state, (c.wants[0] && roomWith(state, shopId, c.wants[0])) ?? shopId);
+  let room = roomById(state, (c.wants[0] && roomWith(state, shopId, c.wants[0])) ?? shopId);
+  if (room.floor > 0) room = stairwell(state)?.bottom ?? roomById(state, shopId); // it's upstairs: in by the stairs
   const off = roomOffset(state, room), door = doorOf(room);
   c.path = [{ x: door.x + off, z: STREET.inLane }, { x: door.x + off, z: door.z }];
   c.arriveRoom = room.id === shopId ? null : { roomId: room.id, offset: off, from: shopId };
@@ -120,7 +120,7 @@ export function spawnCustomer(state, rand = Math.random) {
   const side = rand() < 0.5 ? -1 : 1;
   const c = {
     id: newId(state, 'c'), roomId, x: 0, z: STREET.inLane, facing: -side * Math.PI / 2,
-    path: [], arriveFacing: null,
+    path: [], arriveFacing: null, legs: [], y: 0,
     side, state: 'arriving', timer: 0.3, look, wants: chooseWants(state, rand), basket: [], target: null,
     windowWant: null, bonus: 0, arriveRoom: null,
   };
@@ -251,10 +251,11 @@ function leave(state, c, navs) {
   }
   // Out the front of their room, onto the sidewalk, and off the far end of the road from where they came.
   const far = roadEnd(state, -c.side);
+  // (From upstairs: down the stairs first, then out under the room they were in.)
   const room = roomById(state, c.arriveRoom?.roomId ?? c.roomId);
   const doorX = doorOf(room).x + roomOffset(state, room);
-  if (routeTo(state, navs, c, { street: true, x: doorX, z: STREET.outLane })) c.path.push({ x: far, z: STREET.outLane });
-  else c.path = [{ x: far, z: STREET.outLane }];
+  if (routeTo(state, navs, c, { street: true, x: doorX, z: STREET.outLane })) routeEndPath(c).push({ x: far, z: STREET.outLane });
+  else { c.path = [{ x: far, z: STREET.outLane }]; c.legs = []; }
   c.arriveFacing = null;
   c.state = 'leaving';
 }
@@ -270,7 +271,7 @@ export function tickCustomers(state, navs, dt, rand = Math.random) {
 
   for (const c of [...state.customers]) {
     const speed = c.z > STREET.edgeZ ? CUSTOMER.streetSpeed : CUSTOMER.speed;
-    if (stepAlong(c, speed, dt)) {
+    if (walkRoute(state, c, speed, dt)) {
       finishRoute(c); // walked over from another room (or in from the street)
       if (c.arriveFacing !== null) c.facing = c.arriveFacing;
     }

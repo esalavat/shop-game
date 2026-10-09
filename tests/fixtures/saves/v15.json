@@ -1,0 +1,427 @@
+{
+ "version": 15,
+ "nextId": 9,
+ "day": {
+  "number": 9,
+  "phase": "morning",
+  "time": 0,
+  "stats": {
+   "coins": 0,
+   "tips": 0,
+   "served": 0,
+   "hearts": 0,
+   "sold": {},
+   "wishes": [],
+   "record": false
+  }
+ },
+ "coins": 777,
+ "hearts": 42,
+ "sparkle": 12,
+ "building": {
+  "rooms": [
+   {
+    "id": "r1",
+    "type": "shop",
+    "col": 0,
+    "floor": 0,
+    "fixtures": [
+     {
+      "id": "r1-f0",
+      "kind": "rug",
+      "x": 0.3,
+      "z": 0.15
+     },
+     {
+      "id": "r1-f1",
+      "kind": "shelf",
+      "x": -0.05,
+      "z": -1.06,
+      "slots": [
+       "doll",
+       "doll",
+       "doll",
+       null,
+       null,
+       null,
+       null,
+       null,
+       null
+      ]
+     },
+     {
+      "id": "r1-f2",
+      "kind": "shelf",
+      "x": 1.1,
+      "z": -1.06,
+      "slots": [
+       "lamp",
+       "lamp",
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null
+      ]
+     },
+     {
+      "id": "r1-f3",
+      "kind": "counter",
+      "x": -1.05,
+      "z": 0.1
+     },
+     {
+      "id": "r1-f4",
+      "kind": "plant",
+      "x": -1.45,
+      "z": -1.05
+     }
+    ]
+   },
+   {
+    "id": "r4",
+    "type": "display",
+    "col": 1,
+    "floor": 0,
+    "fixtures": [
+     {
+      "id": "r4-f0",
+      "kind": "rug",
+      "x": 0,
+      "z": 0.35
+     },
+     {
+      "id": "r4-f1",
+      "kind": "pedestal",
+      "x": 0,
+      "z": 0.35
+     },
+     {
+      "id": "r4-f2",
+      "kind": "plant",
+      "x": -1.2,
+      "z": 0.6
+     },
+     {
+      "id": "r4-f3",
+      "kind": "plant",
+      "x": 1.2,
+      "z": 0.6
+     }
+    ]
+   },
+   {
+    "id": "r5",
+    "type": "tea",
+    "col": 2,
+    "floor": 0,
+    "fixtures": [
+     {
+      "id": "r5-f0",
+      "kind": "rug",
+      "x": 0,
+      "z": 0.25
+     },
+     {
+      "id": "r5-f1",
+      "kind": "shelf",
+      "x": -1.15,
+      "z": -1.06,
+      "slots": [
+       null,
+       null,
+       null,
+       "teaset",
+       "teaset",
+       "teaset",
+       null,
+       null,
+       null
+      ]
+     },
+     {
+      "id": "r5-f2",
+      "kind": "shelf",
+      "x": 0,
+      "z": -1.06,
+      "slots": [
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null
+      ]
+     },
+     {
+      "id": "r5-f3",
+      "kind": "shelf",
+      "x": 1.15,
+      "z": -1.06,
+      "slots": [
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null
+      ]
+     },
+     {
+      "id": "r5-f4",
+      "kind": "plant",
+      "x": -1.45,
+      "z": 0.8
+     }
+    ]
+   },
+   {
+    "id": "r6",
+    "type": "stairs",
+    "col": 3,
+    "floor": 0,
+    "fixtures": [
+     {
+      "id": "r6-f0",
+      "kind": "stairs",
+      "x": -1.1,
+      "z": -0.7
+     },
+     {
+      "id": "r6-f1",
+      "kind": "shelf",
+      "x": 0.85,
+      "z": -1.06,
+      "slots": [
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null
+      ]
+     },
+     {
+      "id": "r6-f2",
+      "kind": "plant",
+      "x": 1.45,
+      "z": 0.8
+     }
+    ]
+   },
+   {
+    "id": "r7",
+    "type": "landing",
+    "col": 3,
+    "floor": 1,
+    "fixtures": [
+     {
+      "id": "r7-f0",
+      "kind": "stairhole",
+      "x": -1.1,
+      "z": -0.7
+     },
+     {
+      "id": "r7-f1",
+      "kind": "shelf",
+      "x": 0.85,
+      "z": -1.06,
+      "slots": [
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null
+      ]
+     }
+    ]
+   },
+   {
+    "id": "r8",
+    "type": "fairy",
+    "col": 2,
+    "floor": 1,
+    "fixtures": [
+     {
+      "id": "r8-f0",
+      "kind": "rug",
+      "x": 0,
+      "z": 0.25
+     },
+     {
+      "id": "r8-f1",
+      "kind": "shelf",
+      "x": -1.15,
+      "z": -1.06,
+      "slots": [
+       null,
+       null,
+       null,
+       "doll",
+       "doll",
+       null,
+       null,
+       null,
+       null
+      ]
+     },
+     {
+      "id": "r8-f2",
+      "kind": "shelf",
+      "x": 0,
+      "z": -1.06,
+      "slots": [
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null
+      ]
+     },
+     {
+      "id": "r8-f3",
+      "kind": "shelf",
+      "x": 1.15,
+      "z": -1.06,
+      "slots": [
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null,
+       null
+      ]
+     },
+     {
+      "id": "r8-f4",
+      "kind": "plant",
+      "x": -1.45,
+      "z": 0.8
+     }
+    ]
+   }
+  ]
+ },
+ "keeper": {
+  "roomId": "r1",
+  "x": -1.05,
+  "z": -0.42,
+  "facing": 0.5235987755982988,
+  "path": [],
+  "fixtureId": null,
+  "arriveFacing": null,
+  "task": null,
+  "carrying": null,
+  "spare": null,
+  "arriveRoom": null,
+  "legs": [],
+  "y": 0
+ },
+ "orders": [
+  {
+   "id": "o9",
+   "itemId": "cottage",
+   "qty": 2,
+   "arrivesDay": 1,
+   "lunch": true
+  }
+ ],
+ "boxes": [
+  {
+   "id": "b2",
+   "itemId": "teaset",
+   "qty": 3,
+   "roomId": "r1",
+   "spot": 0
+  },
+  {
+   "id": "b3",
+   "itemId": "chair",
+   "qty": 3,
+   "roomId": "r1",
+   "spot": 1
+  }
+ ],
+ "collection": {
+  "teaset": true,
+  "chair": true,
+  "lamp": true,
+  "bed": true,
+  "doll": true,
+  "cottage": true
+ },
+ "dollhouse": {
+  "slots": {
+   "bedroom": "bed",
+   "parlor": "chair",
+   "tearoom": "teaset"
+  }
+ },
+ "wishes": [
+  "cottage"
+ ],
+ "shopkeeper": {
+  "body": "girl",
+  "hair": "pigtails",
+  "hairColor": "#6b3e2e",
+  "skin": "#ffd9c2",
+  "outfit": "#ff9ec4",
+  "accessory": "bow",
+  "created": true
+ },
+ "upgrades": {
+  "cart": true,
+  "shoes": true,
+  "lunch": true,
+  "sorting": true
+ },
+ "helpers": {
+  "cashier": true,
+  "stocker": true
+ },
+ "stocker": {
+  "roomId": "r1",
+  "x": 1.4,
+  "z": 0.7,
+  "facing": 0,
+  "path": [],
+  "arriveFacing": null,
+  "arriveRoom": null,
+  "legs": [],
+  "y": 0,
+  "carrying": null,
+  "spare": null,
+  "job": null,
+  "timer": 0
+ },
+ "settings": {
+  "muted": true
+ },
+ "best": {
+  "coins": 321
+ },
+ "tutorial": "done",
+ "lastSeen": 1791504000000
+}

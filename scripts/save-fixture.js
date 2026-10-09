@@ -10,7 +10,7 @@
 import { existsSync, writeFileSync } from 'node:fs';
 import { createState, STATE_VERSION, TRANSIENT } from '../js/sim/state.js';
 import { addCoins } from '../js/sim/economy.js';
-import { buildExpansion, buildThemeRoom, roomSpots } from '../js/sim/building.js';
+import { buildExpansion, buildThemeRoom, buildStairwell, roomSpots } from '../js/sim/building.js';
 import { buyUpgrade, hireHelper } from '../js/sim/upgrades.js';
 import { placeInDollhouse } from '../js/sim/collection.js';
 import { placeOrder } from '../js/sim/orders.js';
@@ -29,6 +29,9 @@ addCoins(s, 2000);
 buildExpansion(s);
 const spot = roomSpots(s).at(-1);
 buildThemeRoom(s, 'tea', spot.col, spot.floor); // a theme room (GDD #58), with a box of tea sets on its shelf
+buildStairwell(s, roomSpots(s, 'stairs').at(-1).col); // the Stairwell (GDD #58), and a theme room upstairs
+const up = roomSpots(s).find((p) => p.floor === 1);
+if (up) buildThemeRoom(s, 'fairy', up.col, 1);
 for (const id of Object.keys(UPGRADES)) buyUpgrade(s, id);
 for (const id of Object.keys(HELPERS)) hireHelper(s, id);
 const shop = s.building.rooms.find((r) => r.type === 'shop');
@@ -41,6 +44,7 @@ const shelves = shop.fixtures.filter((f) => f.slots);
 shelves[0].slots.fill('doll', 0, 3);
 shelves[1].slots.fill('lamp', 0, 2);
 s.building.rooms.find((r) => r.type === 'tea')?.fixtures.find((f) => f.slots)?.slots.fill('teaset', 3, 6);
+s.building.rooms.find((r) => r.type === 'fairy')?.fixtures.find((f) => f.slots)?.slots.fill('doll', 3, 5);
 placeOrder(s, 'cottage');
 s.wishes = ['cottage'];
 s.hearts = 42;

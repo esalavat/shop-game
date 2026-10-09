@@ -19,7 +19,7 @@ export function createKeeperView(state, roomOrigin) {
   const object = new THREE.Group();
   let root, inner;
   const k = state.keeper;
-  const prev = { x: k.x, z: k.z };
+  const prev = { x: k.x, z: k.z, y: k.y ?? 0 };
   let prevRoom = k.roomId;
   let facing = k.facing, walkPhase = 0, idlePhase = 0, hop = 0;
   let carried = [], carriedKey = null;
@@ -52,6 +52,7 @@ export function createKeeperView(state, roomOrigin) {
     beforeTick() {
       prev.x = k.x;
       prev.z = k.z;
+      prev.y = k.y ?? 0;
       prevRoom = k.roomId;
     },
 
@@ -82,11 +83,12 @@ export function createKeeperView(state, roomOrigin) {
       if (k.roomId !== prevRoom) { // she switched rooms (and coordinates) this tick: don't slide across
         prev.x = k.x;
         prev.z = k.z;
+        prev.y = k.y ?? 0;
         prevRoom = k.roomId;
       }
       const o = roomOrigin(k.roomId);
       const z = lerp(prev.z, k.z, alpha);
-      object.position.set(o.x + lerp(prev.x, k.x, alpha), o.y + groundAt(z), o.z + z); // steps down to the sidewalk
+      object.position.set(o.x + lerp(prev.x, k.x, alpha), o.y + groundAt(z) + lerp(prev.y, k.y ?? 0, alpha), o.z + z); // the sidewalk step, the stairs
       facing += wrap(k.facing - facing) * Math.min(1, dt * 12);
       object.rotation.y = facing;
 

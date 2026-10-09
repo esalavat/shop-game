@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.23 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.24 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -67,6 +67,7 @@
 | 58 | **More rooms, themed and upstairs** (user; planned, §9): **Grow → Build a room → pick a theme → tap a glowing ＋ spot** on the building. Six **theme rooms**, one per Collection theme (Tea Time, Cozy Parlor, Fairy Garden, Sweet Dreams, Doll Friends, Little Houses), each with **3 shelves** and its own wallpaper. Any item can go anywhere, but **items sell better in their matching room** (a theme bonus on each sale). Customers walk to the room that has what they want and pay at the one counter in the main shop. **Upstairs:** build a **Stairwell** once (a room column with a spiral staircase in the back corner and one shelf beside it, on both floors); then ＋ spots appear upstairs next to it, and upstairs rooms connect through doorways. One upstairs floor for now. Built in two steps: ground-floor theme rooms first, then the Stairwell and upstairs | v0.23 |
 | 59 | **Lots of items, and a Collection that pays off** (user; planned after #58, §6.2, §5.1): aim for **100+ items** over time. Prices **scale up** like today, projected forward: fancier items cost more and make more profit. Many items come in **color variants** (the same chair in mint, pink and lilac), each its own sticker. Each theme is an **album page**; the **order book grows as you collect** (new catalog pages open as you find more items, fancier ones last). **Collection bonus:** each item found brings a few percent more customers; **completing a page** gives a bigger customer boost, a **coin gift with confetti**, and a **shopkeeper style** (an outfit color or accessory). 💡 Later: special things that unlock at **Heart and Sparkle milestones** (§18 #6) | v0.23 |
 | 60 | **Smarter and more stockers** (user; planned with #58, §10): a **Sorting Smarts** upgrade makes stockers unpack each box into its **matching theme room** when there's one with space (otherwise the emptiest shelf, as now). Later, **hire more than one stocker**, each costing more | v0.23 |
+| 61 | **Stairwell and upstairs, as built** (#58 step 2): the Stairwell shows up in Grow after the first theme room (🪙 350) and is placed on a ground-floor ＋ like a theme room; it builds both floors at once. Spiral stairs in the back-left corner (one full turn), one shelf on each floor, a railing round the hole upstairs. Upstairs rooms open into each other through side doorways and have a **low railing along the open front**. The roof steps: each run of rooms with the same height gets its own roof; the sign stays over the shop. **Tap the stairs** to send your shopkeeper up (or the railing upstairs to come down); the view follows. Customers and Bea use the stairs too; everyone still pays at the shop counter | v0.24 |
 
 ## 1. Pitch
 
@@ -255,7 +256,7 @@ Your very own dollhouse, displayed in the shop's front window.
 - Expand **sideways** (new wings) and **upward** (new floors), so it becomes a wide, charming building and not a tower.
 - Each new room costs coins and unlocks through milestones.
 - **Building rooms (v0.23, #58):** **Grow → Build a room → pick a theme**, then tap one of the glowing **＋ spots** on the building: either end of the ground floor, or upstairs next to the Stairwell or another upstairs room. Costs rise with each room (🪙 250, 400, 600, 850, 1150, 1500; tune with play). **Built (step 1):** theme rooms open once the Window Display is built; the theme bonus is **+25% of the price** (rounded up), shown as "theme bonus ✨" at the register; each theme room also makes room for 2 more customers at a time. Sorting Smarts costs 🪙 120 and shows up once Bea is hired and a theme room is built.
-- **Upstairs (#58):** the **Stairwell** (built once, 💡 🪙 350, after your first theme room) is a room column with a spiral staircase in the back corner and one shelf beside it, on the ground floor and upstairs. Upstairs rooms open into each other through doorways; customers, helpers and your shopkeeper walk up the stairs and across. One upstairs floor for now.
+- **Upstairs (#58, #61):** the **Stairwell** (built once, 🪙 350, after your first theme room; built v0.24) is a room column with a spiral staircase in the back corner and one shelf beside it, on the ground floor and upstairs. Upstairs rooms open into each other through doorways; customers, helpers and your shopkeeper walk up the stairs and across. One upstairs floor for now.
 - The outside (roof, colors, sign, awning, flower boxes) is customizable and visible when zoomed out.
 
 ### 9.2 Room types
@@ -377,7 +378,7 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 ### Next
 - [x] **Theme rooms on the ground floor** with ＋ spots and a theme bonus (#58, step 1)
 - [x] **Sorting Smarts** upgrade: stockers use the matching theme room (#60)
-- [ ] **Stairwell and upstairs rooms** (#58, step 2)
+- [x] **Stairwell and upstairs rooms** (#58, step 2, #61)
 - [ ] More than one stocker (#60, later)
 - [ ] **More items, color variants, catalog pages that open as you collect, Collection bonus and page rewards** (#59)
 - Building grid expansion (X and Y), room types, pan/zoom

@@ -1,11 +1,10 @@
 // The shopkeeper: walks where the player taps, and to furniture or boxes to use them.
 // A walk can carry a `task` (pick up a box, stock a shelf) that runs when she arrives. She can also
-// walk out to the street and into other ground-floor rooms (GDD #41, sim/route.js).
+// walk out to the street, into other ground-floor rooms, and up the stairs (GDD #41, #58, sim/route.js).
 
 import { events } from '../core/events.js';
 import { useSpot } from '../data/fixtures.js';
-import { planRoute, startRoute, finishRoute, settleRoute, shopRoom, GREETER, SHOWOFF } from './route.js';
-import { stepAlong } from './walker.js';
+import { planRoute, startRoute, finishRoute, settleRoute, routeStart, walkRoute, shopRoom, GREETER, SHOWOFF } from './route.js';
 import { boxSpot, findFixture, DOORWAY_Z } from './stock.js';
 import { performTask } from './tasks.js';
 import { hasUpgrade } from './upgrades.js';
@@ -19,7 +18,9 @@ export function createKeeper(roomId) {
     path: [], fixtureId: null, arriveFacing: null, task: null,
     carrying: null, // a box { id, itemId, qty } while she holds one
     spare: null,    // a second box on the Stock Cart, unpacked once the first is empty
-    arriveRoom: null, // { roomId, offset, from } while walking to another room or the street (sim/route.js)
+    arriveRoom: null, // { roomId, offset, dy, from, climb } while walking to another room or the street (sim/route.js)
+    legs: [],         // the rest of a route with several legs (up the stairs, ...)
+    y: 0,             // height above her room's floor (on the stairs)
   };
 }
 
@@ -32,7 +33,8 @@ export function walkTo(state, navs, dest, { fixtureId = null, face = null, task 
   const k = state.keeper;
   const entered = settleRoute(state, k);
   if (entered) events.emit('keeperEnteredRoom', { roomId: entered });
-  const route = planRoute(state, navs, k, dest.street ? dest : { roomId: k.roomId, ...dest });
+  const start = routeStart(k); // on the stairs: she finishes the climb first
+  const route = planRoute(state, navs, start, dest.street ? dest : { roomId: start.roomId, ...dest });
   if (!route) return false;
   startRoute(state, k, route); // to another room: shop coordinates on the way, the new room on arrival
   k.fixtureId = fixtureId;
@@ -74,7 +76,7 @@ export function keeperGreeting(state) {
 
 export function tickKeeper(state, dt) {
   const speed = KEEPER_SPEED * (hasUpgrade(state, 'shoes') ? SHOES_SPEED : 1);
-  if (stepAlong(state.keeper, speed, dt)) arrive(state);
+  if (walkRoute(state, state.keeper, speed, dt)) arrive(state);
 }
 
 function arrive(state) {

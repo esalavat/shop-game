@@ -83,6 +83,14 @@ const MIGRATIONS = {
   12: (d) => ({ ...d, version: 13, tutorial: 'done' }),
   // v14: Bea can walk to other rooms (stocker.arriveRoom while on the way; GDD #58).
   13: (d) => ({ ...d, version: 14, stocker: d.stocker && { ...d.stocker, arriveRoom: null } }),
+  // v15: the Stairwell and upstairs rooms (GDD #58): walks come in legs (keeper.legs, up the stairs,
+  // ...) and people have a height on the stairs (y).
+  14: (d) => ({
+    ...d,
+    version: 15,
+    keeper: { ...d.keeper, legs: [], y: 0 },
+    stocker: d.stocker && { ...d.stocker, legs: [], y: 0 },
+  }),
 };
 
 export function migrate(data) {

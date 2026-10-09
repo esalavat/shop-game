@@ -1,7 +1,7 @@
 // Debug panel, enabled with ?debug in the URL. Loaded on demand so players never download it.
 
 import { addCoins } from '../sim/economy.js';
-import { addRoom, hasRoom } from '../sim/building.js';
+import { addRoom, addStairwell, hasStairwell, roomSpots, themesLeft } from '../sim/building.js';
 import { ROOM_TYPES } from '../data/rooms.js';
 import { ITEMS } from '../data/items.js';
 import { spawnCustomer } from '../sim/customers.js';
@@ -19,7 +19,7 @@ export function createDebug({ state, renderer, quality, onViewAll, onReset, onCo
       <button data-act="customer">Spawn customer</button>
       <button data-act="skip">Skip ahead ⏩</button>
       <button data-act="right">Add room →</button>
-      <button data-act="up">Add floor ↑</button>
+      <button data-act="up">Upstairs ↑</button>
       <button data-act="all">Whole shop</button>
       ${onCopyMain ? '<button data-act="copyMain" class="danger">Copy main save</button>' : ''}
       <button data-act="reset" class="danger">Reset save</button>
@@ -29,7 +29,7 @@ export function createDebug({ state, renderer, quality, onViewAll, onReset, onCo
   const stats = root.querySelector('.debug-stats');
   root.querySelector('.debug-toggle').addEventListener('click', () => (panel.hidden = !panel.hidden));
 
-  const types = Object.keys(ROOM_TYPES);
+  const types = Object.keys(ROOM_TYPES).filter((t) => t !== 'stairs' && t !== 'landing'); // the Stairwell comes in two halves (Upstairs ↑)
   const nextType = () => types[state.building.rooms.length % types.length];
   const cols = () => state.building.rooms.map((r) => r.col);
 
@@ -55,13 +55,11 @@ export function createDebug({ state, renderer, quality, onViewAll, onReset, onCo
       addRoom(state, nextType(), col, 0);
     },
     up: () => {
-      // Add on top of the first column that has the fewest floors.
-      const columns = [...new Set(cols())].sort((a, b) => a - b);
-      const height = (c) => state.building.rooms.filter((r) => r.col === c).length;
-      const col = columns.reduce((best, c) => (height(c) < height(best) ? c : best), columns[0]);
-      let floor = 0;
-      while (hasRoom(state, col, floor)) floor++;
-      addRoom(state, nextType(), col, floor);
+      // The Stairwell at the right end first, then theme rooms upstairs beside it.
+      if (!hasStairwell(state)) return addStairwell(state, Math.max(...cols()) + 1);
+      const spot = roomSpots(state).find((p) => p.floor === 1);
+      const type = themesLeft(state)[0];
+      if (spot && type) addRoom(state, type, spot.col, 1);
     },
     all: onViewAll,
     reset: () => { if (confirm('Erase the save and start over?')) onReset(); },

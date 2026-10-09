@@ -26,7 +26,7 @@ import { createSpotsView } from './render/views/spots.js';
 import { DOLLHOUSE } from './render/models/furniture.js';
 import { buildNav } from './sim/nav.js';
 import { walkTo, walkToFixture, walkToBox, walkToGreeter, walkToShowOff, tickKeeper } from './sim/keeper.js';
-import { GREETER, SIDEWALK, groundAt, shopRoom, streetBounds } from './sim/route.js';
+import { GREETER, SIDEWALK, STAIRS, groundAt, shopRoom, streetBounds, stairwell, routeEnd } from './sim/route.js';
 import { tickDay, twilightFor } from './sim/day.js';
 import { tickCustomers } from './sim/customers.js';
 import { tickHelpers } from './sim/helpers.js';
@@ -38,7 +38,7 @@ import { checkoutTap, keeperAtCounter } from './sim/checkout.js';
 import { displayRoom } from './sim/collection.js';
 import { ITEMS } from './data/items.js';
 import { ROOM_TYPES } from './data/rooms.js';
-import { buildThemeRoom, roomSpots } from './sim/building.js';
+import { buildThemeRoom, buildStairwell, roomSpots } from './sim/building.js';
 import { attachGestures } from './input/touch.js';
 import { createHud } from './ui/hud.js';
 import { createOrderBook } from './ui/orderbook.js';
@@ -187,7 +187,7 @@ const decorate = createDecorate(state, thumbs, {
 const grow = createGrow(state, { onDecorate: () => enterDecorate(), onPlaceRoom: (type) => startPlacing(type) });
 
 // ---------------------------------------------------------------------------
-// Building a theme room (GDD #58): after picking a theme in the Grow sheet, tap a glowing + spot.
+// Building a theme room or the Stairwell (GDD #58): after picking one in the Grow sheet, tap a glowing + spot.
 // ---------------------------------------------------------------------------
 let placing = null; // the room type being placed
 const placeBanner = document.getElementById('place-banner');
@@ -196,11 +196,11 @@ const shownSpots = new Set();
 function startPlacing(type) {
   placing = type;
   const t = ROOM_TYPES[type];
-  placeBanner.querySelector('span').textContent = `Tap a ＋ to build your ${t.icon} ${t.name} room`;
+  placeBanner.querySelector('span').textContent = type === 'stairs' ? `Tap a ＋ to build your ${t.icon} ${t.name}` : `Tap a ＋ to build your ${t.icon} ${t.name} room`;
   placeBanner.hidden = false;
   // Zoom out far enough to see the building and every + spot beside it.
   focusedRoomId = null;
-  const L = world.building.layout, xs = roomSpots(state).map((p) => L.roomX(p.col));
+  const L = world.building.layout, xs = roomSpots(state, type).map((p) => L.roomX(p.col));
   const left = Math.min(-L.width / 2, ...xs.map((x) => x - ROOM.W / 2)), right = Math.max(L.width / 2, ...xs.map((x) => x + ROOM.W / 2));
   rig.frame((left + right) / 2, (L.roofTop - 0.8) / 2, right - left + 0.8, L.roofTop + 1.4);
 }
@@ -217,11 +217,12 @@ overlay.root.addEventListener('click', (e) => {
   const [col, floor] = spot.dataset.spot.split(',').map(Number);
   const type = placing;
   stopPlacing();
-  buildThemeRoom(state, type, col, floor);
+  if (type === 'stairs') buildStairwell(state, col);
+  else buildThemeRoom(state, type, col, floor);
 });
 
 function updatePlaceSpots() {
-  const list = placing ? roomSpots(state) : [];
+  const list = placing ? roomSpots(state, placing) : [];
   const keep = new Set(list.map((p) => `${p.col},${p.floor}`));
   for (const key of shownSpots) if (!keep.has(key)) { overlay.removeBubble(`place-${key}`); shownSpots.delete(key); }
   for (const p of list) {
@@ -296,8 +297,6 @@ attachGestures(canvas, {
     }
     // First tap on another room just looks at it.
     if (roomId !== focusedRoomId) return focusRoom(room);
-    // No stairs yet: she can walk to any ground-floor room (out the front and along the sidewalk).
-    if (room.floor !== 0) return;
     const o = roomOrigin(roomId);
     const counter = room.fixtures.find((f) => f.kind === 'counter');
     const tappedCounter = fixtureId === counter?.id || (customerId && customerId === state.queue[0]);
@@ -310,6 +309,13 @@ attachGestures(canvas, {
     } else if (boxId) {
       if (!canCarryMore(state)) return audio.play('boop'), toast(state.keeper.spare ? 'The cart is full! Tap a shelf to unpack.' : 'Hands full! Tap a shelf to unpack this box first.');
       if (walkToBox(state, navs, state.boxes.find((b) => b.id === boxId))) tapFeedback();
+    } else if (fixtureId && /^stair/.test(room.fixtures.find((f) => f.id === fixtureId)?.kind)) {
+      // The stairs: up to the top (or down to the bottom), and the view follows.
+      const st = stairwell(state), other = room.floor === 0 ? st?.top : st?.bottom;
+      if (other && walkTo(state, navs, { roomId: other.id, x: STAIRS.foot.x, z: STAIRS.foot.z }, { face: 0 })) {
+        tapFeedback();
+        focusRoom(other);
+      }
     } else if (fixtureId) {
       const fixture = room.fixtures.find((f) => f.id === fixtureId);
       const task = state.keeper.carrying && fixture.slots ? { type: 'stock', fixtureId } : null;
@@ -359,6 +365,9 @@ events.on('expanded', ({ room }) => {
   if (room.type === 'display') {
     toast('Your Window Display is open! 🎉');
     setTimeout(() => toast('Tap the Dream Dollhouse to decorate it ✨'), 1200);
+  } else if (room.type === 'stairs') {
+    toast('Your 🪜 Stairwell is open! 🎉');
+    setTimeout(() => toast('Now you can build theme rooms upstairs ✨'), 1200);
   } else {
     const t = ROOM_TYPES[room.type];
     toast(`Your ${t.icon} ${t.name} room is open! 🎉`);
@@ -381,13 +390,13 @@ events.on('customerArrived', () => {
   toast('A customer! Stand behind the counter to ring them up 🛎️');
 });
 
-/** A ring where she's headed (the end of her path, in her current room's coordinates). */
+/** A ring where she's headed (the end of her route, in the coordinates of the room it ends in). */
 function tapFeedback() {
-  const k = state.keeper, spot = k.path.at(-1);
+  const spot = routeEnd(state.keeper);
   if (!spot) return;
   audio.play('tap');
-  const o = roomOrigin(k.roomId);
-  fx.tapRing(new THREE.Vector3(o.x + spot.x, o.y + groundAt(spot.z), o.z + spot.z));
+  const o = roomOrigin(spot.roomId);
+  fx.tapRing(new THREE.Vector3(o.x + spot.x, o.y + spot.y + groundAt(spot.z), o.z + spot.z));
 }
 
 /** Bobbing icons over the bonus spots (hidden while decorating or in the creator). */

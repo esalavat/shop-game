@@ -39,7 +39,7 @@ export function separate(state, navs) {
   for (let i = 0; i < people.length; i++) {
     for (let j = i + 1; j < people.length; j++) {
       const a = people[i], b = people[j];
-      if (a.roomId !== b.roomId) continue;
+      if (a.roomId !== b.roomId || Math.abs((a.y ?? 0) - (b.y ?? 0)) > 0.5) continue; // on the stairs: not in each other's way
       const aMoving = a.path.length > 0 && !slip.has(a), bMoving = b.path.length > 0 && !slip.has(b);
       if (!aMoving && !bMoving) continue;
       let dx = a.x - b.x, dz = a.z - b.z;

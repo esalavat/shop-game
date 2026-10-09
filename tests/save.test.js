@@ -241,3 +241,17 @@ test('a v13 save without Bea stays without her', () => {
   store.setItem(SAVE_KEY, JSON.stringify({ ...createState(0), version: 13 }));
   assert.equal(loadGame(store).stocker, null);
 });
+
+test('a v14 save gets walks in legs and a height for the stairs (GDD #58)', () => {
+  const store = memoryStorage();
+  const v14 = { ...createState(0), version: 14, helpers: { stocker: true } };
+  delete v14.keeper.legs; delete v14.keeper.y;
+  v14.stocker = { roomId: 'r1', x: 1.4, z: 0.7, facing: 0, path: [], arriveFacing: null, arriveRoom: null, carrying: { id: 'b9', itemId: 'doll', qty: 2 }, spare: null, job: null, timer: 0 };
+  store.setItem(SAVE_KEY, JSON.stringify(v14));
+  const s = loadGame(store);
+  assert.equal(s.version, STATE_VERSION);
+  assert.deepEqual(s.keeper.legs, []);
+  assert.equal(s.keeper.y, 0);
+  assert.deepEqual(s.stocker.legs, []);
+  assert.equal(s.stocker.carrying.itemId, 'doll');
+});

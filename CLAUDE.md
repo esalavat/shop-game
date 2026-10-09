@@ -83,16 +83,24 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   🪙 250, 400, 600…). Three shelves each and a theme sign; matching items earn +25% at the register. Customers walk
   to the room with what they want and back to the shop counter; Bea stocks every room; **Sorting Smarts** (🪙 120)
   sends boxes to their theme room. Save version 14. On `/dev/` only.
-- **Planned next, in order:** (#58 step 2) the **Stairwell and upstairs rooms** (the user asked to start it; not
-  coded yet; technical plan in `docs/TECH.md` §11.1); then (#59) **more items** (toward
-  100+, color variants, catalog pages that open as you collect), the **Collection bonus** and page rewards (coins,
-  confetti, a shopkeeper style). Later: more stockers (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone
-  unlocks (§18 #6). Open issue: delivery boxes stack too high (docs/ISSUES.md, delivery-bin idea).
+- **Stairwell and upstairs rooms, built 2026-10-09, waiting for the user's feedback** (GDD v0.24 #58 step 2, #61):
+  Grow → Stairwell (🪙 350, after the first theme room) → tap a ground ＋; it builds both floors (spiral stairs, a shelf
+  on each). Then theme rooms can go upstairs, over ground rooms next to the Stairwell top or another upstairs room;
+  upstairs rooms connect through side doorways. Tap the stairs to send your shopkeeper up (the railing upstairs to come
+  down). Customers and Bea climb too; everyone pays downstairs. Routes come in legs (`sim/route.js`, `docs/TECH.md`
+  §4.3.3); save version 15. `tests/stairs.test.js`; a scratch stress run of 150 busy days with upstairs rooms had no
+  stuck days. On `/dev/` only.
+- **Planned next, in order:** (#59) **more items** (toward 100+, color variants, catalog pages that open as you
+  collect), the **Collection bonus** and page rewards (coins, confetti, a shopkeeper style). Later: more stockers
+  (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issues: delivery boxes stack too
+  high (delivery-bin idea), and the evening should close once the last customer has paid or left instead of waiting
+  for them to walk off-screen (user, GDD §18 #7; both in docs/ISSUES.md).
 
-**Next:** build the Stairwell and upstairs rooms (`docs/TECH.md` §11.1), push to `/dev/` for the user to try.
-Still waiting on: M8 feedback (home-screen install, fps on the Pixel), Bea and first-day-guide feedback. Nothing new
-has been released since **v2026.10.9.2** (first-day guide); theme rooms and the crowd fix are on `/dev/` only, and
-releasing them changes the save version (v13 → v14). The MVP list in GDD §17 is complete.
+**Next:** ask the user about the Stairwell on `/dev/`; then the evening-close fix (§18 #7) or #59 (more items),
+whichever the user prefers. Still waiting on: M8 feedback (home-screen install, fps on the Pixel), Bea and
+first-day-guide feedback. Nothing new has been released since **v2026.10.9.2** (first-day guide); theme rooms, the
+crowd fix and the Stairwell are on `/dev/` only, and releasing them changes the save version (v13 → v15). The MVP list
+in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).

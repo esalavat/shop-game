@@ -19,6 +19,10 @@ export const FIXTURES = {
   pedestal: { name: 'Dream Dollhouse', size: { w: 0.92, d: 0.92, h: 1.5 }, use: { dx: -0.72, dz: 0, face: Math.PI / 2 } },
   plant: { name: 'Plant', size: { w: 0.45, d: 0.45, h: 0.95 }, use: { dx: 0, dz: 0.55, face: Math.PI } },
   rug: { name: 'Rug', size: { w: 1.4, d: 1.4, h: 0.02 }, walkable: true },
+  // The Stairwell's spiral staircase (GDD #58), and the hole it comes up through upstairs (with a railing).
+  // Nobody walks on them through the walk grid: the stairs are a path of their own (sim/route.js).
+  stairs: { name: 'Stairs', size: { w: 1.2, d: 1.2, h: 2.6 } },
+  stairhole: { name: 'Stairs', size: { w: 1.2, d: 1.2, h: 0.8 } },
 };
 
 /** Rotate a fixture-local offset into room space (same convention as Object3D.rotation.y). */

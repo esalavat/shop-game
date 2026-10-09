@@ -1,10 +1,11 @@
 // The toolbar's Grow button and sheet (GDD #35): the next room to build, helpers to hire, and
 // upgrades to buy. After the Window Display, "Build a room" lists the theme rooms (GDD #58): pick one,
-// and the sheet closes so you can tap a + spot on the building (main.js placement mode). The button glows when there's something new you can afford. Once the Window
+// and the sheet closes so you can tap a + spot on the building (main.js placement mode). After the
+// first theme room, the Stairwell is placed the same way. The button glows when there's something new you can afford. Once the Window
 // Display is built, a separate Dollhouse button appears next to it and opens decorate mode.
 
-import { nextExpansion, buildExpansion, canBuildThemeRooms, themesLeft, themeRoomCost, isThemeRoom } from '../sim/building.js';
-import { ROOM_TYPES } from '../data/rooms.js';
+import { nextExpansion, buildExpansion, canBuildThemeRooms, themesLeft, themeRoomCost, isThemeRoom, canBuildStairwell } from '../sim/building.js';
+import { ROOM_TYPES, STAIRWELL_COST } from '../data/rooms.js';
 import { displayRoom } from '../sim/collection.js';
 import { buyUpgrade, hireHelper, hasUpgrade, hasHelper } from '../sim/upgrades.js';
 import { UPGRADES, HELPERS } from '../data/upgrades.js';
@@ -37,7 +38,7 @@ export function createGrow(state, { onDecorate, onPlaceRoom }) {
     if (!b || b.disabled) return;
     const [kind, id] = b.dataset.buy.split(':');
     if (kind === 'room' && buildExpansion(state)) sheet.hidden = true;
-    else if (kind === 'theme') { sheet.hidden = true; return onPlaceRoom(id); }
+    else if (kind === 'theme' || kind === 'stairs') { sheet.hidden = true; return onPlaceRoom(kind === 'stairs' ? 'stairs' : id); }
     else if (kind === 'helper') hireHelper(state, id);
     else if (kind === 'upgrade') buyUpgrade(state, id);
     render();
@@ -70,7 +71,13 @@ export function createGrow(state, { onDecorate, onPlaceRoom }) {
         <p>Three more shelves, decorated for one Collection theme. Things from that theme <b>sell for more</b> in their own room!</p>
         <div class="grow-cost">${short > 0 ? `🪙 ${cost} · ${short} more to go` : `🪙 ${cost} · pick a theme, then tap a ＋ on your shop`}</div>
         <div class="grow-themes">${themes}</div></div>`;
-    } else {
+    }
+    if (canBuildStairwell(state)) {
+      const btn = price(STAIRWELL_COST, false) ?? `<button class="grow-build" data-buy="stairs">Build it! 🪙 ${STAIRWELL_COST}</button>`;
+      html += `<div class="grow-card"><div class="grow-art" aria-hidden="true">🪜⬆️✨</div><h3>Stairwell</h3>
+        <p>A spiral staircase up to a <b>second floor</b>, with a shelf on each floor. Then you can build theme rooms upstairs! Tap a ＋ on your shop to place it.</p>${btn}</div>`;
+    }
+    if (!next && !(canBuildThemeRooms(state) && themesLeft(state).length) && !canBuildStairwell(state)) {
       html += '<div class="grow-done">More rooms are coming soon! 🏗️</div>';
     }
     html += '<div class="grow-section">Helpers</div>';
@@ -93,6 +100,7 @@ export function createGrow(state, { onDecorate, onPlaceRoom }) {
     const costs = [
       nextExpansion(state)?.cost,
       canBuildThemeRooms(state) && themesLeft(state).length ? themeRoomCost(state) : null,
+      canBuildStairwell(state) ? STAIRWELL_COST : null,
       ...Object.entries(HELPERS).filter(([id]) => !hasHelper(state, id)).map(([, h]) => h.cost),
       ...Object.entries(UPGRADES).filter(([id]) => !hasUpgrade(state, id) && upgradeListed(id)).map(([, u]) => u.cost),
     ];

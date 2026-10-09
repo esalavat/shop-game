@@ -49,6 +49,27 @@ export const ROOM_TYPES = {
     window: { x: -0.9, w: 0.8, h: 0.7 },
     fixtures: [],
   },
+  // The Stairwell (GDD #58): two rooms, one above the other, built together. A spiral staircase in the
+  // back-left corner (STAIRS in sim/route.js) and one shelf beside it, downstairs and up.
+  stairs: {
+    name: 'Stairwell', icon: '🪜',
+    paper: '#fff4dc', stripe: '#ffeabf', floor: '#e8b98a', curtain: '#ffd98a',
+    window: null,
+    fixtures: [
+      { kind: 'stairs', x: -1.1, z: -0.7 },
+      { kind: 'shelf', x: 0.85, z: -1.06 },
+      { kind: 'plant', x: 1.45, z: 0.8 },
+    ],
+  },
+  landing: {
+    name: 'Stairwell', icon: '🪜',
+    paper: '#fff4dc', stripe: '#ffeabf', floor: '#e8b98a', curtain: '#ffd98a',
+    window: null,
+    fixtures: [
+      { kind: 'stairhole', x: -1.1, z: -0.7 },
+      { kind: 'shelf', x: 0.85, z: -1.06 },
+    ],
+  },
   // Theme rooms (GDD #58): one per Collection theme (ITEMS[id].set), three shelves along the back wall.
   // Items of the room's theme sell better there (THEME_BONUS).
   tea: themeRoom('tea', 'Tea Time', '🫖', { paper: '#e4f1ff', stripe: '#d2e7ff', curtain: '#a8d8ff' }),
@@ -65,3 +86,6 @@ export const THEME_ROOMS = Object.keys(ROOM_TYPES).filter((t) => ROOM_TYPES[t].t
 export const THEME_ROOM_COSTS = [250, 400, 600, 850, 1150, 1500];
 /** Items sold from their own theme room earn this much extra (a share of the price, rounded up). */
 export const THEME_BONUS = 0.25;
+/** The Stairwell's price (both floors), and the highest floor rooms can go on. */
+export const STAIRWELL_COST = 350;
+export const TOP_FLOOR = 1;
