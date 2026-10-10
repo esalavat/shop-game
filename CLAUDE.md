@@ -150,7 +150,7 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   floor), +🪙 50 on every spot per shelf room built (`ROOM_EACH`), so the cheapest spot always climbs; register rooms
   don't count. Staircases cheaper (500, 700, 950, 1250, +350). `roomCost` in `js/sim/building.js`. No save change.
 - **Roller Skates 🛼, built 2026-10-09, waiting for feedback** (GDD v0.38 #76): 🪙 180 upgrade, locked until Bea is hired;
-  every stocker walks ×1.4 (`SKATES_SPEED`; Comfy Shoes is the shopkeeper's only). Upgrades can have `needs` (a helper id,
+  every stocker walks ×1.4 (`SKATES_SPEED`; Comfy Shoes is the shopkeeper's only). No skates drawn on them (user). Upgrades can have `needs` (a helper id,
   `canBuyUpgrade` in `js/sim/upgrades.js`). No save change.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
@@ -160,8 +160,8 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 **Next:** the rest of #59 (color variants, more items). Waiting on feedback: Roller Skates (#76), room prices (#75), register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71).
 
-**Releases:** the latest is **v2026.10.9.10** (2026-10-09): room prices (#75) and pinching out to the whole house
-(§18 #14); no save change. Everything on `main` is public. The MVP list in GDD §17 is complete.
+**Releases:** the latest is **v2026.10.9.11** (2026-10-09): Roller Skates (#76); before it v2026.10.9.10, room prices (#75)
+and pinching out to the whole house (§18 #14); no save changes. Everything on `main` is public. The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).
