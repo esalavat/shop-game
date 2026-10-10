@@ -1,7 +1,7 @@
 // Room types: how each kind of room looks and what furniture it starts with.
 
 /** Interior size of every room: width, height, depth, and wall/floor thickness. */
-export const ROOM_SIZE = { W: 3.4, H: 2.5, D: 2.6, T: 0.16 };
+export const ROOM_SIZE = { W: 3.4, H: 2.8, D: 2.6, T: 0.16 }; // H was 2.5; taller so more wallpaper shows (user, 2026-10-10)
 
 export const ROOM_TYPES = {
   shop: {

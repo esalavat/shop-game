@@ -201,6 +201,8 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   (`render` in `js/ui/styler.js`). Not released yet.
 - **Smaller shopkeeper creator, 2026-10-10** (user: couldn't see the changes): the same swipe-sideways rows as the decorate panel,
   each with its name beside it; about 340 px tall at phone size (`render` in `js/ui/creator.js`). Not released yet.
+- **Taller rooms, no upstairs front railing, 2026-10-10** (GDD v0.50 #88, user): `ROOM_SIZE.H` 2.5 → 2.8 in `js/data/rooms.js`
+  (everything, stairs included, follows it); `frontRail` removed from `js/render/building.js`. Not released yet.
 - **Fixed 2026-10-10: the Dream Dollhouse picker ran off the screen** with every color found (user's Pixel): capped at 48% of the
   screen, items scroll, Done always visible (docs/ISSUES.md). Not released yet.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,

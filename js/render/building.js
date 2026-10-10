@@ -51,7 +51,6 @@ export function createBuilding(rooms, lighting, preview = null) {
       box(group, W + 2 * T, T, D + 0.2, P.cream, cx, fy - T / 2, 0).castShadow = false;
     }
     if (!has(r.col, r.floor + 1)) box(group, W + 2 * T, T, D + 0.2, P.cream, cx, fy + H + T / 2, 0).castShadow = false;
-    if (r.floor > 0) frontRail(group, cx, fy);
     hitTargets.push(...furnishRoom(group, r, cx, fy, lighting, preview?.roomId === r.id ? preview.decor : null));
   }
 
@@ -68,13 +67,6 @@ function sideWall(group, x, fy, door) {
   box(group, T, H, z0 + D / 2, P.facade, x, fy + H / 2, (-D / 2 + z0) / 2);
   box(group, T, H, D / 2 - z1, P.facade, x, fy + H / 2, (z1 + D / 2) / 2);
   box(group, T, H - DOORWAY.h, DOORWAY.w, P.facade, x, fy + DOORWAY.h + (H - DOORWAY.h) / 2, DOORWAY.z);
-}
-
-/** A low railing along an upstairs room's open front. */
-function frontRail(group, cx, fy) {
-  const z = D / 2 - 0.02, h = 0.32;
-  box(group, W + T, 0.05, 0.06, P.cream, cx, fy + h, z).castShadow = false;
-  for (let x = -W / 2 + 0.1; x <= W / 2; x += 0.34) box(group, 0.04, h, 0.04, P.cream, cx + x, fy + h / 2, z).castShadow = false;
 }
 
 /**
