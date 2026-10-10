@@ -201,12 +201,13 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 - **Planned next:** feedback on the balancing pass (#80). Later: more items past 100 (#59), more stockers
   (#60), **Instant Delivery** (GDD §11, on the §17 roadmap, design to discuss), Heart/Sparkle milestone unlocks (§18 #6). 
 
-**Next:** feedback on the balancing pass (#80), the simpler order book (#82), the ladder (#83, #84) and #85-#87; then a release. Waiting on feedback: the balancing pass (#80), Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
+**Next:** playtest feedback on v2026.10.10.2 (#80-#87). Waiting on feedback: the balancing pass (#80), Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71).
 
-**Releases:** the latest is **v2026.10.10** (2026-10-10): Sweet Shop and Pet Corner (#79), **save version 20**
-(`state.pagesOpen`); before it v2026.10.9.12, color rounds (#77) and shopping by item (#78); v2026.10.9.11, Roller Skates (#76).
-Not released yet: the balancing script, the balancing pass (#80), "new items" (#81), the simpler order book (#82), the ladder (#83, #84) and #85-#87. **Save versions 21, 22 and 23** go out with them. The MVP list in GDD §17 is complete.
+**Releases:** the latest is **v2026.10.10.2** (2026-10-10): the balancing pass and script (#80), "new items" (#81), the simpler
+order book (#82), the helper and upgrade ladder (#83, #84), tips by sale and Roller Skates for everyone (#85), decorating with
+the first shelf room (#86) and picture-wallpaper Collection prizes (#87); **save versions 21-23**. Before it v2026.10.10, Sweet Shop
+and Pet Corner (#79, save v20). Everything on `main` is public. The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).
