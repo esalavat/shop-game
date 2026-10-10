@@ -5,6 +5,8 @@ import * as THREE from 'three';
 
 const PITCH = THREE.MathUtils.degToRad(9);
 const DISTANCE = 40;
+// Pinch limits, relative to what's framed. On a big house you can always pinch out far enough to see
+// all of it (`limits.fit`, GDD §18 #14), even past ZOOM_MIN.
 const ZOOM_MIN = 0.6, ZOOM_MAX = 2.5;
 
 export class CameraRig {
@@ -13,12 +15,13 @@ export class CameraRig {
     this.aspect = 1;
     this.target = { cx: 0, cy: 0, w: 1, h: 1, zoom: 1, lift: 0 };
     this.view = { ...this.target };
-    this.limits = { minX: -Infinity, maxX: Infinity, minY: -Infinity, maxY: Infinity };
+    this.limits = { minX: -Infinity, maxX: Infinity, minY: -Infinity, maxY: Infinity, fit: null };
     this.halfH = 1;
     this._center = new THREE.Vector3();
     this._dir = new THREE.Vector3();
   }
 
+  /** Pan limits, plus `fit`: { cx, cy, w, h }, the area the furthest pinch-out must be able to show. */
   setLimits(limits) {
     this.limits = limits;
     this._clamp();
@@ -45,12 +48,22 @@ export class CameraRig {
   }
 
   zoomBy(factor) {
-    this.target.zoom *= factor;
+    const t = this.target, fit = this.limits.fit, before = t.zoom;
+    t.zoom *= factor;
     this._clamp();
+    // Past ZOOM_MIN, drift toward the middle of the house so the furthest pinch-out shows all of it.
+    const min = this._zoomMin(), from = Math.min(before, ZOOM_MIN);
+    if (fit && t.zoom < from && from > min) {
+      const k = (from - t.zoom) / (from - min);
+      t.cx += (fit.cx - t.cx) * k;
+      t.cy += (fit.cy - t.cy) * k;
+      this._clamp();
+    }
   }
 
   resize(aspect) {
     this.aspect = aspect;
+    this._clamp();
   }
 
   update(dt, time) {
@@ -78,6 +91,13 @@ export class CameraRig {
     const t = this.target, L = this.limits;
     t.cx = THREE.MathUtils.clamp(t.cx, L.minX, L.maxX);
     t.cy = THREE.MathUtils.clamp(t.cy, L.minY, L.maxY);
-    t.zoom = THREE.MathUtils.clamp(t.zoom, ZOOM_MIN, ZOOM_MAX);
+    t.zoom = THREE.MathUtils.clamp(t.zoom, this._zoomMin(), ZOOM_MAX);
+  }
+
+  _zoomMin() {
+    const fit = this.limits.fit;
+    if (!fit) return ZOOM_MIN;
+    const halfH = (w, h) => Math.max(h / 2, w / 2 / this.aspect);
+    return Math.min(ZOOM_MIN, halfH(this.target.w, this.target.h) / halfH(fit.w, fit.h));
   }
 }

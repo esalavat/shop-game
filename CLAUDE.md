@@ -145,14 +145,14 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 - **Delivery bin, built 2026-10-09, works on the user's phone** (GDD v0.36 #74): two loose doorstep boxes, the rest in a
   crate at the right end of the doorstep with a count badge; tap it for a list by item, tap one to fetch it
   (`js/ui/bin.js`, `BIN` / `inBin` / `settleBoxes` in `js/sim/stock.js`, drawn in `js/render/views/boxes.js`). No save change.
-- **Pinch out further on a big house** (GDD §18 #14, docs/ISSUES.md): to do.
+- **Fixed 2026-10-09: pinch out further on a big house** (GDD §18 #14): pinching out can always show the whole house.
 - **Room costs to revisit** (GDD §18 #13): shops grow into a pyramid, not a square.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
 - **Planned next, in order:** (#59) **more items** (toward 100+, color variants). Later: more stockers
-  (#60), **Instant Delivery** (GDD §11, on the §17 roadmap, design to discuss), Heart/Sparkle milestone unlocks (§18 #6). Open issue: pinch-zoom limit on big houses (docs/ISSUES.md).
+  (#60), **Instant Delivery** (GDD §11, on the §17 roadmap, design to discuss), Heart/Sparkle milestone unlocks (§18 #6). 
 
-**Next:** room costs (§18 #13) and the zoom-out limit (§18 #14). Waiting on feedback: register rooms (#73), the
+**Next:** room costs (§18 #13), waiting on the user's pick (options proposed 2026-10-09). Waiting on feedback: register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71). Then the rest of #59 (color variants, more items). Waiting on feedback: the Collection bonus and theme
 rewards (#70), stock counts (#71).
 

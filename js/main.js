@@ -123,7 +123,7 @@ function buildWorld() {
   scene.add(group);
   lighting.fitTo(building.layout);
   const { width, roofTop } = building.layout;
-  rig.setLimits({ minX: -width / 2 - 1, maxX: width / 2 + 1, minY: 0.5, maxY: roofTop });
+  rig.setLimits({ minX: -width / 2 - 1, maxX: width / 2 + 1, minY: 0.5, maxY: roofTop, fit: { cx: 0, cy: (roofTop - 0.8) / 2, w: width + 2.4, h: roofTop + 2.4 } });
   // An invisible strip along the sidewalk, so she can be sent out onto the street.
   const street = new THREE.Mesh(new THREE.PlaneGeometry(width + 1, 0.8), new THREE.MeshBasicMaterial({ visible: false }));
   street.rotation.x = -Math.PI / 2;

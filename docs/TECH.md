@@ -260,7 +260,9 @@ docs/                   # GDD, tech plan
 
 ### 5.2 Camera
 - A rig with a **center**, **framing size** (fit room or whole building to the portrait screen), and **zoom**, with smoothing. Uses an **orthographic camera** (decided), front-on with a ~9° downward tilt.
-- Gestures: drag to pan (clamped to the building), pinch to zoom, tap a room to focus it.
+- Gestures: drag to pan (clamped to the building), pinch to zoom, tap a room to focus it. Pinch is limited to
+  0.6×–2.5× of what's framed, except that pinching out can always go far enough to show the whole house
+  (`limits.fit`, set in `buildWorld`); past 0.6× the view drifts to the middle of the house.
 
 ### 5.3 Models
 - Phase 1: **procedural low-poly builders in code** (boxes, cylinders, icosahedrons), like the prototype. Fast to iterate, zero asset pipeline.

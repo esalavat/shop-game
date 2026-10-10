@@ -21,11 +21,13 @@ Design questions (not bugs) belong in [GDD.md](GDD.md) §18.
   ones always go right of the shop (#64). Nothing breaks (routes work from any column), it just doesn't match the
   rule. Never on the public game.
 
-### Pinch-zoom doesn't go out far enough on a big house (2026-10-09, user)
+## Fixed
+
+### Pinch-zoom doesn't go out far enough on a big house (2026-10-09, user) — fixed
 - The furthest pinch-out is a fixed factor of what's framed (`ZOOM_MIN` in `js/render/camera.js`), so on a big
   building you can't see the whole house. It should grow with the house (GDD §18 #14).
-
-## Fixed
+- **Fix:** `CameraRig` gets the house's size (`limits.fit`); the pinch-out limit is 0.6× or whatever shows the
+  whole house, if that's further, and past 0.6× the view drifts to the middle of the house.
 
 ### Tapping the delivery bin did nothing on the phone (2026-10-09, user) — fixed
 - Taps on the 3D scene fire on `pointerup`; on a phone the browser then sends a click to the same spot. When the bin
