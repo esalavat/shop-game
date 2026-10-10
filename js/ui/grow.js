@@ -3,7 +3,7 @@
 // on the building (main.js placement mode); rooms further out cost more (GDD §18 #8). After the first
 // room comes the Stairwell, always built right next to the shop, then more floors, each pricier. The button glows when there's something new you can afford. Once the Window
 // Display is built, a separate Dollhouse button appears next to it and opens decorate mode. At the top,
-// Decorate rooms opens the room styler (ui/styler.js, GDD #68).
+// Decorate rooms opens the room styler (ui/styler.js, GDD #68), and Shop name the namer (ui/namer.js, GDD #91).
 // Helpers and upgrades come as a ladder (GDD #83): the sheet lists what you can get now, the next one
 // as a locked teaser, and what you already have as a small row of icons at the bottom.
 
@@ -13,6 +13,7 @@ import { displayRoom } from '../sim/collection.js';
 import { buyUpgrade, hireHelper, ladder } from '../sim/upgrades.js';
 import { HELPERS } from '../data/upgrades.js';
 import { events } from '../core/events.js';
+import { DEFAULT_SIGN } from '../sim/shopName.js';
 
 const ROOM_INFO = {
   display: {
@@ -21,7 +22,7 @@ const ROOM_INFO = {
   },
 };
 
-export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
+export function createGrow(state, { onDecorate, onPlaceRoom, onStyle, onName }) {
   const button = document.getElementById('btn-grow');
   const dollButton = document.getElementById('btn-dollhouse');
   const toolbar = document.getElementById('toolbar');
@@ -45,6 +46,7 @@ export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
     else if (kind === 'floor' && buildFloor(state)) sheet.hidden = true;
     else if (kind === 'place') { sheet.hidden = true; return onPlaceRoom(); }
     else if (kind === 'style') { sheet.hidden = true; return onStyle(); }
+    else if (kind === 'name') { sheet.hidden = true; return onName(); }
     else if (kind === 'register') { if (buildRegister(state)) sheet.hidden = true; }
     else if (kind === 'helper') hireHelper(state, id);
     else if (kind === 'upgrade') buyUpgrade(state, id);
@@ -66,7 +68,11 @@ export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
 
   function render() {
     const next = nextExpansion(state);
-    let html = !state.decorOpen ? '' : `<div class="grow-card small grow-style"><div class="grow-art" aria-hidden="true">🎨</div><div><h3>Decorate rooms</h3>
+    const name = (state.shopName || DEFAULT_SIGN.join(' ')).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    let html = `<div class="grow-card small"><div class="grow-art" aria-hidden="true">🪧</div><div><h3>${name}</h3>
+      <p>${state.shopName ? 'Your shop\'s name, up on the sign.' : 'Give your shop its own name for the sign on the roof!'}</p></div>
+      <button class="grow-build" data-buy="name">${state.shopName ? 'Change the name' : 'Name your shop'}</button></div>`;
+    html += !state.decorOpen ? '' : `<div class="grow-card small grow-style"><div class="grow-art" aria-hidden="true">🎨</div><div><h3>Decorate rooms</h3>
       <p>Wallpaper, floors, rugs, curtains and corner pieces, paid for with Ribbons 🎀 from granted wishes and new finds.</p></div>
       <button class="grow-build" data-buy="style">Decorate · 🎀 ${state.ribbons}</button></div>`;
     html += '<div class="grow-section">Rooms</div>';

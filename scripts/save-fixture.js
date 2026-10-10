@@ -57,6 +57,7 @@ s.best = { coins: 321 };
 s.shopkeeper = { ...s.shopkeeper, hair: 'pigtails', hairColor: '#6b3e2e', outfit: '#ff9ec4', accessory: 'bow', created: true };
 s.settings = { muted: true };
 s.tutorial = 'done';
+s.shopName = 'The Sparkly Teacup';
 
 const saved = { ...s };
 for (const key of TRANSIENT) delete saved[key];

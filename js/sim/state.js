@@ -6,7 +6,7 @@ import { createKeeper } from './keeper.js';
 import { dropBox } from './stock.js';
 import { emptyStats } from './day.js';
 
-export const STATE_VERSION = 23;
+export const STATE_VERSION = 24;
 
 /** Live-only fields: never saved, reset on every load (customers just walk in again). */
 export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer', 'cashier', 'greeter', 'dresser', 'registers', 'refunds'];
@@ -56,6 +56,7 @@ export function createState(now = Date.now()) {
     decor: { owned: {} }, // room styles bought with Ribbons ('kind:id' -> true; sim/decor.js); each room wears room.decor
     // The shopkeeper's look, girl or boy (the creator, ui/creator.js); `created` is false until the player has seen the creator.
     shopkeeper: { body: 'girl', hair: 'bun', hairColor: '#c2563a', skin: '#ffd9c2', outfit: '#9fe0c8', accessory: 'none', created: false },
+    shopName: '', // typed by the player (sim/shopName.js, GDD #91); '' shows the game's own sign
     themeGifts: [], // themes whose coin gift was given, in order (sim/rewards.js, GDD #70)
     upgrades: {}, // id -> true (data/upgrades.js)
     helpers: {},  // id -> true

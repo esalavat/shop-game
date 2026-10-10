@@ -164,6 +164,8 @@ const MIGRATIONS = {
     for (const [set, [kind, id]] of Object.entries(OLD_THEME_STYLES)) if (themeComplete(d.collection ?? {}, set)) owned[`${kind}:${id}`] = true;
     return { ...d, version: 23, decor: { ...d.decor, owned } };
   },
+  // v24: shops can have a name (GDD #91); existing shops keep the game's own sign until they pick one.
+  23: (d) => ({ ...d, version: 24, shopName: '' }),
 };
 
 export function migrate(data) {

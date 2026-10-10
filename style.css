@@ -386,6 +386,7 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 @keyframes fade-in { from { opacity: 0; } }
 @keyframes slide-up { from { transform: translateY(40%); } }
 @keyframes spring-up { from { transform: translateY(100%); } }
+@keyframes spring-down { from { transform: translateY(-100%); } }
 
 /* ---------- World-pinned bubbles & pop-ups ---------- */
 #overlay {
@@ -627,6 +628,27 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 .grow-theme span { font-size: 20px; }
 .grow-theme:disabled { opacity: 0.5; }
 .grow-done { padding: 10px; font-size: 14px; font-weight: 700; opacity: 0.7; text-align: center; }
+
+/* Name your shop (GDD #91): at the top, so the keyboard doesn't cover it. */
+.sheet.top { align-items: flex-start; }
+.sheet.top .sheet-body {
+  padding: calc(env(safe-area-inset-top) + 14px) 14px 16px;
+  border-radius: 0 0 24px 24px;
+  box-shadow: 0 -40px 0 var(--cream);
+  animation: spring-down 0.4s cubic-bezier(0.25, 1.35, 0.5, 1);
+}
+.namer-row { display: flex; gap: 8px; margin-top: 12px; }
+.namer-row input {
+  flex: 1; min-width: 0; padding: 12px 14px;
+  border: 2px solid var(--shadow); border-radius: 14px; background: #fff;
+  color: var(--ink); font: 800 18px var(--font);
+  -webkit-user-select: text; user-select: text;
+}
+.namer-row input:focus { outline: none; border-color: var(--pink); }
+.namer-idea { width: 52px; border: 0; border-radius: 14px; background: var(--butter); font-size: 24px; box-shadow: 0 3px 0 var(--shadow); }
+.namer-note { margin: 8px 2px 12px; min-height: 18px; font-size: 14px; font-weight: 700; opacity: 0.8; }
+.namer-note.bad { color: var(--pink-dark); opacity: 1; }
+.namer-reset { display: block; margin: 10px auto 0; padding: 6px; border: 0; background: none; color: var(--ink); font: 700 14px var(--font); opacity: 0.7; text-decoration: underline; }
 
 .grow-build {
   width: 100%;

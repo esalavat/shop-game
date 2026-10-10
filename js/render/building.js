@@ -9,6 +9,7 @@ import { wallMaterial, floorMaterial } from './patterns.js';
 import { FIXTURES } from '../data/fixtures.js';
 import { buildFixture, fixtureHitbox } from './models/furniture.js';
 import { STAIRS, DOORWAY } from '../sim/route.js';
+import { signLines } from '../sim/shopName.js';
 
 export const ROOM = ROOM_SIZE;
 const { W, H, D, T } = ROOM;
@@ -29,8 +30,11 @@ export function layoutRooms(rooms) {
 /** The hole in the Stairwell top's floor (room-local x0..x1, z0..z1), over the spiral stairs. */
 const STAIR_HOLE = { x0: -W / 2, x1: STAIRS.center.x + 0.6, z0: -D / 2 - 0.1, z1: STAIRS.center.z + 0.6 };
 
-/** `preview` ({ roomId, decor }) shows styles on one room without saving them (decorate mode). */
-export function createBuilding(rooms, lighting, preview = null) {
+/**
+ * `preview` ({ roomId, decor }) shows styles on one room without saving them (decorate mode). The roof sign
+ * shows `shopName` (GDD #91), or the game's own sign when it's empty; tapping it renames the shop.
+ */
+export function createBuilding(rooms, lighting, preview = null, shopName = '') {
   const group = new THREE.Group();
   const layout = layoutRooms(rooms);
   const occupied = new Set(rooms.map((r) => `${r.col},${r.floor}`));
@@ -56,7 +60,8 @@ export function createBuilding(rooms, lighting, preview = null) {
 
   const { width } = layout;
   box(group, width + 2 * T + 0.1, 0.4 - T, D + 0.3, P.foundation, 0, -0.4 + (0.4 - T) / 2, 0);
-  addRoofs(group, rooms, layout);
+  const sign = addRoofs(group, rooms, layout, shopName);
+  if (sign) hitTargets.push(sign);
   return { group, layout, hitTargets };
 }
 
@@ -74,7 +79,7 @@ function sideWall(group, x, fy, door) {
  * part of it gets a stepped roofline. A lower roof stops at the taller wall beside it. The sign sits
  * over the shop, and the chimney on the tallest roof.
  */
-function addRoofs(group, rooms, layout) {
+function addRoofs(group, rooms, layout, shopName) {
   const top = new Map();
   for (const r of rooms) top.set(r.col, Math.max(top.get(r.col) ?? -1, r.floor));
   const cols = [...top.keys()].sort((a, b) => a - b);
@@ -86,6 +91,7 @@ function addRoofs(group, rooms, layout) {
   }
   const tallest = runs.reduce((a, b) => (b.floor > a.floor || (b.floor === a.floor && b.to - b.from > a.to - a.from) ? b : a));
   const shop = rooms.find((r) => r.type === 'shop') ?? rooms[0];
+  let signMesh = null;
   for (const run of runs) {
     const y = layout.roomY(run.floor) + H + T;
     const tallerLeft = (top.get(run.from - 1) ?? -1) > run.floor, tallerRight = (top.get(run.to + 1) ?? -1) > run.floor;
@@ -98,11 +104,14 @@ function addRoofs(group, rooms, layout) {
     if (shop.col >= run.from && shop.col <= run.to) {
       const sx = Math.min(Math.max(layout.roomX(shop.col), left + 1.6), right - 1.6), signZ = (D + 0.6) / 2;
       box(group, 2.12, 0.9, 0.06, P.cream, sx, y + 0.62, signZ + 0.01);
-      const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.78), new THREE.MeshBasicMaterial({ map: signTexture(['My Dream', 'Dollhouse Shop']) }));
+      const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.78), new THREE.MeshBasicMaterial({ map: signTexture(signLines(shopName)) }));
       sign.position.set(sx, y + 0.62, signZ + 0.05);
+      sign.userData = { sign: true };
       group.add(sign);
+      signMesh = sign;
     }
   }
+  return signMesh;
 }
 
 /**

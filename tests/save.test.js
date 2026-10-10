@@ -317,3 +317,13 @@ test('a v20 save gets its coins back for Comfy Shoes and Gift Wrap, once, and ke
   assert.equal(plain.coins, 500);
   assert.equal(plain.refunds, undefined);
 });
+
+test('a v23 save gets an empty shop name, so it keeps the game\'s own sign (GDD #91)', () => {
+  const store = memoryStorage();
+  const v23 = { ...createState(0), version: 23 };
+  delete v23.shopName;
+  store.setItem(SAVE_KEY, JSON.stringify(v23));
+  const s = loadGame(store);
+  assert.equal(s.version, STATE_VERSION);
+  assert.equal(s.shopName, '');
+});

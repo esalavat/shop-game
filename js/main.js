@@ -57,6 +57,7 @@ import { giftCompleteThemes } from './sim/rewards.js';
 import { hasHelper } from './sim/upgrades.js';
 import { styleName } from './data/decor.js';
 import { createCreator } from './ui/creator.js';
+import { createNamer } from './ui/namer.js';
 import { createJuice } from './ui/juice.js';
 import { createAudio } from './audio/audio.js';
 import { createQuality } from './render/quality.js';
@@ -117,7 +118,7 @@ function buildWorld() {
     disposeTree(world.group);
   }
   lighting.resetLamps();
-  const building = createBuilding(state.building.rooms, lighting, stylePreview);
+  const building = createBuilding(state.building.rooms, lighting, stylePreview, state.shopName);
   const group = new THREE.Group();
   group.add(building.group, createEnvironment(building.layout, lighting));
   scene.add(group);
@@ -198,7 +199,18 @@ const decorate = createDecorate(state, thumbs, {
     if (room) focusRoom(room);
   },
 });
-const grow = createGrow(state, { onDecorate: () => enterDecorate(), onPlaceRoom: () => startPlacing(), onStyle: () => enterStyler() });
+const grow = createGrow(state, { onDecorate: () => enterDecorate(), onPlaceRoom: () => startPlacing(), onStyle: () => enterStyler(), onName: () => namer.open() });
+
+// Name your shop (GDD #91): from Grow or by tapping the roof sign; the new name goes up with a sparkle.
+const namer = createNamer(state, { onBoop: () => audio.play('boop') });
+events.on('shopNamed', ({ name }) => {
+  buildWorld();
+  focusAll();
+  const sign = world.building.hitTargets.find((m) => m.userData.sign);
+  if (sign) fx.sparkle(sign.getWorldPosition(new THREE.Vector3()), { count: 16, spread: 2.4 });
+  audio.play('sparkle');
+  if (name) toast(`Welcome to ${name}! 🪧✨`);
+});
 
 // ---------------------------------------------------------------------------
 // Decorate rooms (GDD #68): style the room above the panel with Ribbons
@@ -337,6 +349,7 @@ attachGestures(canvas, {
     if (hit.object.userData.spot) return tapSpot(hit.object.userData.spot);
     if (hit.object.userData.street) return tapStreet(hit.point);
     if (hit.object.userData.bin) return binSheet.open();
+    if (hit.object.userData.sign) return namer.open();
     const { roomId, fixtureId, boxId, customerId, floor } = hit.object.userData;
     const room = roomById(roomId);
     // The Dream Dollhouse opens decorate mode straight away.
@@ -571,7 +584,7 @@ const save = () => { if (!resetting) saveGame(state); };
 setInterval(save, AUTOSAVE_SECONDS * 1000);
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 addEventListener('pagehide', save);
-for (const e of ['orderPlaced', 'dayStarted', 'stocked', 'sale', 'phaseChanged', 'dayClosed', 'expanded', 'dollhouseChanged', 'upgradeBought', 'helperHired', 'lunchDelivery', 'decorChanged', 'decorBought']) events.on(e, save);
+for (const e of ['orderPlaced', 'dayStarted', 'stocked', 'sale', 'phaseChanged', 'dayClosed', 'expanded', 'dollhouseChanged', 'upgradeBought', 'helperHired', 'lunchDelivery', 'decorChanged', 'decorBought', 'shopNamed']) events.on(e, save);
 
 // ---------------------------------------------------------------------------
 // Debug (?debug)

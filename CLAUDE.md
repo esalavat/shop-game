@@ -218,7 +218,15 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 - **Sharing, designed 2026-10-10, next to build** (GDD v0.52 #91, §6.5): Share button → framed picture of the house +
   a link (shop packed after the `#`, no server) to a public view-only 3D visit page (zoom into rooms, shopkeeper and a few
   browsing customers, whole house / Dream Dollhouse / day-night buttons, "Get the game" later). Typed shop names on the roof
-  sign, frame and visit page (filter, §18 #21) — a save change.
+  sign, frame and visit page (filter, §18 #21).
+  - ✅ **Step 1, shop names, built 2026-10-10, waiting for feedback:** Grow → 🪧 card (top) or tap the roof sign → a panel at
+    the top of the screen (keyboard-safe): type up to 20 characters or 🎲 for an idea; "Use My Dream Dollhouse Shop" goes back.
+    The filter (`js/sim/shopName.js`, words in `js/data/badwords.js`) drops emoji and symbols, undoes look-alikes (sh1t,
+    f u c k), blocks phone numbers and websites, and lets innocent words through (Classic, Peacock, Grape). `safeName` is for
+    the visit page. Sign lines from `signLines`; `createBuilding(..., shopName)`; the sign is a hit target (`userData.sign`).
+    UI `js/ui/namer.js`. **Save version 24** (`state.shopName`, '' = the game's sign). `tests/shopName.test.js`.
+  - Next: step 2, the visit page (shop packed into the link), then 3 (shopkeeper, customers, view and day/night buttons),
+    then 4 (framed picture + share sheet).
 - **Planned: 9-room Dream Dollhouse** (GDD v0.53 #92): a 3 × 3 house, 🪙 4,000 on the ladder once Bright opens, as a
   customer boost when numbers level off; room names to settle (§18 #22).
 
