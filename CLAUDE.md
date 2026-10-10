@@ -177,8 +177,7 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   ×12 / ×144 (was ×16 / ×256); room prices ×1.35 per shelf room (`ROOM_GROWTH`), staircases ×1.6 past the list, register
   rooms ×2, `niceCost` rounding; pricier later helpers and upgrades (Theo 1,200, Juno 5,000, ...); **each catalog page also
   needs Hearts** (`ROUNDS[].hearts` in `js/data/items.js`; pages can open on a sale), so the bot finds all 96 in ~3.8 h.
-  No save change (opened pages stay open). Not yet checked in the browser (no free preview server that session): look at
-  the order book lock notes and the album teaser at phone size.
+  No save change (opened pages stay open). Lock notes and the album teaser checked at phone size; pushed to `/dev/`.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
 - **Planned next:** feedback on the balancing pass (#80). Later: more items past 100 (#59), more stockers
