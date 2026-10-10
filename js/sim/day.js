@@ -8,6 +8,7 @@ import { dropBox } from './stock.js';
 import { ITEMS, boxCost } from '../data/items.js';
 import { openPageCount, orderableItems } from './catalog.js';
 import { ribbonsForDay, ribbonsForFinds } from './decor.js';
+import { giftCompleteThemes } from './rewards.js';
 
 export const DAY_LENGTH = {
   open: 180,    // seconds of open hours
@@ -150,6 +151,7 @@ export function deliverOrders(state, isDue = (o) => dueInMorning(o, state.day.nu
   }
   events.emit('boxesChanged');
   ribbonsForFinds(state, discovered);
+  giftCompleteThemes(state);
   const opened = [];
   for (let page = pagesBefore; page < openPageCount(state); page++) {
     opened.push(page);

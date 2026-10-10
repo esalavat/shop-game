@@ -764,6 +764,9 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 }
 
 .creator-opts button.swatch { width: 36px; padding: 0; border-radius: 50%; }
+.creator-opts button.locked { opacity: 0.5; }
+.creator-opts button.swatch.locked { position: relative; }
+.creator-opts button.swatch.locked::after { content: '🔒'; position: absolute; inset: 0; display: grid; place-items: center; font-size: 14px; }
 .creator-opts button.on { border-color: var(--pink-dark); box-shadow: 0 0 0 2px #fff inset, 0 2px 0 var(--shadow); }
 
 /* ---------- Decorate mode ---------- */

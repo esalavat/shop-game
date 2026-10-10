@@ -35,7 +35,7 @@ notes, the day cycle (morning / open / short twilight evening / closing summary,
 Collection and Dream Dollhouse v0 (M6), and M7 (Mia the cashier, three upgrades, the shopkeeper
 creator, walking out to the Window Display and the greeter spot, Pip's rescue box).
 
-- **M8 (Polish pass), built 2026-10-09; the user approved the sounds, other feedback still to come** (GDD v0.15,
+- **M8 (Polish pass), built 2026-10-09, approved by the user** (GDD v0.15,
   decisions #45-50):
   - **Juice:** coins, tips and hearts pop at the register; hearts float up from happy customers;
     stocked items squash and stretch onto the shelf with a sparkle; an emptied box goes *poof*;
@@ -51,9 +51,8 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
     in Chrome with a 4× slower CPU at Pixel size (`docs/TECH.md` §5.4). Not yet checked on the real Pixel.
   - **PWA:** PNG app icons, network-first service worker (`sw.js`), so it installs to the home screen
     and opens offline (`docs/TECH.md` §9.3).
-  - Still to hear from the user: does the home-screen install work on the Pixel, and does the fps stay smooth?
 
-- **Bea the stocker, built 2026-10-09, waiting for the user's feedback** (GDD v0.18 #51, #53): 🪙 200 in
+- **Bea the stocker, built 2026-10-09, approved** (GDD v0.18 #51, #53): 🪙 200 in
   the Grow sheet. She fetches doorstep boxes (wished-for items first, then items not on the shelves) and
   unpacks them onto the emptiest shelf, in the morning, open hours and evening; never takes the box your
   shopkeeper is heading for; waits by the right wall. Code: `js/sim/stocker.js`, drawn in
@@ -74,27 +73,27 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   migrating, and sample saves in `tests/fixtures/saves/` that every release must load. Repo settings: the
   `github-pages` environment allows `v*` tags. First release **v2026.10.9** is out (2026-10-09).
 
-- **First-day guide, built 2026-10-09, waiting for the user's feedback** (GDD v0.22 #57): arrows over a box →
+- **First-day guide, built 2026-10-09, approved** (GDD v0.22 #57): arrows over a box →
   a shelf → Open shop → the register, once per new game (`js/sim/tutorial.js`, `js/ui/guide.js`;
   `state.tutorial`, save version 13, existing saves skip it). Plus an "Open your shop!" arrow any morning after
   5 s of nothing happening.
 
-- **Stairwell and upstairs rooms, built 2026-10-09, waiting for the user's feedback** (GDD v0.24 #58, #61, #64):
+- **Stairwell and upstairs rooms, built 2026-10-09, approved** (GDD v0.24 #58, #61, #64):
   Grow → Stairwell (🪙 350, after the first room); it always goes right next to the shop (rooms on that side move
   over) and builds two floors (spiral stairs, a shelf on each). Upstairs rooms connect through side doorways. Tap the
   stairs to send your shopkeeper up (the railing round the hole to come down). Customers and Bea climb too; everyone
   pays downstairs. Routes come in legs (`sim/route.js`, `docs/TECH.md` §4.3.3). `tests/stairs.test.js`. (Theme rooms,
   v0.23 #58, came first and were replaced by plain shelf rooms in #65.)
-- **Quick evenings, built 2026-10-09, waiting for the user's feedback** (GDD v0.25 #62): 10 s of twilight, then
+- **Quick evenings, built 2026-10-09, approved** (GDD v0.25 #62): 10 s of twilight, then
   shoppers pay for what they have or go home; the day closes once the last one has paid, while they're still walking
   away. **Close now** (#63, v0.26): in the evening the day button closes on the spot (two taps); customers put their
   things back on the shelves and go home (`sendEveryoneHome` in `sim/customers.js`, `closeNow` in `sim/day.js`).
-- **Plain shelf rooms, more floors, prices by distance, built 2026-10-09, waiting for the user's feedback** (GDD v0.28
+- **Plain shelf rooms, more floors, prices by distance, built 2026-10-09, approved** (GDD v0.28
   #65): theme rooms and Sorting Smarts are gone (save v16 turns built theme rooms into shelf rooms and refunds
   Sorting Smarts). Grow → Build a room → tap a ＋ (each shows its price: by ring around the middle, sideways or up,
   +15% per floor, so a squarish house is cheapest). Grow → Another floor raises the Stairwell (each staircase costs
   more). Routes climb floor by floor. Prices are first guesses (`js/data/rooms.js`).
-- **24 items on four catalog pages, built 2026-10-09, waiting for the user's feedback** (GDD v0.29 #66, the first step of
+- **24 items on four catalog pages, built 2026-10-09, approved** (GDD v0.29 #66, the first step of
   #59): 6 themes × 4 items; order book tabs Starter / Favorites / Fancy Finds / Treasures, opening at 4 / 10 / 16 items
   found (toast + confetti + a "new" dot); found items can always be reordered; customers only wish for orderable items;
   album sections per theme. `js/sim/catalog.js`, `PAGES` and `page` in `js/data/items.js`, 18 new models in
@@ -102,7 +101,7 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   Open tuning question: Sparkle maxes out traffic with one Treasure (GDD §18 #10).
 - **Back to the summary after ordering** (GDD v0.30 #67), done: ✕ on an order book opened from the summary
   reopens it; the toolbar's Day summary button is pink.
-- **Decoration shop and Ribbons 🎀, built 2026-10-09, waiting for the user's feedback** (GDD v0.31 #68, §9.5): a new
+- **Decoration shop and Ribbons 🎀, built 2026-10-09, approved** (GDD v0.31 #68, §9.5): a new
   currency, Ribbons, from granted wish notes (+1, the note is used up), window-peekers buying what they pointed at (+1),
   new Collection items (+2), complete themes (+5) and +1 per 5 happy customers at closing (summary line). 🎀 in the HUD.
   Grow → 🎨 Decorate rooms: bottom panel, ◀ ▶ or tap a room; tabs Walls (colour + pattern), Floor, Rug, Curtains (rooms
@@ -114,13 +113,21 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 - **Theme rewards** (GDD v0.32 #69), done: completing a theme gives a matching room style (`THEME_STYLES` in
   `js/data/decor.js`; ownership worked out from the Collection, no save change); the album shows each reward. The user
   approved the Ribbon rates and prices for now.
-- **Planned next, in order:** (#59) **more items** (toward 100+, color variants), the **Collection bonus** and page rewards (coins, confetti, a shopkeeper style). Later: more stockers
+- **Collection bonus and theme rewards, built 2026-10-09, waiting for the user's feedback** (GDD v0.33 #70): +2% visitors
+  per item found, +5% per complete theme, up to +50% (added to Sparkle); the album shows it. Completing a theme gives
+  🪙 100, then +50 for each one after, with confetti, and a shopkeeper style (Strawberry / Plum Velvet / Starry Night
+  outfits, Flower Crown, Bunny Ears, Royal Crown), 🔒 in the creator until then. Old saves get theirs on first load.
+  Code: `js/sim/rewards.js`, `COLLECTION` in `js/data/items.js`, `THEME_LOOKS` in `js/data/customers.js`; save version 18
+  (`state.themeGifts`).
+- **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
+  shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
+- **Planned next, in order:** (#59) **more items** (toward 100+, color variants). Later: more stockers
   (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issue: delivery boxes stack too
   high (delivery-bin idea, docs/ISSUES.md).
 
-**Next:** the rest of #59 (color variants, more items, Collection bonus, page rewards; themes already give a room style, #69). Still waiting on feedback: the 24 items
-and catalog pages, everything built 2026-10-09 (Stairwell, shelf rooms,
-floors and prices, quick evenings, Close now), M8 (home-screen install, fps on the Pixel), Bea, the first-day guide.
+**Next:** to discuss with the user: stock counts in the order book (tester, GDD §18 #11) and more helpers / upgrades
+(more registers, more stockers, a greeter; §18 #12). Then the rest of #59 (color variants, more items). Waiting on
+feedback: the Collection bonus and theme rewards (#70).
 
 **Releases:** the latest is **v2026.10.9.7** (2026-10-09): the day summary scrolls on a big day so "Start Day" stays on
 screen (no save change). Everything on `main` is public. The MVP list in GDD §17 is complete.

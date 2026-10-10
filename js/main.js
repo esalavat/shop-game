@@ -52,6 +52,7 @@ import { createGrow } from './ui/grow.js';
 import { createDecorate } from './ui/decorate.js';
 import { createStyler } from './ui/styler.js';
 import { SETS } from './data/items.js';
+import { giftCompleteThemes } from './sim/rewards.js';
 import { styleName } from './data/decor.js';
 import { createCreator } from './ui/creator.js';
 import { createJuice } from './ui/juice.js';
@@ -289,6 +290,7 @@ function enterDecorate(slotId) {
 // ---------------------------------------------------------------------------
 const creator = createCreator(state, {
   onChange: (look) => keeperView.setLook(look),
+  onLocked: (text) => { audio.play('boop'); toast(text); },
   onOpen() {
     orderBook.close();
     if (decorate.isOpen) decorate.close();
@@ -439,10 +441,20 @@ events.on('ribbons', ({ amount, why }) => {
 events.on('ribbons', ({ why, set, amount, style }) => {
   if (why !== 'theme') return;
   toast(`🌟 ${SETS[set]} complete! +${amount} 🎀`);
-  if (style) {
-    setTimeout(() => toast(`🎁 New room style: ${styleName(style.kind, style.id)}! Try it in Grow → 🎨 Decorate rooms`), 1200);
+  if (style) setTimeout(() => toast(`🎁 New room style: ${styleName(style.kind, style.id)}! Try it in Grow → 🎨 Decorate rooms`), 1200);
+});
+// A complete theme's coin gift and shopkeeper style (GDD #70), with confetti. Toasts wait their turn
+// behind the Ribbon and room style ones above.
+let giftDelay = 0;
+events.on('themeGift', ({ set, coins, look }) => {
+  const wait = 2400 + giftDelay;
+  giftDelay += 2400;
+  setTimeout(() => {
+    giftDelay -= 2400;
     juice.celebrate();
-  }
+    toast(`🎁 ${SETS[set]} gift: +${coins} 🪙!`);
+    setTimeout(() => toast(`👗 New shopkeeper style: ${look.name}! Tap your shopkeeper in the morning to try it`), 1200);
+  }, wait);
 });
 events.on('wishGranted', () => audio.play('twinkle'));
 events.on('dollhouseChanged', ({ slotId, gained }) => {
@@ -558,6 +570,7 @@ if (new URLSearchParams(location.search).has('debug')) {
 // Loop
 // ---------------------------------------------------------------------------
 dayUI.resume();
+giftCompleteThemes(state); // themes finished before the update get their gifts now (GDD #70)
 if (!state.shopkeeper.created) creator.open(); // new game, or the first time after the update
 else if (state.day.number === 1 && state.day.phase === 'morning') toast('Stock your shelves, then tap Open shop ☀️');
 fx.warmUp(renderer, rig.camera);

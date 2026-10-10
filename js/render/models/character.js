@@ -1,12 +1,14 @@
 // Chunky bean-shaped characters: big head, rosy cheeks, simple hair styles, and an optional
 // accessory. Girls' hair: bob, bun, pigtails, ponytail; boys' (GDD #43): short, spiky, curly, swoop.
-// Accessories: bow, glasses, sun hat, bow tie, cap.
+// Accessories: bow, glasses, sun hat, bow tie, cap; theme rewards (GDD #70): flower crown, bunny ears, crown.
 // `root` is moved and turned; `inner` is bobbed and wobbled for walk/idle animation.
 
 import * as THREE from 'three';
 import { mesh, box, ball, cyl } from './prims.js';
 import { PALETTE as P } from '../toon.js';
 
+const GOLD = '#ffd24d', GEM = '#ff7fb0', EAR = '#fff6ee', EAR_IN = '#ffb8d0', LEAF = '#8fd19e';
+const FLOWERS = ['#ff9ec4', '#ffd98a', '#c8b6ff', '#fff6ee'];
 const EYE = '#3a2a3a', CHEEK = '#ff9fb0', SHOE = '#5a3a55', BOW = '#ff7fb0', FRAMES = '#5a3a55', CAP = '#8fc8f0', BRIM = '#6fb0e0';
 
 /** Grown-up size relative to the room; kids can pass a smaller scale. */
@@ -100,6 +102,32 @@ function addAccessory(inner, accessory, hair) {
     brim.scale.set(1, 1, 0.75);
     brim.rotation.x = 0.55;
     ball(inner, 0.03, P.cream, 0, 1.13, -0.02, 0);
+  } else if (accessory === 'flowers') { // a ring of little flowers and leaves round the head
+    for (let i = 0; i < 12; i++) {
+      const a = (i / 12) * Math.PI * 2;
+      const x = Math.sin(a) * 0.235, z = Math.cos(a) * 0.215 - 0.02;
+      if (i % 2) ball(inner, 0.03, LEAF, x, 1.0, z, 0).scale.set(1, 0.6, 1.4);
+      else ball(inner, 0.052, FLOWERS[(i / 2) % FLOWERS.length], x, 1.0, z, 0);
+    }
+  } else if (accessory === 'bunny') { // tall ears on a headband
+    for (const side of [-1, 1]) {
+      const ear = ball(inner, 0.07, EAR, side * 0.11, 1.24, -0.03);
+      ear.scale.set(0.6, 2.0, 0.45);
+      ear.rotation.z = -side * 0.22;
+      const inside = ball(inner, 0.045, EAR_IN, side * 0.112, 1.23, 0.0, 0);
+      inside.scale.set(0.55, 1.9, 0.3);
+      inside.rotation.z = -side * 0.22;
+    }
+  } else if (accessory === 'crown') { // a little gold crown with points and a pink gem
+    const tilt = -0.15;
+    cyl(inner, 0.14, 0.13, 0.08, 14, GOLD, 0, 1.11, -0.01).rotation.x = tilt;
+    for (let i = 0; i < 5; i++) {
+      const a = ((i - 2) / 5) * Math.PI * 2 * 0.9;
+      const point = mesh(inner, new THREE.ConeGeometry(0.035, 0.08, 5), GOLD, Math.sin(a) * 0.13, 1.18 - Math.cos(a) * 0.01, Math.cos(a) * 0.12 - 0.02);
+      point.rotation.x = tilt;
+      ball(inner, 0.018, GOLD, point.position.x, point.position.y + 0.045, point.position.z, 0);
+    }
+    ball(inner, 0.03, GEM, 0, 1.11, 0.13, 0);
   } else if (accessory === 'hat') {
     cyl(inner, 0.33, 0.33, 0.025, 14, P.butter, 0, 1.0, -0.02).rotation.x = -0.12;
     cyl(inner, 0.17, 0.2, 0.15, 12, P.butter, 0, 1.08, -0.03).rotation.x = -0.12;

@@ -7,7 +7,7 @@ import { dropBox } from './stock.js';
 import { emptyStats } from './day.js';
 import { ribbonsForCollection } from './decor.js';
 
-export const STATE_VERSION = 17;
+export const STATE_VERSION = 18;
 
 /** Live-only fields: never saved, reset on every load (customers just walk in again). */
 export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer', 'cashier'];
@@ -52,6 +52,7 @@ export function createState(now = Date.now()) {
     decor: { owned: {} }, // room styles bought with Ribbons ('kind:id' -> true; sim/decor.js); each room wears room.decor
     // The shopkeeper's look, girl or boy (the creator, ui/creator.js); `created` is false until the player has seen the creator.
     shopkeeper: { body: 'girl', hair: 'bun', hairColor: '#c2563a', skin: '#ffd9c2', outfit: '#9fe0c8', accessory: 'none', created: false },
+    themeGifts: [], // themes whose coin gift was given, in order (sim/rewards.js, GDD #70)
     upgrades: {}, // id -> true (data/upgrades.js)
     helpers: {},  // id -> true
     stocker: null, // Bea, once hired (sim/stocker.js); saved, so boxes in her hands are never lost

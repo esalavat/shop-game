@@ -26,6 +26,20 @@ export const LOOKS = {
 export const ADULT_SCALE = 1.15;
 export const KID_SCALE = 0.9;
 
+/**
+ * Shopkeeper styles you get by completing a theme in the Collection (GDD #70), for girls and boys:
+ * theme (SETS in data/items.js) -> [creator row, value, name]. Locked until then (sim/rewards.js).
+ */
+export const THEME_LOOKS = {
+  tea: ['outfit', '#ff6f8e', 'Strawberry outfit'],
+  parlor: ['outfit', '#9466c4', 'Plum Velvet outfit'],
+  fairy: ['accessory', 'flowers', 'Flower Crown'],
+  bedroom: ['outfit', '#5f6fcf', 'Starry Night outfit'],
+  dolls: ['accessory', 'bunny', 'Bunny Ears'],
+  houses: ['accessory', 'crown', 'Royal Crown'],
+};
+const REWARD_ACCESSORIES = [['flowers', 'Flower crown 🌸'], ['bunny', 'Bunny ears 🐰'], ['crown', 'Crown 👑']];
+
 /** Choices in the shopkeeper creator (ui/creator.js). */
 export const CREATOR = {
   bodies: [['girl', 'Girl 👧'], ['boy', 'Boy 👦']], // GDD #43: the first choice
@@ -35,9 +49,9 @@ export const CREATOR = {
   },
   hairColors: LOOKS.hairColors,
   skins: LOOKS.skins,
-  outfits: LOOKS.outfits,
+  outfits: [...LOOKS.outfits, ...Object.values(THEME_LOOKS).filter(([row]) => row === 'outfit').map(([, c]) => c)],
   accessories: {
-    girl: [['none', 'None'], ['bow', 'Bow 🎀'], ['glasses', 'Glasses 👓'], ['hat', 'Sun hat 👒']],
-    boy: [['none', 'None'], ['bowtie', 'Bow tie 🎀'], ['glasses', 'Glasses 👓'], ['cap', 'Cap 🧢']],
+    girl: [['none', 'None'], ['bow', 'Bow 🎀'], ['glasses', 'Glasses 👓'], ['hat', 'Sun hat 👒'], ...REWARD_ACCESSORIES],
+    boy: [['none', 'None'], ['bowtie', 'Bow tie 🎀'], ['glasses', 'Glasses 👓'], ['cap', 'Cap 🧢'], ...REWARD_ACCESSORIES],
   },
 };

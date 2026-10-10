@@ -270,3 +270,15 @@ test('a v16 save gets Ribbons for its Collection and no styles yet (GDD #68)', (
   assert.equal(s.day.stats.ribbons, 0);
   assert.equal(s.building.rooms[0].decor, undefined);
 });
+
+test('a v17 save gets theme coin gifts on the next load, not in the migration (GDD #70)', () => {
+  const store = memoryStorage();
+  const v17 = { ...createState(0), version: 17 };
+  delete v17.themeGifts;
+  v17.collection = { teaset: true, cupcakes: true, trolley: true, caketower: true, chair: true };
+  store.setItem(SAVE_KEY, JSON.stringify(v17));
+  const s = loadGame(store);
+  assert.equal(s.version, STATE_VERSION);
+  assert.deepEqual(s.themeGifts, []);
+  assert.equal(s.coins, v17.coins);
+});

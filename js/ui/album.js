@@ -1,9 +1,12 @@
 // The Collection album: every item as a sticker, one section per theme (GDD #66). Found ones are in
-// color; the rest are silhouettes. Each theme shows the room style it gives when complete (GDD #69). A little house badge marks what's on show in the Dream Dollhouse.
+// color; the rest are silhouettes. Each theme shows the room style (GDD #69), shopkeeper style and coin
+// gift (#70) it gives when complete, and the top shows the Collection bonus. A little house badge marks what's on show in the Dream Dollhouse.
 
 import { ITEMS, SETS } from '../data/items.js';
 import { dollhouseItems } from '../sim/collection.js';
 import { THEME_STYLES, styleName } from '../data/decor.js';
+import { THEME_LOOKS } from '../data/customers.js';
+import { collectionBonus } from '../sim/rewards.js';
 
 export function createAlbum(state, thumbs) {
   const sheet = document.getElementById('album');
@@ -17,6 +20,7 @@ export function createAlbum(state, thumbs) {
     count.textContent = found.length === ids.length
       ? `All ${ids.length} treasures found! 🎉`
       : `${found.length} of ${ids.length} treasures found`;
+    count.textContent += ` · Collection bonus: +${Math.round(collectionBonus(state) * 100)}% customers 🛍️`;
     const sticker = (id) => {
       const item = ITEMS[id], have = state.collection[id];
       return `<div class="sticker${have ? '' : ' locked'}">
@@ -29,7 +33,8 @@ export function createAlbum(state, thumbs) {
       const inSet = ids.filter((id) => ITEMS[id].set === set);
       const got = inSet.filter((id) => state.collection[id]).length;
       const done = got === inSet.length;
-      const reward = `<div class="album-reward${done ? ' done' : ''}">🎁 ${styleName(...THEME_STYLES[set])}${done ? ': yours! ✓' : ' room style when complete'}</div>`;
+      const prizes = `${styleName(...THEME_STYLES[set])} and ${THEME_LOOKS[set][2]}`;
+      const reward = `<div class="album-reward${done ? ' done' : ''}">🎁 ${done ? `${prizes}: yours! ✓` : `${prizes}, plus a 🪙 gift, when complete`}</div>`;
       return `<div class="album-set"><span>${name}</span><span>${done ? '🌟' : ''} ${got} / ${inSet.length}</span></div>
         ${inSet.map(sticker).join('')}${reward}`;
     }).join('');

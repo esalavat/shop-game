@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.32 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.33 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -76,6 +76,7 @@
 | 67 | **Back to the summary after ordering** (user): closing the order book you opened from the day summary brings the summary back, so "Start Day N" is right there. After closing, the toolbar's **Day summary** button is pink like the other "do this next" buttons (Open shop, Close early) | v0.30 |
 | 68 | **Decoration shop and Ribbons 🎀** (user; resolves §18 #9): a new currency, **Ribbons 🎀**, earned by caring for customers and collecting, not by selling more: **+1** when a sale grants a wish note (the note is used up), **+1** when a window-peeker buys the thing they pointed at, **+2** for each new Collection item, **+5** for completing a theme (all four items), and an end-of-day gift of **+1 per 5 happy customers**. New shops start with 🎀 4 (the two starter items); existing shops get 🎀 2 per item found plus 5 per complete theme. **Grow → 🎨 Decorate rooms** opens decorate mode: the camera zooms to a room above a bottom panel; ◀ ▶ (or tapping a room) changes room. Every room can be styled: **Walls** (colour and pattern), **Floor**, **Rug**, **Curtains** (rooms with a window) and the **Corner** piece (the room's plant spot). Tapping a style **shows it on the room straight away**; one you don't own shows its 🎀 price and a Get it button. **Bought once, yours forever, in any room**; restyling is free. The colours and looks already in the game are free. **Styles are just for looks** (no Sparkle or bonus). The shop keeps running while you decorate. Prices are first guesses (`js/data/decor.js`) | v0.31 |
 | 69 | **Complete a theme, get a room style** (user): finishing a theme in the Collection (all four items) gives a matching room style for free, on top of the 🎀 5: Tea Time → Gingham wallpaper, Cozy Parlor → Bookcase, Fairy Garden → Flower rug, Sweet Dreams → Stars wallpaper, Doll Friends → Hearts wallpaper, Little Houses → Pink checker floor. They can still be bought with Ribbons before that. The album shows each theme's reward; a toast and confetti announce it. Themes completed before the update count. The user is happy with the Ribbon rates and prices for now (balance later if needed) | v0.32 |
+| 70 | **Collection bonus and theme rewards** (user; part of #59): every item found brings **+2% more visitors** and every complete theme **+5% more**, up to **+50%**; it adds to Sparkle's boost (so at most twice as many visitors). The album shows the bonus ("Collection bonus: +16% customers"). Completing a theme (an album page) also gives a **coin gift with confetti**: 🪙 **100** for the first theme you complete, **+50** for each one after (100, 150, 200 ... 350), and a **shopkeeper style** for girls and boys, a mix of outfit colours and accessories: Tea Time → **Strawberry** outfit, Cozy Parlor → **Plum Velvet** outfit, Fairy Garden → **Flower Crown**, Sweet Dreams → **Starry Night** outfit, Doll Friends → **Bunny Ears**, Little Houses → **Royal Crown**. Locked styles show in the creator with a 🔒 and say which theme unlocks them. Shops that already finished themes get the coins and styles the first time they open the updated game. Numbers are first guesses (`js/data/items.js` `COLLECTION`) | v0.33 |
 
 ## 1. Pitch
 
@@ -187,7 +188,7 @@ Your very own dollhouse, displayed in the shop's front window.
 ### 6.2 The Collection
 - Every item you **receive in a delivery** (or get as a story gift) is added to your **Collection**, a sticker-book style album.
 - **v0 album (v0.9):** one page with every item as a sticker (found = in color, not yet = silhouette with "Order one to find it"), a "4 of 6 found" count, and a 🏠 badge on items in your dollhouse.
-- **24 items (v0.29, #66):** the album has one section per theme with four stickers each and a "1 / 4" count (🌟 when complete). Page rewards come next (#59).
+- **24 items (v0.29, #66):** the album has one section per theme with four stickers each and a "1 / 4" count (🌟 when complete). Page rewards came in v0.33 (#70).
 
   | Page (opens at) | Tea Time | Cozy Parlor | Fairy Garden | Sweet Dreams | Doll Friends | Little Houses |
   |---|---|---|---|---|---|---|
@@ -200,7 +201,16 @@ Your very own dollhouse, displayed in the shop's front window.
 - Anything in your Collection can be placed in the Dream Dollhouse **for free and forever**. It doesn't use up shop stock.
 - Collection pages fill in by theme (Tea Time, Sweet Dreams Bedroom, Pet Friends, Princess Castle…). Completing a page gives a reward.
 - **Growing to 100+ items (v0.23, #59):** prices scale up the way they do now (fancier = costs more, more profit). Many items come in **color variants**, each its own sticker. New **catalog pages open in the order book as you find more items**; the fanciest come last.
-- **Collection bonus (#59):** each item found brings a few percent more customers (stacks with Sparkle). **Completing a page** gives a bigger customer boost, a coin gift with confetti, and a shopkeeper style (an outfit color or accessory).
+- **Collection bonus (#59, built in v0.33 #70):** each item found brings **+2%** more customers and each complete theme **+5%**, up to **+50%**, added to Sparkle's boost. **Completing a theme** also gives a **coin gift with confetti** (🪙 100 for the first, +50 for each after), a room style (#69), 🎀 5 (#68), and a **shopkeeper style**:
+
+  | Theme | Shopkeeper style |
+  |---|---|
+  | Tea Time | Strawberry outfit colour |
+  | Cozy Parlor | Plum Velvet outfit colour |
+  | Fairy Garden | Flower Crown accessory |
+  | Sweet Dreams | Starry Night outfit colour |
+  | Doll Friends | Bunny Ears accessory |
+  | Little Houses | Royal Crown accessory |
 - Some **special treasures** only come from story events and can't be bought.
 - That makes ordering new kinds of stock exciting twice: once for the shop, and once for your Collection.
 
@@ -409,7 +419,8 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - [x] **Stairwell and upstairs rooms** (#58, step 2, #61)
 - [ ] More than one stocker (#60, later)
 - [x] **24 items on four catalog pages that open as you collect** (#66, first step of #59)
-- [ ] **Color variants, more items toward 100+, Collection bonus and page rewards** (#59)
+- [x] **Collection bonus and theme rewards: coins, shopkeeper styles** (#70, part of #59)
+- [ ] **Color variants and more items toward 100+** (#59)
 - [x] **Decoration shop with Ribbons 🎀:** style every room's walls, floor, rug, curtains and corner (#68)
 - Building grid expansion (X and Y), room types, pan/zoom
 - More morning picks and special days
@@ -439,3 +450,5 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 8. ~~**Rethink the building**~~ (user, 2026-10-09). **Resolved in v0.27-v0.28 (decisions #64, #65):** the Stairwell always goes right of the shop, rooms are plain shelf rooms, floors keep going up (each staircase pricier), and rooms cost more the further they are from the middle, sideways or up. Prices are first guesses to tune with play. A **decoration shop** (its own currency, styles each room) is next to design.
 9. ~~**Decoration shop**~~ (user, 2026-10-09). **Resolved in v0.31-v0.32 (#68, #69):** Ribbons 🎀 (wishes granted, window wants, Collection finds, happy days); walls, floor, rug, curtains and corner per room; buy once, use anywhere; just for looks; completing a theme gives a style. Rates and prices approved for now; rebalance if playtests show problems.
 10. **Sparkle tops out fast with fancy items** (2026-10-09, #66): visitor traffic is already at its 1.5× cap at 30 Sparkle, and one Treasure (e.g. the Castle Dollhouse, 35) gets there alone. Rethink the Sparkle curve (higher cap, or more Sparkle needed) when tuning the new items.
+11. **Seeing your stock** (tester, 2026-10-09): a tester wants to see all their inventory: they try to stock evenly and make sure they have everything, and it's hard to tell what's on the shelves. Idea (user): the order book shows how many of each item you already have when buying. Not designed yet.
+12. **More helpers and upgrades** (user, 2026-10-09): more registers, more stockers (#60), and other people such as a greeter. Not designed yet.

@@ -69,6 +69,7 @@ test('a fully decorated house gets bonus Sparkle', () => {
 
 test('Sparkle brings visitors more often, up to a cap', () => {
   const s = withDisplay();
+  s.collection = {}; // no Collection bonus (GDD #70)
   assert.equal(trafficBoost(s), 1);
   s.sparkle = 30;
   assert.ok(trafficBoost(s) > 1 && trafficBoost(s) <= SPARKLE.trafficMax);

@@ -65,6 +65,7 @@ js/
     tutorial.js         # First-day guide steps (state.tutorial: box → shelf → open → register → done), advanced each tick
     stocker.js          # Bea the stocker: fetches doorstep boxes and unpacks them in any room; Sorting Smarts (state.stocker, saved)
     upgrades.js         # Buying upgrades / hiring helpers (one-time; state.upgrades, state.helpers)
+    rewards.js          # The Collection pays off (GDD #70): visitor bonus, theme coin gifts, shopkeeper styles from themes
     decor.js            # Ribbons (earning: wishes granted, window wants, finds, themes, end of day) and buying / putting on room styles (GDD #68)
     route.js            # Walking between rooms and onto the street (planRoute, startRoute/finishRoute/settleRoute/routeTo, doors)
     economy.js          # Coins, Hearts, Sparkle, costs
@@ -123,10 +124,11 @@ docs/                   # GDD, tech plan
 
 ```js
 {
-  version: 17,                         // STATE_VERSION (js/sim/state.js)
+  version: 18,                         // STATE_VERSION (js/sim/state.js)
   day: { number: 1, phase: 'morning', time: 0 },
   coins: 50, hearts: 0, sparkle: 0, ribbons: 4,   // Ribbons 🎀 for room styles (v17)
   decor: { owned: { 'pattern:stars': true } },     // styles bought (v17); free ones (price 0) aren't listed
+  themeGifts: ['tea'],                 // themes whose coin gift was given, in order (v18, GDD #70)
   building: { rooms: [{ id, type, col, floor, style?, decor?, fixtures: [{ id, kind, x, z, slots? }] }] }, // type: shop | display | room | stairs | landing; style: shelf rooms (v16); decor: { kind: optionId } chosen styles (v17)
   stock: { boxes: [...], back: { itemId: count } },
   orders: [{ itemId, qty, arrivesDay }],
@@ -166,6 +168,12 @@ docs/                   # GDD, tech plan
   All go through `addRibbons`, which also counts `day.stats.ribbons` and emits `ribbons`.
 - Theme rewards (GDD #69): `ownsDecor` also counts a style as owned when the theme in `THEME_STYLES` that gives it is
   complete, so nothing extra is saved and old saves get theirs on load.
+- Collection rewards (GDD #70, `sim/rewards.js`): `collectionBonus` (+2% per item found, +5% per complete theme, up to
+  +50%; numbers in `COLLECTION`, `data/items.js`) is added to Sparkle's boost in `trafficBoost`. `giftCompleteThemes`
+  pays a coin gift for each complete theme not yet in `state.themeGifts` (🪙 100, then +50 each) and emits `themeGift`;
+  it runs after each delivery and once on load (so themes finished before v18 pay out with the celebration).
+  Shopkeeper styles (`THEME_LOOKS` in `data/customers.js`) are owned when their theme is complete (`ownsLook`); the
+  creator shows the rest with a 🔒.
 
 ### 4.3.2 Helpers & upgrades (M7)
 - `sim/helpers.js`: Mia stands at the counter's use spot (the till). When the shopkeeper is at the counter or walking
@@ -405,15 +413,16 @@ Each milestone ends with a push so it's playable on your phone.
 | Feature | Status |
 |---|---|
 | Public game from releases, test build at `/dev/`, save safety (GDD #56, §9) | ✅ |
-| First-day guide and morning Open-shop nudge (#57) | ✅ built, on /dev/ |
+| First-day guide and morning Open-shop nudge (#57) | ✅ approved |
 | Theme rooms on the ground floor + Sorting Smarts (#58 step 1, #60) | ✅ built, then replaced by plain shelf rooms (#65) |
 | Crowd deadlock fix (customers stuck behind the line) | ✅ |
-| Stairwell and upstairs rooms (#58 step 2, #61, #64) | ✅ built (waiting for the user's feedback); see §4.3.3, §11.1 |
-| Quick evenings and Close now (#62, #63) | ✅ built (waiting for the user's feedback) |
-| Plain shelf rooms, more floors, prices by distance (#65) | ✅ built (waiting for the user's feedback) |
-| Decoration shop with Ribbons 🎀 (#68) | ✅ built (waiting for the user's feedback); see §4.3.1 |
-| 24 items on four catalog pages that open as you collect (#66) | ✅ built (waiting for the user's feedback) |
-| Color variants, more items, Collection bonus and page rewards (#59) | ⏭ next |
+| Stairwell and upstairs rooms (#58 step 2, #61, #64) | ✅ approved; see §4.3.3, §11.1 |
+| Quick evenings and Close now (#62, #63) | ✅ approved |
+| Plain shelf rooms, more floors, prices by distance (#65) | ✅ approved |
+| Decoration shop with Ribbons 🎀 (#68) | ✅ approved; see §4.3.1 |
+| 24 items on four catalog pages that open as you collect (#66) | ✅ approved |
+| Collection bonus and theme rewards: coins, shopkeeper styles (#70, part of #59) | ✅ built (waiting for the user's feedback) |
+| Color variants and more items (#59) | ⏭ later |
 
 ### 11.1 Plan: Stairwell and upstairs (#58 step 2) — ✅ built 2026-10-09
 The plan as worked out; it was built this way (GDD #61, §4.3.3). Differences: the upstairs half is its own room

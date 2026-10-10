@@ -119,6 +119,9 @@ const MIGRATIONS = {
     decor: { owned: {} },
     day: { ...d.day, stats: { ribbons: 0, ...d.day.stats } },
   }),
+  // v18: theme coin gifts (GDD #70). None given yet: themes already complete are paid on the next
+  // load (giftCompleteThemes in main.js), with the celebration.
+  17: (d) => ({ ...d, version: 18, themeGifts: [] }),
 };
 
 export function migrate(data) {

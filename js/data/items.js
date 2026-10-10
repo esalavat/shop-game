@@ -55,3 +55,15 @@ export const PAGES = [
 export const boxCost = (itemId) => ITEMS[itemId].cost * ITEMS[itemId].perBox;
 /** What a whole box earns once every item sells (before tips). */
 export const boxProfit = (itemId) => (ITEMS[itemId].price - ITEMS[itemId].cost) * ITEMS[itemId].perBox;
+
+/**
+ * The Collection pays off (GDD #70): more visitors for every item found and theme complete (added to
+ * Sparkle's boost), and a coin gift for each theme you complete, bigger each time.
+ */
+export const COLLECTION = {
+  perItem: 0.02,   // +2% visitors per item found
+  perTheme: 0.05,  // +5% more per complete theme
+  maxBonus: 0.5,   // up to +50%
+  giftFirst: 100,  // coins for the first theme you complete...
+  giftStep: 50,    // ...and this much more for each one after
+};

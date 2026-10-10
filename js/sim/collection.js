@@ -6,6 +6,7 @@ import { events } from '../core/events.js';
 import { ITEMS } from '../data/items.js';
 import { DOLLHOUSE_SLOTS, SPARKLE } from '../data/dollhouse.js';
 import { ROOM_SIZE } from '../data/rooms.js';
+import { collectionBonus } from './rewards.js';
 
 export const slotById = (slotId) => DOLLHOUSE_SLOTS.find((s) => s.id === slotId);
 
@@ -37,9 +38,9 @@ export function placeInDollhouse(state, slotId, itemId) {
 
 export const dollhouseItems = (state) => new Set(Object.values(state.dollhouse.slots).filter(Boolean));
 
-/** How many times as often visitors arrive, thanks to Sparkle. */
+/** How many times as often visitors arrive, thanks to Sparkle and the Collection bonus (GDD #70). */
 export function trafficBoost(state) {
-  return Math.min(SPARKLE.trafficMax, 1 + state.sparkle / SPARKLE.trafficFull);
+  return Math.min(SPARKLE.trafficMax, 1 + state.sparkle / SPARKLE.trafficFull) + collectionBonus(state);
 }
 
 /** Chance a new visitor stops at the window first (0 with nothing on show or no window). */
