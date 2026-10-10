@@ -30,6 +30,8 @@ Design questions (not bugs) belong in [GDD.md](GDD.md) §18.
   boxes poking out, or a count, so you can still see at a glance that deliveries came. Bea would take boxes from
   the bin the same way. Needs a design pass (GDD) before building: where the bin sits, whether some boxes still
   show on the doorstep, and how the first-day guide's "Tap a box!" arrow (#57) points at the bin.
+- **Designed 2026-10-09 (GDD #74), being built:** three loose doorstep spots plus a delivery bin with a count badge and
+  a list to pick from.
 
 ## Fixed
 
