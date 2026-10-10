@@ -9,10 +9,13 @@ import { hasUpgrade } from './upgrades.js';
 
 /**
  * Where Pip leaves delivery boxes: on the doorstep (the sidewalk just in front of the shop room,
- * room-local coordinates, below floor level). Extra boxes stack on top. They sit at the right end,
- * away from the counter, so a big delivery never hides the register (docs/ISSUES.md).
+ * room-local coordinates, below floor level). They sit at the right end, away from the counter, so a
+ * big delivery never hides the register (docs/ISSUES.md). Two boxes sit loose; the rest go in the
+ * delivery bin beside them (GDD #74), so nothing stacks up in front of the shelves. The bin stays in
+ * front of the shop, so it's in view when the camera is on the shop.
  */
-export const BOX_SPOTS = [{ x: 0.66, z: 1.72 }, { x: 1.04, z: 1.72 }, { x: 1.42, z: 1.72 }, { x: 1.8, z: 1.72 }];
+export const BOX_SPOTS = [{ x: 0.66, z: 1.72 }, { x: 1.04, z: 1.72 }];
+export const BIN = { x: 1.44, z: 1.72 };
 export const DOORSTEP_Y = -0.4; // sidewalk height relative to the shop floor
 export const BOX_SIZE = 0.36;
 export const DOORWAY_Z = 1.1; // where you stand inside the shop to lean out and grab a doorstep box
@@ -22,10 +25,13 @@ export function newId(state, prefix) {
   return `${prefix}${state.nextId}`;
 }
 
-/** Spot index i maps to BOX_SPOTS[i % n], stacked layer floor(i / n). */
+/** Spots 0-1 are on the doorstep; any higher spot is in the delivery bin. */
+export const inBin = (box) => box.spot >= BOX_SPOTS.length;
+
+/** Where a box spot is (layer is always 0 now: boxes in the bin sit inside it). */
 export function boxSpot(i) {
-  const s = BOX_SPOTS[i % BOX_SPOTS.length];
-  return { x: s.x, z: s.z, layer: Math.floor(i / BOX_SPOTS.length), y: DOORSTEP_Y };
+  const s = i < BOX_SPOTS.length ? BOX_SPOTS[i] : BIN;
+  return { x: s.x, z: s.z, layer: 0, y: DOORSTEP_Y, bin: i >= BOX_SPOTS.length };
 }
 
 export function shopRoomId(state) {
@@ -33,20 +39,22 @@ export function shopRoomId(state) {
 }
 
 /**
- * Boxes fall into gaps: when a box leaves the bottom of a stack, the ones above it drop down a layer
- * (docs/ISSUES.md: they used to float). Returns true if anything moved.
+ * When a doorstep spot frees up, the next box comes out of the bin onto it (GDD #74); boxes in the bin
+ * keep their order. Also tidies old saves, whose stacked boxes go in the bin. Returns true if anything moved.
  */
 export function settleBoxes(state) {
   const n = BOX_SPOTS.length;
-  let moved = false, again = true;
-  while (again) {
-    again = false;
-    for (const b of state.boxes) {
-      if (b.spot < n) continue;
-      if (state.boxes.some((o) => o.roomId === b.roomId && o.spot === b.spot - n)) continue;
-      b.spot -= n;
-      moved = again = true;
+  let moved = false;
+  for (const roomId of new Set(state.boxes.map((b) => b.roomId))) {
+    const here = state.boxes.filter((b) => b.roomId === roomId);
+    const used = new Set(here.filter((b) => b.spot < n).map((b) => b.spot));
+    const binned = here.filter((b) => b.spot >= n).sort((a, b) => a.spot - b.spot);
+    for (let spot = 0; spot < n && binned.length; spot++) {
+      if (used.has(spot)) continue;
+      binned.shift().spot = spot;
+      moved = true;
     }
+    binned.forEach((b, i) => { if (b.spot !== n + i) { b.spot = n + i; moved = true; } });
   }
   return moved;
 }

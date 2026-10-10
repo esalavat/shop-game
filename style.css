@@ -903,3 +903,6 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 .album-reward { grid-column: 1 / -1; margin: -2px 2px 4px; font-size: 12px; font-weight: 700; opacity: 0.6; }
 .album-reward.done { opacity: 0.9; color: #b8336a; }
 .sty-buy small { font-weight: 700; opacity: 0.7; }
+
+/* The delivery bin's list (GDD #74): box cards you tap to fetch. */
+.card.bin-box { font: inherit; color: inherit; cursor: pointer; }

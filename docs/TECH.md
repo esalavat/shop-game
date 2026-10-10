@@ -424,6 +424,8 @@ Each milestone ends with a push so it's playable on your phone.
 | Collection bonus and theme rewards: coins, shopkeeper styles (#70, part of #59) | ✅ built (waiting for the user's feedback) |
 | Stock counts in the order book (#71) | ✅ built (waiting for the user's feedback); `stockCount` in `sim/stock.js` |
 | More helpers and upgrades (#72) | 🚧 steps 1-3 built (greeter, window dresser, scanner, gift wrap; tall shelves; up to three stockers, save v19) |
+| Delivery bin (#74) | ✅ built (waiting for the user's feedback); `js/ui/bin.js`, `BIN` in `sim/stock.js` |
+| Register rooms (#73) | ⏭ next |
 | Color variants and more items (#59) | ⏭ later |
 
 ### 11.1 Plan: Stairwell and upstairs (#58 step 2) — ✅ built 2026-10-09

@@ -48,6 +48,7 @@ import { createGuide } from './ui/guide.js';
 import { advanceTutorial } from './sim/tutorial.js';
 import { createDayUI } from './ui/day.js';
 import { createAlbum } from './ui/album.js';
+import { createBinSheet } from './ui/bin.js';
 import { createGrow } from './ui/grow.js';
 import { createDecorate } from './ui/decorate.js';
 import { createStyler } from './ui/styler.js';
@@ -92,6 +93,7 @@ const orderBook = createOrderBook(state, thumbs);
 const overlay = createOverlay(canvas, () => rig.camera);
 const dayUI = createDayUI(state, thumbs, orderBook, toast, audio);
 const album = createAlbum(state, thumbs);
+const binSheet = createBinSheet(state, thumbs, { onPick: fetchBox });
 lighting.setTwilight(twilightFor(state.day)); // start in the right light (e.g. reopened after closing)
 
 // ---------------------------------------------------------------------------
@@ -334,6 +336,7 @@ attachGestures(canvas, {
     if (hit.object.userData.keeper) return creator.open();
     if (hit.object.userData.spot) return tapSpot(hit.object.userData.spot);
     if (hit.object.userData.street) return tapStreet(hit.point);
+    if (hit.object.userData.bin) return binSheet.open();
     const { roomId, fixtureId, boxId, customerId, floor } = hit.object.userData;
     const room = roomById(roomId);
     // The Dream Dollhouse opens decorate mode straight away.
@@ -352,8 +355,7 @@ attachGestures(canvas, {
     } else if (customerId) {
       // Browsing customers: nothing to do yet.
     } else if (boxId) {
-      if (!canCarryMore(state)) return audio.play('boop'), toast(state.keeper.spare ? 'The cart is full! Tap a shelf to unpack.' : 'Hands full! Tap a shelf to unpack this box first.');
-      if (walkToBox(state, navs, state.boxes.find((b) => b.id === boxId))) tapFeedback();
+      fetchBox(state.boxes.find((b) => b.id === boxId));
     } else if (fixtureId && /^stair/.test(room.fixtures.find((f) => f.id === fixtureId)?.kind)) {
       // The stairs go up a floor; the railing round the hole goes back down. The view follows.
       const kind = room.fixtures.find((f) => f.id === fixtureId).kind;
@@ -512,6 +514,13 @@ function tapSpot(id) {
   } else if (walkToGreeter(state, navs)) {
     tapFeedback();
   }
+}
+
+/** Send the shopkeeper for a box on the doorstep or in the delivery bin (GDD #74). */
+function fetchBox(box) {
+  if (!box) return;
+  if (!canCarryMore(state)) return audio.play('boop'), toast(state.keeper.spare ? 'The cart is full! Tap a shelf to unpack.' : 'Hands full! Tap a shelf to unpack this box first.');
+  if (walkToBox(state, navs, box)) tapFeedback();
 }
 
 /** The sidewalk: in front of the shop door she waits to greet people; anywhere else she just goes there. */

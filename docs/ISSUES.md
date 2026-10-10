@@ -21,19 +21,18 @@ Design questions (not bugs) belong in [GDD.md](GDD.md) §18.
   ones always go right of the shop (#64). Nothing breaks (routes work from any column), it just doesn't match the
   rule. Never on the public game.
 
-### Delivery boxes stack too high and hide the shelves (2026-10-09, user)
-- The doorstep has four box spots (`BOX_SPOTS` in `js/sim/stock.js`); every box after that stacks on top. A big
-  delivery (or a few days of orders left unpacked) builds tall towers in front of the shop that hide the shelves
-  behind them and get in the way of tapping them.
-- **Idea (user):** a **delivery bin** on the doorstep instead of loose stacks. Tap it to open a window listing every
-  box waiting (item picture, how many); tap one there to send your shopkeeper to fetch it. The bin could show a few
-  boxes poking out, or a count, so you can still see at a glance that deliveries came. Bea would take boxes from
-  the bin the same way. Needs a design pass (GDD) before building: where the bin sits, whether some boxes still
-  show on the doorstep, and how the first-day guide's "Tap a box!" arrow (#57) points at the bin.
-- **Designed 2026-10-09 (GDD #74), being built:** three loose doorstep spots plus a delivery bin with a count badge and
-  a list to pick from.
+### Pinch-zoom doesn't go out far enough on a big house (2026-10-09, user)
+- The furthest pinch-out is a fixed factor of what's framed (`ZOOM_MIN` in `js/render/camera.js`), so on a big
+  building you can't see the whole house. It should grow with the house (GDD §18 #14).
 
 ## Fixed
+
+### Delivery boxes stack too high and hide the shelves (2026-10-09, user) — fixed
+- The doorstep had four box spots and every box after that stacked on top, building towers in front of the shop
+  that hid the shelves and got in the way of tapping them.
+- **Fix (GDD #74):** two loose doorstep spots plus a **delivery bin** (`BIN` in `js/sim/stock.js`) with a count badge;
+  any box past the second goes in the bin, and comes out onto the doorstep when a spot frees (`settleBoxes`). Tap
+  the bin for a list by item (`js/ui/bin.js`); stockers take doorstep boxes first. Old saves' stacked boxes go in the bin.
 
 ### A big day's summary hides the "Start Day" button (2026-10-09, tester, Day 37) — fixed
 - With many kinds of items sold, the summary grew taller than the sheet: "Start Day N" was pushed off the bottom

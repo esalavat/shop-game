@@ -4,7 +4,7 @@ import { createState } from '../js/sim/state.js';
 import { buildNav } from '../js/sim/nav.js';
 import { tickStockers, chooseBox, STOCKER_WAIT } from '../js/sim/stocker.js';
 import { tickKeeper, walkToBox } from '../js/sim/keeper.js';
-import { dropBox, settleBoxes, pickUpBox, BOX_SPOTS } from '../js/sim/stock.js';
+import { dropBox, settleBoxes, pickUpBox, boxSpot, inBin, BOX_SPOTS } from '../js/sim/stock.js';
 import { soldOut } from '../js/sim/day.js';
 import { hireHelper } from '../js/sim/upgrades.js';
 import { HELPERS } from '../js/data/upgrades.js';
@@ -90,15 +90,25 @@ test('no Bea until she is hired, and she rests after closing', () => {
   assert.equal(hired.s.boxes.length, 2);
 });
 
-test('taking a box from the bottom of a stack drops the one above it (no floating boxes)', () => {
+test('extra boxes go in the delivery bin, and come out onto the doorstep as spots free up (GDD #74)', () => {
   const s = createState();
   s.boxes = [];
   const n = BOX_SPOTS.length;
-  const boxes = Array.from({ length: n + 1 }, () => dropBox(s, 'chair', 3));
-  assert.equal(boxes[n].spot, n); // on top of spot 0
-  assert.ok(pickUpBox(s, boxes[0].id));
-  assert.equal(boxes[n].spot, 0);
+  const boxes = Array.from({ length: n + 3 }, () => dropBox(s, 'chair', 3));
+  assert.deepEqual(boxes.map(inBin), [...Array(n).fill(false), true, true, true]);
+  assert.ok(boxes.every((b) => boxSpot(b.spot).layer === 0), 'nothing stacks');
+  assert.ok(pickUpBox(s, boxes[1].id));
+  assert.equal(boxes[n].spot, 1, 'the first box in the bin comes out');
+  assert.deepEqual([boxes[n + 1].spot, boxes[n + 2].spot], [n, n + 1], 'the rest keep their order');
+  assert.ok(pickUpBox(s, boxes[n + 2].id, s.keeper.carrying ? { carrying: null, spare: null } : s.keeper), 'fetched straight from the bin');
   assert.equal(settleBoxes(s), false); // already settled
+});
+
+test('old saves with stacked boxes put the stacked ones in the bin', () => {
+  const s = createState();
+  s.boxes = [0, 1, 4, 5, 2].map((spot, i) => ({ id: `b${i}`, itemId: 'chair', qty: 3, roomId: 'r1', spot }));
+  settleBoxes(s);
+  assert.deepEqual(s.boxes.map((b) => b.spot), [0, 1, 3, 4, 2]);
 });
 
 test('Theo comes after Bea and Juno after Theo; they never head for the same box (GDD #72)', () => {
