@@ -15,7 +15,7 @@ import { events } from '../core/events.js';
 const ROOM_INFO = {
   display: {
     art: '🪟🏠✨', name: 'Window Display',
-    desc: 'A sunny shop window right next door, with your very own <b>Dream Dollhouse</b> inside. Decorate it with treasures from your Collection. The more it sparkles, the more visitors stop by!',
+    desc: 'A sunny shop window right next door, with your very own <b>Dream Dollhouse</b> inside. Decorate it with favorites from your Collection. The more it sparkles, the more visitors stop by!',
   },
 };
 

@@ -45,10 +45,10 @@ export function needFor(state, step) {
   return { need: Math.max(0, STEPS[step].opensAt - foundCount(state)), hearts: Math.max(0, STEPS[step].hearts - (state.hearts ?? 0)) };
 }
 
-/** "Find 3 more treasures and make 40 more customers happy ❤️" (what a locked step still needs). */
+/** "Find 3 new items and make 40 more customers happy ❤️" (what a locked step still needs). */
 export function needText(state, step) {
   const { need, hearts } = needFor(state, step);
-  const find = need ? `find ${need} more treasure${need > 1 ? 's' : ''}` : '';
+  const find = need ? `find ${need} new item${need > 1 ? 's' : ''}` : ''; // not "treasures": that's a page name (GDD #81)
   const happy = hearts ? `make ${hearts} more customer${hearts > 1 ? 's' : ''} happy ❤️` : '';
   const text = [find, happy].filter(Boolean).join(' and ');
   return text[0].toUpperCase() + text.slice(1);

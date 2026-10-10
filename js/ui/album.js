@@ -20,8 +20,8 @@ export function createAlbum(state, thumbs) {
     const found = ids.filter((id) => state.collection[id]);
     const onShow = dollhouseItems(state);
     count.textContent = found.length === ids.length
-      ? `All ${ids.length} treasures found! 🎉`
-      : `${found.length} of ${ids.length} treasures found`;
+      ? `All ${ids.length} items found! 🎉`
+      : `${found.length} of ${ids.length} items found`;
     count.textContent += ` · Collection bonus: +${Math.round(collectionBonus(state) * 100)}% customers 🛍️`;
     const sticker = (id) => {
       const item = ITEMS[id], have = state.collection[id];

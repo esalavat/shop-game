@@ -137,5 +137,5 @@ test('each page also needs happy customers, and opens on the sale that makes eno
   off();
   assert.deepEqual(opened, [1]);
   assert.ok(canOrder(s, 'cottage'));
-  assert.equal(needText(createState(), 1), `Find 3 more treasures and make ${STEPS[1].hearts} more customers happy ❤️`);
+  assert.equal(needText(createState(), 1), `Find 3 new items and make ${STEPS[1].hearts} more customers happy ❤️`);
 });
