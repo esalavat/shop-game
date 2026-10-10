@@ -18,15 +18,44 @@ export function buyUpgrade(state, id) {
   return true;
 }
 
-/** Some upgrades need a helper first: Roller Skates need a stocker to wear them. */
-export const canBuyUpgrade = (state, id) => !UPGRADES[id]?.needs || hasHelper(state, UPGRADES[id].needs);
+/** Enough happy customers for this rung of the ladder (GDD #83)? */
+const heartsFor = (state, thing) => (state.hearts ?? 0) >= (thing?.hearts ?? 0);
 
-/** Some helpers need something first: Rosa the Window Display, each stocker the one before. */
-export function canHire(state, id) {
-  const needs = HELPERS[id]?.needs;
+/** Has what it needs first: a helper (Roller Skates need a stocker; each stocker the one before) or the Window Display (Rosa). */
+function needsMet(state, needs) {
   if (!needs) return true;
   if (needs === 'display') return state.building.rooms.some((r) => r.type === 'display' && r.floor === 0);
   return hasHelper(state, needs);
+}
+
+/** Can this upgrade be bought now (enough Hearts, and its helper hired)? */
+export const canBuyUpgrade = (state, id) => heartsFor(state, UPGRADES[id]) && needsMet(state, UPGRADES[id]?.needs);
+
+/** Can this helper be hired now (enough Hearts, and what they need)? */
+export const canHire = (state, id) => heartsFor(state, HELPERS[id]) && needsMet(state, HELPERS[id]?.needs);
+
+/** Every helper and upgrade, in ladder order: [{ kind: 'helper' | 'upgrade', id, ...data }] (GDD #83). */
+export const LADDER = [
+  ...Object.entries(HELPERS).map(([id, h]) => ({ kind: 'helper', id, ...h })),
+  ...Object.entries(UPGRADES).map(([id, u]) => ({ kind: 'upgrade', id, ...u })),
+].sort((a, b) => a.hearts - b.hearts || a.cost - b.cost);
+
+const owns = (state, rung) => (rung.kind === 'helper' ? hasHelper(state, rung.id) : hasUpgrade(state, rung.id));
+const ready = (state, rung) => (rung.kind === 'helper' ? canHire(state, rung.id) : canBuyUpgrade(state, rung.id));
+
+/**
+ * The Grow sheet's ladder (GDD #83): what you can get now, the next one still locked (shown as a teaser,
+ * with `why`: { hearts } still to make, or `needs`), and what you already have.
+ */
+export function ladder(state) {
+  const available = LADDER.filter((r) => !owns(state, r) && ready(state, r));
+  const owned = LADDER.filter((r) => owns(state, r));
+  const locked = LADDER.find((r) => !owns(state, r) && !ready(state, r));
+  const next = locked && {
+    ...locked,
+    why: heartsFor(state, locked) ? { needs: locked.needs } : { hearts: locked.hearts - (state.hearts ?? 0) },
+  };
+  return { available, next: next ?? null, owned };
 }
 
 export function hireHelper(state, id) {

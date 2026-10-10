@@ -49,7 +49,7 @@ js/
     dollhouse.js        # Dream Dollhouse slots, Sparkle tuning, shop expansions (costs)
     customers.js        # Customer types: wants, budgets, looks
     story.js            # Regulars, story beats, triggers
-    upgrades.js         # Upgrades (Stock Cart, Comfy Shoes, Lunchtime Delivery) and helpers (Mia): costs, tuning
+    upgrades.js         # Upgrades and helpers: costs, `hearts` to appear (the ladder, GDD #83), `needs`, tuning
     decor.js            # Room styles for the decoration shop (DECOR: paper, pattern, floor, rug, curtain, corner), Ribbon rates, roomLook()
   sim/                  # Pure game logic. No three.js, no DOM.
     state.js            # Creates a fresh game state; schema version
@@ -64,7 +64,7 @@ js/
     helpers.js          # Hired helpers doing jobs: Mia the cashier (state.cashier, live-only); Ollie the greeter and Rosa the window dresser standing at the bonus spots (state.greeter / state.dresser, live-only, GDD #72)
     tutorial.js         # First-day guide steps (state.tutorial: box → shelf → open → register → done), advanced each tick
     stocker.js          # Bea the stocker: fetches doorstep boxes and unpacks them in any room; Sorting Smarts (state.stocker, saved)
-    upgrades.js         # Buying upgrades / hiring helpers (one-time; state.upgrades, state.helpers)
+    upgrades.js         # Buying upgrades / hiring helpers (one-time; state.upgrades, state.helpers); canHire / canBuyUpgrade check Hearts and `needs`; LADDER and ladder(state) for the Grow sheet (GDD #83)
     rewards.js          # The Collection pays off (GDD #70): visitor bonus, theme coin gifts, shopkeeper styles from themes
     decor.js            # Ribbons (earning: wishes granted, window wants, finds, themes, end of day) and buying / putting on room styles (GDD #68)
     route.js            # Walking between rooms and onto the street (planRoute, startRoute/finishRoute/settleRoute/routeTo, doors)

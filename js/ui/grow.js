@@ -4,12 +4,14 @@
 // room comes the Stairwell, always built right next to the shop, then more floors, each pricier. The button glows when there's something new you can afford. Once the Window
 // Display is built, a separate Dollhouse button appears next to it and opens decorate mode. At the top,
 // Decorate rooms opens the room styler (ui/styler.js, GDD #68).
+// Helpers and upgrades come as a ladder (GDD #83): the sheet lists what you can get now, the next one
+// as a locked teaser, and what you already have as a small row of icons at the bottom.
 
 import { nextExpansion, buildExpansion, canBuildRooms, roomSpots, roomCost, canBuildStairwell, buildStairwell, hasStairwell, buildFloor, stairCost, stairRooms, nextRegisterFloor, registerCost, buildRegister, registerRoomsBuilt } from '../sim/building.js';
 import { REGISTER_CASHIERS } from '../data/upgrades.js';
 import { displayRoom } from '../sim/collection.js';
-import { buyUpgrade, hireHelper, hasUpgrade, hasHelper, canHire, canBuyUpgrade } from '../sim/upgrades.js';
-import { UPGRADES, HELPERS } from '../data/upgrades.js';
+import { buyUpgrade, hireHelper, ladder } from '../sim/upgrades.js';
+import { HELPERS } from '../data/upgrades.js';
 import { events } from '../core/events.js';
 
 const ROOM_INFO = {
@@ -94,29 +96,30 @@ export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
     if (!next && !canBuildRooms(state)) {
       html += '<div class="grow-done">More rooms are coming soon! 🏗️</div>';
     }
-    html += '<div class="grow-section">Helpers</div>';
-    for (const [id, h] of Object.entries(HELPERS)) {
-      html += small({ art: h.icon, name: `${h.name} the ${h.job}`, desc: h.desc, cost: h.cost, owned: hasHelper(state, id), ownedText: 'Hired 💖', buy: `helper:${id}`, buyText: 'Hire', locked: canHire(state, id) ? null : h.needs === 'display' ? 'Build the Window Display first' : `Hire ${HELPERS[h.needs].name} first` });
-    }
-    html += '<div class="grow-section">Upgrades</div>';
     // Register rooms (GDD #73): one per floor, straight above the shop, each with its own cashier.
     const regFloor = nextRegisterFloor(state);
     if (regFloor !== null) {
       const cost = registerCost(state), who = REGISTER_CASHIERS[registerRoomsBuilt(state).length % REGISTER_CASHIERS.length].name;
       html += small({ art: '🛎️', name: `Register room · floor ${regFloor + 1}`, cost, buy: 'register', buyText: 'Build it!',
         desc: `A second shop counter, upstairs right above your shop, with ${who} the cashier. Customers on that floor pay there instead of coming down. Rooms in the way move over.` });
-    } else if (hasStairwell(state) && !registerRoomsBuilt(state).length) {
-      html += small({ art: '🛎️', name: 'Register room', cost: 0, owned: true, ownedText: 'Build another floor first',
-        desc: 'A second shop counter upstairs, with its own cashier. One per floor.' });
     }
-    for (const [id, u] of Object.entries(UPGRADES)) {
-      if (!upgradeListed(id)) continue;
-      html += small({ art: u.icon, name: u.name, desc: u.desc, cost: u.cost, owned: hasUpgrade(state, id), ownedText: 'Yours ✓', buy: `upgrade:${id}`, buyText: 'Buy', locked: canBuyUpgrade(state, id) ? null : `Hire ${HELPERS[u.needs].name} first` });
+    // Helpers and upgrades (GDD #83): what you can get now, then the next one, locked.
+    const { available, next: soon, owned } = ladder(state);
+    if (available.length || soon) html += '<div class="grow-section">Helpers and upgrades</div>';
+    for (const r of available) html += small(rungCard(r));
+    if (soon) {
+      const why = soon.why.hearts ? `Coming at ${soon.hearts} ❤️ · ${soon.why.hearts} more to go`
+        : soon.why.needs === 'display' ? 'Build the Window Display first' : `Hire ${HELPERS[soon.why.needs].name} first`;
+      html += small({ ...rungCard(soon), locked: `🔒 ${why}` }).replace('grow-card small', 'grow-card small next');
+    }
+    if (owned.length) {
+      html += `<div class="grow-owned"><span>Already yours</span> ${owned.map((r) => `<i title="${rungName(r)}">${r.icon}</i>`).join('')}</div>`;
     }
     list.innerHTML = html;
   }
 
-  const upgradeListed = () => true;
+  const rungName = (r) => (r.kind === 'helper' ? `${r.name} the ${r.job}` : r.name);
+  const rungCard = (r) => ({ art: r.icon, name: rungName(r), desc: r.desc, cost: r.cost, buy: `${r.kind}:${r.id}`, buyText: r.kind === 'helper' ? 'Hire' : 'Buy' });
   /** The cheapest + spot right now. */
   const cheapestRoom = () => Math.min(...roomSpots(state).map((p) => roomCost(state, p.col, p.floor)));
 
@@ -127,8 +130,7 @@ export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
       canBuildRooms(state) ? cheapestRoom() : null,
       canBuildStairwell(state) || hasStairwell(state) ? stairCost(state) : null,
       nextRegisterFloor(state) !== null ? registerCost(state) : null,
-      ...Object.entries(HELPERS).filter(([id]) => !hasHelper(state, id) && canHire(state, id)).map(([, h]) => h.cost),
-      ...Object.entries(UPGRADES).filter(([id]) => !hasUpgrade(state, id) && upgradeListed(id) && canBuyUpgrade(state, id)).map(([, u]) => u.cost),
+      ...ladder(state).available.map((r) => r.cost),
     ];
     return costs.some((c) => c != null && state.coins >= c);
   }

@@ -608,6 +608,14 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 .grow-card.small p { margin: 0 0 8px; font-size: 13px; }
 .grow-card.small .grow-build { grid-column: 2; padding: 9px 0; font-size: 15px; }
 .grow-card.owned { opacity: 0.75; }
+/* The next helper or upgrade on the ladder, still locked (GDD #83). */
+.grow-card.next { background: #f7eef2; box-shadow: none; }
+.grow-card.next .grow-art { filter: grayscale(1); opacity: 0.5; }
+.grow-card.next .grow-build:disabled { background: #fff4dc; color: var(--ink); }
+/* What you already have, as a row of icons. */
+.grow-owned { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 12px 0 4px; padding: 8px 12px; border-radius: 14px; background: #d4f3e6; font-size: 22px; }
+.grow-owned span { margin-right: 4px; font-size: 13px; font-weight: 800; }
+.grow-owned i { font-style: normal; }
 .grow-cost { margin: -4px 0 10px; font-size: 14px; font-weight: 800; }
 .grow-themes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .grow-theme {

@@ -9,7 +9,7 @@
 // rings people up (4 taps a second) and restocks; it closes early when sold out. At closing it fills
 // the Dream Dollhouse with its sparkliest finds, orders one box of every new item it can (to grow the
 // Collection), refills the shelves with the best-paying colors, then spends what's left on growth
-// (a fixed order of upgrades, helpers and rooms, then the cheapest room / floor / register forever).
+// (the cheapest of what the Grow sheet offers: the ladder of helpers and upgrades, rooms, floors, registers).
 // It never uses Lunchtime Delivery (it only orders at closing), greets, or shows off the dollhouse.
 
 import { writeFileSync } from 'node:fs';
@@ -25,7 +25,7 @@ import { checkoutTap, counterOf, keeperAtCounter, registerOf } from '../js/sim/c
 import { placeOrder } from '../js/sim/orders.js';
 import { canOrder, foundCount, openPageCount, orderableItems } from '../js/sim/catalog.js';
 import { stockCount, freeSlots, shopRoomId, canCarryMore } from '../js/sim/stock.js';
-import { buyUpgrade, hireHelper, hasUpgrade, hasHelper, canBuyUpgrade, canHire } from '../js/sim/upgrades.js';
+import { buyUpgrade, hireHelper, hasUpgrade, hasHelper, canBuyUpgrade, canHire, ladder } from '../js/sim/upgrades.js';
 import {
   buildExpansion, nextExpansion, buildRoom, roomSpots, roomCost, canBuildRooms, buildStairwell, canBuildStairwell,
   stairCost, hasStairwell, buildFloor, buildRegister, nextRegisterFloor, registerCost, sellingRooms, isShelfRoom,
@@ -52,11 +52,8 @@ const TAP_EVERY = 0.25;     // a player taps the register about 4 times a second
 const MORNING_MAX = 45;     // seconds the bot spends unpacking before it opens anyway
 const MENU_TIME = 30;       // seconds a player spends in the closing summary, order book and Grow sheet
 
-/** What the bot buys first, in order; after that, the cheapest room / floor / register, forever. */
-const PLAN = [
-  'display', 'cart', 'cashier', 'stocker', 'shoes', 'scanner', 'room', 'greeter', 'stairwell', 'tall',
-  'giftwrap', 'skates', 'room', 'dresser', 'stocker2', 'room', 'floor', 'register', 'room', 'stocker3', 'room',
-];
+/** What the bot builds, cheapest first, besides the helpers and upgrades on the ladder (GDD #83). */
+const BUILDS = ['display', 'stairwell', 'room', 'floor', 'register'];
 
 // ---------------------------------------------------------------------------------------------------
 // Buying growth
@@ -87,30 +84,23 @@ function offer(state, what) {
   throw new Error(`unknown plan step ${what}`);
 }
 
-/** Spend leftover coins on growth. Returns what was bought ([{ what, cost }]). */
-function buyGrowth(state, bot) {
+/**
+ * Spend leftover coins on growth, cheapest first: whatever the ladder offers now (GDD #83), the Window
+ * Display and the Stairwell, and rooms, floors and register rooms (keeping half their price in hand: more
+ * rooms bring more customers, CUSTOMER.perRoom). Returns what was bought ([{ what, cost }]).
+ */
+function buyGrowth(state) {
   const bought = [];
   for (;;) {
-    let what, o;
-    if (bot.plan < PLAN.length) {
-      what = PLAN[bot.plan];
-      o = offer(state, what);
-      if (!o) {
-        // Not possible yet (e.g. the Stairwell before a shelf room): skip it if it can never be, else wait.
-        if (what === 'display' || hasUpgrade(state, what) || hasHelper(state, what)) { bot.plan++; continue; }
-        if (what === 'stairwell' && hasStairwell(state)) { bot.plan++; continue; }
-        break;
-      }
-    } else {
-      const opts = ['room', 'floor', 'register'].map((w) => ({ w, o: offer(state, w) })).filter((x) => x.o);
-      if (!opts.length) break;
-      ({ w: what, o } = opts.sort((a, b) => a.o.cost - b.o.cost)[0]);
-    }
-    // After the plan, it keeps half a room's price in hand (rooms bring more customers: CUSTOMER.perRoom).
-    const keep = bot.plan < PLAN.length ? 1 : 1.5;
-    if (state.coins < o.cost * keep || !o.buy()) break;
-    bought.push({ what, cost: o.cost });
-    if (bot.plan < PLAN.length) bot.plan++;
+    const opts = [
+      ...ladder(state).available.map((r) => ({ what: r.id, o: offer(state, r.id), keep: 1 })),
+      ...BUILDS.map((w) => ({ what: w, o: offer(state, w), keep: ['display', 'stairwell'].includes(w) ? 1 : 1.5 })),
+    ].filter((x) => x.o).sort((a, b) => a.o.cost - b.o.cost);
+    const pick = opts.find((x) => state.coins >= x.o.cost * x.keep);
+    // Saving up: never skip a ladder rung for a dearer room.
+    if (!pick || opts.some((x) => x.keep === 1 && x.o.cost < pick.o.cost)) break;
+    if (!pick.o.buy()) break;
+    bought.push({ what: pick.what, cost: pick.o.cost });
   }
   return bought;
 }
@@ -231,7 +221,7 @@ function run(seed, days, { log = false } = {}) {
   const navs = new Map();
   const rebuildNavs = () => { navs.clear(); for (const r of state.building.rooms) navs.set(r.id, buildNav(r)); };
   rebuildNavs();
-  const bot = { plan: 0, tap: 0 };
+  const bot = { tap: 0 };
   const rows = [];
   const milestones = {}; // name -> { day, minutes }
   const mark = (name, day, clock) => { if (!milestones[name]) milestones[name] = { day, minutes: +(clock / 60).toFixed(1) }; };
@@ -266,7 +256,7 @@ function run(seed, days, { log = false } = {}) {
     fillDollhouse(state);
     const sold = Object.values(stats.sold).reduce((a, b) => a + b, 0);
     const ordered = orderStock(state, sold);
-    const bought = buyGrowth(state, bot);
+    const bought = buyGrowth(state);
     if (bought.length) rebuildNavs();
     fillDollhouse(state);
     for (const b of bought) mark(b.what === 'room' || b.what === 'floor' || b.what === 'register' ? `${b.what} #${countOf(state, b.what)}` : b.what, day, clock);

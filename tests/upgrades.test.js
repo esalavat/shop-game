@@ -17,6 +17,7 @@ const counterOf = (s) => s.building.rooms[0].fixtures.find((f) => f.kind === 'co
 
 test('upgrades and helpers cost coins once and can only be bought once', () => {
   const s = createState();
+  s.hearts = 9999; // past every rung of the ladder (GDD #83)
   s.coins = 1000;
   assert.ok(buyUpgrade(s, 'shoes'));
   assert.equal(s.coins, 1000 - UPGRADES.shoes.cost);
@@ -31,6 +32,7 @@ test('upgrades and helpers cost coins once and can only be bought once', () => {
 
 test('without the Stock Cart she carries one box; with it, two, and the second keeps filling the shelf', () => {
   const s = createState();
+  s.hearts = 9999; // past every rung of the ladder (GDD #83)
   const [a, b] = s.boxes;
   assert.ok(pickUpBox(s, a.id));
   assert.equal(canCarryMore(s), false);
@@ -47,6 +49,7 @@ test('without the Stock Cart she carries one box; with it, two, and the second k
 
 test('a full shelf leaves the spare box on the cart', () => {
   const s = createState();
+  s.hearts = 9999; // past every rung of the ladder (GDD #83)
   s.upgrades.cart = true;
   const [a, b] = s.boxes;
   pickUpBox(s, a.id);
@@ -63,6 +66,7 @@ test('a full shelf leaves the spare box on the cart', () => {
 test('Comfy Shoes make the shopkeeper quicker', () => {
   const time = (shoes) => {
     const s = createState();
+    s.hearts = 9999; // past every rung of the ladder (GDD #83)
     if (shoes) s.upgrades.shoes = true;
     walkToFixture(s, new Map([['r1', buildNav(s.building.rooms[0])]]), shelvesOf(s)[1]);
     let t = 0;
@@ -74,6 +78,7 @@ test('Comfy Shoes make the shopkeeper quicker', () => {
 
 test('Lunchtime Delivery: orders before midday arrive halfway through the day', () => {
   const s = createState();
+  s.hearts = 9999; // past every rung of the ladder (GDD #83)
   s.upgrades.lunch = true;
   s.coins = 500;
   placeOrder(s, 'teddy'); // morning
@@ -92,6 +97,7 @@ test('Lunchtime Delivery: orders before midday arrive halfway through the day', 
 
 test('without the upgrade, or closing before midday, orders come the next morning', () => {
   const s = createState();
+  s.hearts = 9999; // past every rung of the ladder (GDD #83)
   s.coins = 500;
   placeOrder(s, 'teddy');
   assert.equal(s.orders[0].arrivesDay, 2);
@@ -107,6 +113,7 @@ test('without the upgrade, or closing before midday, orders come the next mornin
 
 function cashierShop() {
   const s = createState();
+  s.hearts = 9999; // past every rung of the ladder (GDD #83)
   s.spawnTimer = Infinity;
   s.helpers.cashier = true;
   s.day.phase = 'open';
@@ -131,7 +138,7 @@ test('Mia rings customers up on her own, without tips', () => {
   const coins = s.coins;
   runShop(s, navs, 25, rand);
   assert.equal(s.coins, coins + 20);
-  assert.equal(s.hearts, 1);
+  assert.equal(s.hearts, 9999 + 1);
   assert.equal(s.day.stats.tips, 0);
 });
 
@@ -151,6 +158,7 @@ test('Mia steps aside when the shopkeeper comes to the counter, and back when sh
 
 test('no Mia until she is hired', () => {
   const s = createState();
+  s.hearts = 9999; // past every rung of the ladder (GDD #83)
   tickHelpers(s, 0.1);
   assert.equal(s.cashier, null);
   assert.equal(miaAtTill(s), false);
@@ -162,7 +170,8 @@ test('Ollie the greeter greets everyone walking in; Rosa needs the Window Displa
   const { hireHelper } = await import('../js/sim/upgrades.js');
   const { buildExpansion } = await import('../js/sim/building.js');
   const s = createState();
-  s.coins = 2000;
+  s.hearts = 9999; // past every rung of the ladder (GDD #83)
+  s.coins = 1e5;
   tickHelpers(s, 0.1);
   assert.ok(!greeterOnDuty(s));
   assert.ok(hireHelper(s, 'greeter'));
@@ -178,6 +187,7 @@ test('Ollie the greeter greets everyone walking in; Rosa needs the Window Displa
 test('Speedy Scanner scans two per tap; Gift Wrap doubles tips', async () => {
   const { startCheckout, checkoutTap } = await import('../js/sim/checkout.js');
   const s = createState();
+  s.hearts = 9999; // past every rung of the ladder (GDD #83)
   const customer = { id: 'c1', basket: ['teaset', 'teaset', 'chair'], state: 'waiting' };
   s.customers.push(customer);
   s.upgrades.scanner = true;
@@ -196,6 +206,7 @@ test('Tall Shelves give every shelf, old and new, a top row filled last (GDD #72
   const { buildRoom, roomSpots, buildExpansion } = await import('../js/sim/building.js');
   const { freeSlots } = await import('../js/sim/stock.js');
   const s = createState();
+  s.hearts = 9999; // past every rung of the ladder (GDD #83)
   s.coins = 5000;
   const shelves = () => s.building.rooms.flatMap((r) => r.fixtures.filter((f) => f.slots));
   assert.ok(shelves().every((f) => f.slots.length === 9));
@@ -206,4 +217,33 @@ test('Tall Shelves give every shelf, old and new, a top row filled last (GDD #72
   const spot = roomSpots(s)[0];
   assert.ok(buildRoom(s, spot.col, spot.floor));
   assert.ok(shelves().every((f) => f.slots.length === 12));
+});
+
+test('helpers and upgrades come as a ladder: each appears at more Hearts and costs more (GDD #83)', async () => {
+  const { LADDER, ladder, canHire } = await import('../js/sim/upgrades.js');
+  for (let i = 1; i < LADDER.length; i++) {
+    assert.ok(LADDER[i].hearts > LADDER[i - 1].hearts, `${LADDER[i].id} needs more Hearts than ${LADDER[i - 1].id}`);
+    assert.ok(LADDER[i].cost >= LADDER[i - 1].cost * 1.3, `${LADDER[i].id} costs well over ${LADDER[i - 1].id}`);
+  }
+  const s = createState();
+  s.coins = 1e6;
+  let l = ladder(s);
+  assert.deepEqual(l.available.map((r) => r.id), ['cart']);
+  assert.equal(l.next.id, 'shoes');
+  assert.deepEqual(l.next.why, { hearts: UPGRADES.shoes.hearts });
+  assert.equal(hireHelper(s, 'cashier'), false, 'not enough happy customers yet');
+  s.hearts = HELPERS.cashier.hearts;
+  assert.ok(canHire(s, 'cashier'));
+  assert.ok(buyUpgrade(s, 'cart'));
+  l = ladder(s);
+  assert.deepEqual(l.available.map((r) => r.id), ['shoes', 'cashier']);
+  assert.deepEqual(l.owned.map((r) => r.id), ['cart']);
+  assert.equal(l.next.id, 'giftwrap');
+  // Rosa needs the Window Display as well as her Hearts: the teaser says so, and later rungs still come.
+  s.hearts = HELPERS.dresser.hearts;
+  l = ladder(s);
+  assert.equal(l.next.id, 'skates', 'Roller Skates wait for a stocker');
+  assert.deepEqual(l.next.why, { needs: 'stocker' });
+  assert.ok(!l.available.some((r) => r.id === 'dresser'));
+  assert.ok(l.available.some((r) => r.id === 'tall'));
 });

@@ -180,27 +180,26 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   No save change (opened pages stay open). Lock notes and the album teaser checked at phone size; pushed to `/dev/`.
 - **Simpler order book, built 2026-10-10, waiting for feedback** (GDD v0.44 #82, half of §18 #17): color dots only once Bright
   opens (then all three, Dazzle locked); of the locked tabs only the next one shows. `js/ui/orderbook.js`. No save change.
-  **Next, to design with the user:** the Grow sheet half of §18 #17 (show upgrades and helpers only as they're needed, #16
-  hide bought ones) together with **re-spacing upgrade and helper prices** (user: too many too close in price).
+- **Helpers and upgrades as a ladder, built 2026-10-10, waiting for feedback** (GDD v0.45 #83, resolves §18 #16, #17): each
+  appears at a Hearts count and costs ~1.4-1.5× the one before (Stock Cart 60 ... Juno 15,000; `hearts` in `js/data/upgrades.js`,
+  `LADDER` / `ladder()` in `js/sim/upgrades.js`). Grow shows what you can get, the next one as a 🔒 teaser, and an "Already yours"
+  icon row. The balance bot buys from the ladder (cheapest first). No save change.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
 - **Planned next:** feedback on the balancing pass (#80). Later: more items past 100 (#59), more stockers
   (#60), **Instant Delivery** (GDD §11, on the §17 roadmap, design to discuss), Heart/Sparkle milestone unlocks (§18 #6). 
 
-**Next:** feedback on the balancing pass (#80). Waiting on feedback: the balancing pass (#80), Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
+**Next:** feedback on the balancing pass (#80), the simpler order book (#82) and the ladder (#83); then a release. Waiting on feedback: the balancing pass (#80), Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71).
 
 **Releases:** the latest is **v2026.10.10** (2026-10-10): Sweet Shop and Pet Corner (#79), **save version 20**
 (`state.pagesOpen`); before it v2026.10.9.12, color rounds (#77) and shopping by item (#78); v2026.10.9.11, Roller Skates (#76).
-Not released yet: the balancing script and the balancing pass (#80). The MVP list in GDD §17 is complete.
+Not released yet: the balancing script, the balancing pass (#80), "new items" (#81), the simpler order book (#82) and the ladder (#83). No save changes. The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).
 - Background music (a music-box loop by time of day, GDD §15).
 - An Orderer helper who re-orders what sells (GDD §10, not decided).
-- A switch in the Grow sheet to hide purchased upgrades (GDD §18 #16).
-- Hide what isn't available yet (GDD §18 #17): order book shows only the first color until round 1 is complete and only the
-  next locked tab; the Grow sheet shows upgrades and helpers only as they're needed.
 
 ## How the code is organized
 

@@ -18,12 +18,13 @@ const stocked = (s) => shelvesOf(s).flatMap((f) => f.slots).filter(Boolean).leng
 
 function beaShop() {
   const s = createState();
+  s.hearts = 9999; // past every rung of the ladder (GDD #83)
   s.coins = HELPERS.stocker.cost;
   assert.ok(hireHelper(s, 'stocker'));
   return { s, navs: navsFor(s) };
 }
 
-test('Bea costs 200 coins and starts by the wall', () => {
+test('Bea costs coins and starts by the wall', () => {
   const { s, navs } = beaShop();
   assert.equal(s.coins, 0);
   run(s, navs, 0.1);
@@ -79,6 +80,7 @@ test('a box in her hands still counts as stock (not sold out)', () => {
 
 test('no Bea until she is hired, and she rests after closing', () => {
   const s = createState();
+  s.hearts = 9999; // past every rung of the ladder (GDD #83)
   const navs = navsFor(s);
   run(s, navs, 5);
   assert.equal(s.stockers[0], undefined);
@@ -92,6 +94,7 @@ test('no Bea until she is hired, and she rests after closing', () => {
 
 test('extra boxes go in the delivery bin, and come out onto the doorstep as spots free up (GDD #74)', () => {
   const s = createState();
+  s.hearts = 9999; // past every rung of the ladder (GDD #83)
   s.boxes = [];
   const n = BOX_SPOTS.length;
   const boxes = Array.from({ length: n + 3 }, () => dropBox(s, 'chair', 3));
@@ -106,6 +109,7 @@ test('extra boxes go in the delivery bin, and come out onto the doorstep as spot
 
 test('old saves with stacked boxes put the stacked ones in the bin', () => {
   const s = createState();
+  s.hearts = 9999; // past every rung of the ladder (GDD #83)
   s.boxes = [0, 1, 4, 5, 2].map((spot, i) => ({ id: `b${i}`, itemId: 'chair', qty: 3, roomId: 'r1', spot }));
   settleBoxes(s);
   assert.deepEqual(s.boxes.map((b) => b.spot), [0, 1, 3, 4, 2]);
@@ -113,7 +117,8 @@ test('old saves with stacked boxes put the stacked ones in the bin', () => {
 
 test('Theo comes after Bea and Juno after Theo; they never head for the same box (GDD #72)', () => {
   const s = createState();
-  s.coins = 10000;
+  s.hearts = 9999; // past every rung of the ladder (GDD #83)
+  s.coins = 1e6;
   assert.equal(hireHelper(s, 'stocker2'), false, 'Bea first');
   assert.ok(hireHelper(s, 'stocker'));
   assert.equal(hireHelper(s, 'stocker3'), false, 'Theo first');
@@ -133,6 +138,7 @@ test('Theo comes after Bea and Juno after Theo; they never head for the same box
 
 test('Roller Skates need a stocker first, then make stockers finish the doorstep boxes sooner', () => {
   const s0 = createState();
+  s0.hearts = 9999; // past every rung of the ladder (GDD #83)
   s0.coins = 1000;
   assert.equal(buyUpgrade(s0, 'skates'), false, 'no stocker to wear them');
   const timeToEmpty = (skates) => {
