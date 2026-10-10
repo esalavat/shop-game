@@ -133,8 +133,8 @@ proposal: a second register with its own cashier, a second stocker, a door greet
 hire more). Then the rest of #59 (color variants, more items). Waiting on feedback: the Collection bonus and theme
 rewards (#70), stock counts (#71).
 
-**Releases:** the latest is **v2026.10.9.7** (2026-10-09): the day summary scrolls on a big day so "Start Day" stays on
-screen (no save change). Everything on `main` is public. The MVP list in GDD §17 is complete.
+**Releases:** the latest is **v2026.10.9.8** (2026-10-09): the Collection bonus and theme rewards (#70) and stock counts in
+the order book (#71); save version 17 → 18. Everything on `main` is public. The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).
