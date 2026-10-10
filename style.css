@@ -99,7 +99,7 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 
 .hud-row2 { position: relative; display: flex; justify-content: center; width: 100%; }
 
-#btn-mute {
+#btn-mute, #btn-share {
   position: absolute;
   right: 0;
   top: 0;
@@ -113,6 +113,9 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
   font-size: 16px;
   pointer-events: auto;
 }
+
+/* Share (GDD #91) sits left of the sound button. */
+#btn-share { right: 42px; }
 
 .day-chip {
   padding: 4px 12px;
@@ -143,7 +146,7 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
   line-height: 1.5;
 }
 
-#boot-error, #update-needed {
+#boot-error, #update-needed, #visit-error {
   position: absolute;
   inset: 0;
   display: flex;
@@ -152,8 +155,8 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
   background: var(--frame);
 }
 
-#boot-error[hidden], #update-needed[hidden] { display: none; }
-#boot-error .rotate-card, #update-needed .rotate-card { margin: 0 16px; }
+#boot-error[hidden], #update-needed[hidden], #visit-error[hidden] { display: none; }
+#boot-error .rotate-card, #update-needed .rotate-card, #visit-error .rotate-card { margin: 0 16px; }
 
 #boot-error button, #update-needed button {
   margin-top: 12px;
@@ -973,3 +976,24 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 
 /* The delivery bin's list (GDD #74): box cards you tap to fetch. */
 .card.bin-box { font: inherit; color: inherit; cursor: pointer; }
+
+/* ---------- Visit page (visit.html, GDD #91) ---------- */
+#visit-head {
+  position: absolute; top: calc(env(safe-area-inset-top) + 12px); left: 16px; right: 16px;
+  padding: 10px 14px; border-radius: 18px; background: var(--cream); box-shadow: 0 3px 0 var(--shadow);
+  text-align: center; pointer-events: none; animation: spring-down 0.5s cubic-bezier(0.25, 1.35, 0.5, 1);
+}
+#visit-head[hidden], #visit-bar[hidden] { display: none; }
+.visit-welcome { font-size: 18px; font-weight: 800; }
+.visit-name { color: var(--pink-dark); }
+.visit-tip { margin-top: 2px; font-size: 13px; font-weight: 700; opacity: 0.7; }
+#visit-bar {
+  position: absolute; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 16px);
+  display: flex; justify-content: center; gap: 8px;
+}
+#visit-bar button {
+  padding: 12px 18px; border: 0; border-radius: 16px; background: var(--cream); color: var(--ink);
+  font: 800 15px var(--font); box-shadow: 0 4px 0 var(--shadow);
+}
+#visit-bar button:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--shadow); }
+#visit-bar button[hidden] { display: none; }

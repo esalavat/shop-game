@@ -370,6 +370,21 @@ One Pages site holds two builds (GDD #56):
   build never sells packs; `?debug` unlocks them for testing.
 - **Save transfer code** from the web build into the app (also needed before the repo moves to a new GitHub address).
 
+### 9.2.1 Sharing a shop: the visit page (GDD #91)
+- `js/sim/share.js` packs what a visitor sees (rooms with type, spot, style, decor and fixtures with their
+  shelf slots; the Dream Dollhouse; the shopkeeper's look; the name) into JSON, compresses it
+  (`CompressionStream('deflate-raw')`) and writes it as base64url after `v1.`. The link is
+  `visit.html#v1.…` next to whichever build made it (`visitUrl`), so `/dev/` links open the test build.
+  The part after `#` never reaches a server. A 7-room shop is ~600 characters, 56 rooms ~3,000.
+- `unpackShop` trusts nothing (anyone can hand-make a link): unknown room types, fixtures, items, looks and
+  far-off or floating rooms are dropped or replaced, numbers are bounded, the name goes through `safeName`.
+  `tests/share.test.js`. A new format gets a new prefix (`v2.`); keep decoding `v1.`.
+- `visit.html` + `js/visit.js`: no save, no sim ticking; builds a state-shaped object from the link and draws it
+  with the game's own `createBuilding`, shelves and dollhouse views, camera rig and gestures. `scripts/stamp.js`
+  stamps both pages with the same import map.
+- In the game, the 📤 HUD button (left of 🔊) shares the link through `navigator.share`, else copies it, else
+  opens the visit page.
+
 ### 9.3 Offline and install (PWA)
 - `manifest.webmanifest` + PNG icons in `icons/` make "Add to Home screen" give a proper app icon
   (Android uses `icon-maskable-512.png`, cropped to its own shape; iOS uses `apple-touch-icon.png`).

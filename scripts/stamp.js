@@ -17,7 +17,7 @@ import { join, relative } from 'node:path';
 const outDir = process.argv[2] ?? '_site';
 const version = (process.argv[3] || process.env.GITHUB_SHA || Date.now().toString(36)).slice(0, 10);
 const channel = process.argv[4] ?? 'main';
-const PUBLISH = ['index.html', 'style.css', 'manifest.webmanifest', 'icon.svg', 'icons', 'sw.js', 'js', 'vendor', 'prototypes'];
+const PUBLISH = ['index.html', 'visit.html', 'style.css', 'manifest.webmanifest', 'icon.svg', 'icons', 'sw.js', 'js', 'vendor', 'prototypes'];
 const MODULE_DIRS = ['js', 'vendor'];
 
 rmSync(outDir, { recursive: true, force: true });
@@ -44,15 +44,18 @@ for (const dir of MODULE_DIRS) {
   }
 }
 
-const indexPath = join(outDir, 'index.html');
-let html = readFileSync(indexPath, 'utf8');
+// The game and the visit page (GDD #91) share the import map and stamps.
 const map = `<script type="importmap">\n${JSON.stringify({ imports }, null, 1)}\n</script>`;
-html = html.replace(/<script type="importmap">[\s\S]*?<\/script>/, map);
-html = html.replace(/(src="js\/main\.js)\?v=[^"]*"/, `$1?v=${version}"`);
-html = html.replace(/(href="style\.css)\?v=[^"]*"/, `$1?v=${version}"`);
-html = html.replace(/<html lang="en">/, `<html lang="en" data-channel="${channel}" data-version="${version}">`);
-if (channel !== 'main') html = html.replace(/<title>(.*?)<\/title>/, `<title>$1 (${channel.toUpperCase()})</title>`);
-writeFileSync(indexPath, html);
+for (const page of ['index.html', 'visit.html']) {
+  const pagePath = join(outDir, page);
+  let html = readFileSync(pagePath, 'utf8');
+  html = html.replace(/<script type="importmap">[\s\S]*?<\/script>/, map);
+  html = html.replace(/(src="js\/(?:main|visit)\.js)\?v=[^"]*"/, `$1?v=${version}"`);
+  html = html.replace(/(href="style\.css)\?v=[^"]*"/, `$1?v=${version}"`);
+  html = html.replace(/<html lang="en">/, `<html lang="en" data-channel="${channel}" data-version="${version}">`);
+  if (channel !== 'main') html = html.replace(/<title>(.*?)<\/title>/, `<title>$1 (${channel.toUpperCase()})</title>`);
+  writeFileSync(pagePath, html);
+}
 
 if (channel !== 'main') {
   const manifestPath = join(outDir, 'manifest.webmanifest');

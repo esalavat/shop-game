@@ -58,6 +58,8 @@ import { hasHelper } from './sim/upgrades.js';
 import { styleName } from './data/decor.js';
 import { createCreator } from './ui/creator.js';
 import { createNamer } from './ui/namer.js';
+import { encodeShop, visitUrl } from './sim/share.js';
+import { DEFAULT_SIGN } from './sim/shopName.js';
 import { createJuice } from './ui/juice.js';
 import { createAudio } from './audio/audio.js';
 import { createQuality } from './render/quality.js';
@@ -200,6 +202,25 @@ const decorate = createDecorate(state, thumbs, {
   },
 });
 const grow = createGrow(state, { onDecorate: () => enterDecorate(), onPlaceRoom: () => startPlacing(), onStyle: () => enterStyler(), onName: () => namer.open() });
+
+// Share your shop (GDD #91): a link to the visit page with the whole shop packed after the #. The phone's
+// share sheet if there is one, otherwise the link is copied (or the visit page opens). The framed picture comes with step 4.
+document.getElementById('btn-share').addEventListener('click', async () => {
+  audio.play('tap');
+  const url = visitUrl(location.href, await encodeShop(state));
+  const name = state.shopName || DEFAULT_SIGN.join(' ');
+  try {
+    if (navigator.share) return await navigator.share({ title: name, text: `Come visit ${name}! 🏠✨`, url });
+  } catch (e) {
+    if (e.name === 'AbortError') return; // closed the share sheet
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    toast('Link copied! Send it to a friend 💌');
+  } catch {
+    window.open(url, '_blank'); // no share sheet or clipboard: open the visit page, its address is the link
+  }
+});
 
 // Name your shop (GDD #91): from Grow or by tapping the roof sign; the new name goes up with a sparkle.
 const namer = createNamer(state, { onBoop: () => audio.play('boop') });

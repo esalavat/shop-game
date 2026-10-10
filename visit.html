@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#bfe3f5">
+<meta name="robots" content="noindex">
+<meta property="og:title" content="Come visit my shop! 🏠✨">
+<meta property="og:description" content="Take a look around my Dream Dollhouse Shop.">
+<title>Visit a Dream Dollhouse Shop</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css?v=11">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
+</script>
+</head>
+<body class="visit">
+<!-- The visit page (GDD #91): a friend's shop in 3D, view only, from a link made by the Share button. -->
+<div id="app">
+  <canvas id="game"></canvas>
+  <div id="visit-head" hidden>
+    <div class="visit-welcome">Welcome to <b class="visit-name"></b>!</div>
+    <div class="visit-tip">Pinch and drag to look around. Tap a room to peek inside.</div>
+  </div>
+  <div id="visit-bar" hidden>
+    <button id="visit-house"><span aria-hidden="true">🏠</span> Whole house</button>
+  </div>
+  <div id="visit-error" hidden>
+    <div class="rotate-card">🏠💭<br>This shop link doesn't work.<br><small>Ask your friend to share it again!</small></div>
+  </div>
+  <div id="boot-error" hidden>
+    <div class="rotate-card">Oops! The shop didn't open properly.<br><button id="boot-reload">Reload</button></div>
+  </div>
+</div>
+<script>
+  function showBootError() { if (!window.__booted) document.getElementById('boot-error').hidden = false; }
+  setTimeout(showBootError, 10000);
+  document.getElementById('boot-reload').addEventListener('click', function () { location.reload(); });
+</script>
+<script type="module" src="js/visit.js?v=1" onerror="showBootError()"></script>
+</body>
+</html>

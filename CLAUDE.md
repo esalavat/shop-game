@@ -225,8 +225,11 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
     f u c k), blocks phone numbers and websites, and lets innocent words through (Classic, Peacock, Grape). `safeName` is for
     the visit page. Sign lines from `signLines`; `createBuilding(..., shopName)`; the sign is a hit target (`userData.sign`).
     UI `js/ui/namer.js`. **Save version 24** (`state.shopName`, '' = the game's sign). `tests/shopName.test.js`.
-  - Next: step 2, the visit page (shop packed into the link), then 3 (shopkeeper, customers, view and day/night buttons),
-    then 4 (framed picture + share sheet).
+  - ✅ **Step 2, the visit page, built 2026-10-10, waiting for feedback:** 📤 in the HUD (left of 🔊) shares a link
+    `visit.html#v1.…` (the shop packed after the `#`, `js/sim/share.js`); `visit.html` / `js/visit.js` draw it in 3D, view
+    only: welcome card with the name, pinch / drag, tap a room to zoom in, 🏠 Whole house; a friendly card for broken links.
+    `docs/TECH.md` §9.2.1, `tests/share.test.js`. No save change.
+  - Next: step 3 (shopkeeper and a few browsing customers, view buttons, day / night), then 4 (framed picture + share sheet).
 - **Planned: 9-room Dream Dollhouse** (GDD v0.53 #92): a 3 × 3 house, 🪙 4,000 on the ladder once Bright opens, as a
   customer boost when numbers level off; room names to settle (§18 #22).
 
@@ -259,6 +262,7 @@ everyone (#85), decorating with the first shelf room (#86) and picture-wallpaper
 - Game feel is event-driven: `js/ui/juice.js` listens to sim events and plays sounds
   (`js/audio/audio.js`), 3D effects (`js/render/fx.js`), pop-ups (`js/ui/overlay.js`) and confetti
   (`js/ui/confetti.js`). Add new feedback there rather than in the sim.
+- `visit.html` / `js/visit.js` is the share link's view-only page (GDD #91, `docs/TECH.md` §9.2.1); it reuses the render code.
 - `js/main.js` wires everything together: a fixed-step 10 Hz sim tick plus per-frame rendering with
   interpolation.
 
