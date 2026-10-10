@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.51 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.52 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -97,6 +97,7 @@
 | 88 | **Taller rooms, no front railing upstairs** (user): every room is about 12% taller (ceiling 2.8 instead of 2.5), so more wallpaper shows above the shelves; the low railing along the front of upstairs rooms is gone (it hid the floor). The railing round the stair hole stays (tap it to go down). Smaller decorate and creator panels (one swipe row per choice) and a scrolling Dream Dollhouse picker came the same day | v0.50 |
 | 89 | **Store release and how the game makes money** (user; resolves §18 #1): **free to download, no ads ever.** Everything in the game today stays free. Money comes from **decoration packs** sold for real money, **$1.99 or $2.99** each, about **one new pack a month**, starting with **Christmas** (the first store release aims for early December 2026). Packs are **sold directly at a fixed price** (no Ribbons or coins for real money, nothing random) and are **just for looks** (no items that sell, nothing that changes coins, Sparkle or customers). **Packs are always for sale**: featured in their season, never "gone forever". Released **worldwide** except mainland China (needs a government game licence); English only to start. Packs are themed on holidays and ideas, not northern-hemisphere seasons (Christmas is summer in Australia). Published by an **LLC** so the developer's own name and address stay private (§16). **The web build stays free and is never promoted**: it's the test build, so changes can be tried without phone releases, may go behind a login later, and never sells packs (the debug panel unlocks them for testing) | v0.51 |
 | 90 | **Decorating the outside of the shop** (user; designed with the Christmas pack, §18 #19): the street and the front of the house can be decorated too, e.g. Christmas decorations by the street trees and **lights on the house**. **Some pieces are free for everyone, some come in the paid packs.** Details (where pieces go, how you place them, which are free) to design before building | v0.51 |
+| 91 | **Sharing: a framed picture plus a link to a 3D visit** (user; replaces the Snapshot / code phases of §6.5): one **Share** button sends a **framed picture** of the house and a **link** through the phone's share sheet. The link opens a public, view-only **visit page** with the shop in 3D: zoom into any room and see its decorations and shelf items; the shopkeeper and a few browsing customers are there; buttons for the whole house, the Dream Dollhouse and **day / night**; a **"Get the game"** button once the store builds exist. **No server:** the shop is packed into the link after the `#`. **Shops get a name you type** (filter, length limit, real-name hint), shown on the roof sign, the frame and the visit page; preset names if typing doesn't work out. Details in §6.5 | v0.52 |
 
 ## 1. Pitch
 
@@ -306,11 +307,12 @@ Your very own dollhouse, displayed in the shop's front window.
 - Sparkle milestones unlock new things (catalog pages, story moments, decorations).
 - **Decided v0.9:** a window-peeker sometimes points at something in the window ("I want that!" with its picture). If you have it in stock, that's an easy sale; if not, it becomes a wish note.
 
-### 6.5 Sharing (future)
-- **Phase 1 (no server):** a **Snapshot** button makes a pretty photo of your Dream Dollhouse to save or share.
-- **Phase 2:** share a dollhouse as a code or link that friends can open in a view-only viewer.
-- **Phase 3 (needs a backend):** visit friends' dollhouses and leave a heart or sticker. Preset reactions only (no chat), with an age check / parental gate (§3.1).
-- For this age group, sharing is a big motivator. Snapshot is planned right after the MVP.
+### 6.5 Sharing (decided v0.52, #91)
+- **Share button:** makes a **framed picture** of the whole house (with the shop's name) and opens the phone's share sheet with the picture **and a link** together ("Come visit my shop! 🏠✨ <link>"). The picture can also be saved to the photos.
+- **The link opens a view-only 3D copy of the shop** in a public **visit page**: pinch, pan and tap a room to zoom in, like the game; every room's decorations, every shelf item, the Dream Dollhouse, and your shopkeeper with a few customers wandering about (browsing only, no sales). **View buttons:** whole house, the Dream Dollhouse window, and **day / night**. A **"Get the game"** button joins once the store builds exist.
+- **No server:** the shop travels inside the link, after the `#`, which is never sent to any server (measured: ~900 characters for a 5-room shop, ~3,100 for 56 rooms, before trimming). The link is a snapshot of the shop when it was shared. Nothing is uploaded or stored; no accounts.
+- **Shop name:** you can **type a name for your shop** (short, with a word filter and a "don't use your real name" hint); it goes on the roof sign, the picture's frame and the visit page. Preset names are the fallback if typed names turn out not to work (§18 #21).
+- **Later (needs a backend):** short share codes, visiting friends' shops and leaving a heart or sticker. Preset reactions only (no chat), with an age check / parental gate (§3.1).
 
 ## 7. Shop Days
 
@@ -513,7 +515,7 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - More morning picks and special days
 - First regulars and story moments
 - More items, Collection pages, decorations
-- **Snapshot sharing** (high priority for this audience)
+- [ ] **Sharing: a framed picture and a link to a 3D visit page, shop names** (#91, next)
 - More Dream Dollhouse rooms
 - More shopkeeper outfits and accessories
 - Offline earnings; background music (sound effects are done, #46)
@@ -555,3 +557,4 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 18. ✅ **Resolved (#87).** **Collection reward styles should be fun and special** (user, 2026-10-10): rewards should be theme-specific and different from normal decorations, e.g. **Pet Corner → a cat-face wallpaper**, and the Bright and Dazzle rounds' rewards should match their round's colors. Today's rewards are mostly ordinary Ribbon-shop styles (gingham, stars, a cherry rug, grape curtains). Since #86 they can't be bought, which leaves the Ribbon shop small (28 looks, about 🎀 150 in all, one wallpaper pattern); the old reward styles could go back into the Ribbon shop once new prizes replace them. Not designed yet.
 19. **Christmas pack and outside decorations** (user, 2026-10-10, #89, #90): to design together before building. What's in the pack (outside pieces, room styles, an outfit?) and which pieces are free for everyone; where outside pieces go (by the street trees, along the sidewalk, lights on the house front, the roof?) and how you place them (fixed spots like the room styles, or tap a spot); whether free seasonal pieces switch on by the date or stay once added; price $1.99 or $2.99.
 20. **Business setup for the stores** (user, 2026-10-10, #89): LLC (which state; a registered agent), business address and phone for the store pages, EIN, D-U-N-S, a business bank account, Apple and Google company accounts, a business domain and email, and maybe moving the repo to a GitHub organization (that changes the web address, so web saves need the transfer code first). The user is handling this, starting now, for the December target.
+21. **Typed shop names** (user, 2026-10-10, #91): the user prefers typing over presets. Things to get right: a word filter (also applied on the visit page, since anyone can hand-make a link with any text), a short limit (~20 characters), a hint not to use your real name, and whether the stores' rules on user-generated content need anything more (the name only reaches people the player sends the link to). Fall back to presets ("The Sparkly Teacup", built from word pieces) if needed.

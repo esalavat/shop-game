@@ -214,7 +214,11 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   China; published by an LLC (the user is setting up the business side, GDD §18 #20). **Target: in the iOS and Android
   stores with the Christmas pack by early December 2026.** The web build stays free, unpromoted, the test build (never sells
   packs). Outside decorations (street, trees, lights on the house; some free, some in packs) are part of the Christmas pack,
-  to design later (§18 #19). **Sharing comes first** (next, being discussed).
+  to design later (§18 #19).
+- **Sharing, designed 2026-10-10, next to build** (GDD v0.52 #91, §6.5): Share button → framed picture of the house +
+  a link (shop packed after the `#`, no server) to a public view-only 3D visit page (zoom into rooms, shopkeeper and a few
+  browsing customers, whole house / Dream Dollhouse / day-night buttons, "Get the game" later). Typed shop names on the roof
+  sign, frame and visit page (filter, §18 #21) — a save change.
 
 **Next:** playtest feedback on v2026.10.10.2 (#80-#87). Waiting on feedback: the balancing pass (#80), Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71).
