@@ -5,8 +5,9 @@ import { makeRoom } from './building.js';
 import { createKeeper } from './keeper.js';
 import { dropBox } from './stock.js';
 import { emptyStats } from './day.js';
+import { ribbonsForCollection } from './decor.js';
 
-export const STATE_VERSION = 16;
+export const STATE_VERSION = 17;
 
 /** Live-only fields: never saved, reset on every load (customers just walk in again). */
 export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer', 'cashier'];
@@ -38,6 +39,7 @@ export function createState(now = Date.now()) {
     coins: 50,
     hearts: 0,
     sparkle: 0,
+    ribbons: 0, // Ribbons 🎀 for room styles (GDD #68); set below from the starter Collection
     building: {
       rooms: [makeRoom('r1', 'shop', 0, 0)],
     },
@@ -47,6 +49,7 @@ export function createState(now = Date.now()) {
     collection: {},
     dollhouse: { slots: {} }, // slotId -> itemId (data/dollhouse.js); on show once the Window Display is built
     wishes: [],
+    decor: { owned: {} }, // room styles bought with Ribbons ('kind:id' -> true; sim/decor.js); each room wears room.decor
     // The shopkeeper's look, girl or boy (the creator, ui/creator.js); `created` is false until the player has seen the creator.
     shopkeeper: { body: 'girl', hair: 'bun', hairColor: '#c2563a', skin: '#ffd9c2', outfit: '#9fe0c8', accessory: 'none', created: false },
     upgrades: {}, // id -> true (data/upgrades.js)
@@ -58,5 +61,6 @@ export function createState(now = Date.now()) {
     lastSeen: now,
   };
   giveStarterBoxes(state);
+  state.ribbons = ribbonsForCollection(state.collection);
   return resetTransient(state);
 }

@@ -3,7 +3,9 @@
 import * as THREE from 'three';
 import { box, prism } from './models/prims.js';
 import { PALETTE as P } from './toon.js';
-import { ROOM_TYPES, ROOM_SIZE, ROOM_STYLES } from '../data/rooms.js';
+import { ROOM_TYPES, ROOM_SIZE } from '../data/rooms.js';
+import { roomLook } from '../data/decor.js';
+import { wallMaterial, floorMaterial } from './patterns.js';
 import { FIXTURES } from '../data/fixtures.js';
 import { buildFixture, fixtureHitbox } from './models/furniture.js';
 import { STAIRS, DOORWAY } from '../sim/route.js';
@@ -27,7 +29,8 @@ export function layoutRooms(rooms) {
 /** The hole in the Stairwell top's floor (room-local x0..x1, z0..z1), over the spiral stairs. */
 const STAIR_HOLE = { x0: -W / 2, x1: STAIRS.center.x + 0.6, z0: -D / 2 - 0.1, z1: STAIRS.center.z + 0.6 };
 
-export function createBuilding(rooms, lighting) {
+/** `preview` ({ roomId, decor }) shows styles on one room without saving them (decorate mode). */
+export function createBuilding(rooms, lighting, preview = null) {
   const group = new THREE.Group();
   const layout = layoutRooms(rooms);
   const occupied = new Set(rooms.map((r) => `${r.col},${r.floor}`));
@@ -49,7 +52,7 @@ export function createBuilding(rooms, lighting) {
     }
     if (!has(r.col, r.floor + 1)) box(group, W + 2 * T, T, D + 0.2, P.cream, cx, fy + H + T / 2, 0).castShadow = false;
     if (r.floor > 0) frontRail(group, cx, fy);
-    hitTargets.push(...furnishRoom(group, r, cx, fy, lighting));
+    hitTargets.push(...furnishRoom(group, r, cx, fy, lighting, preview?.roomId === r.id ? preview.decor : null));
   }
 
   const { width } = layout;
@@ -114,34 +117,40 @@ function addRoofs(group, rooms, layout) {
  * Wallpaper, floor, window, lamp and furniture. Returns the meshes a tap can land on, tagged with
  * userData.roomId plus either `floor: true` or a `fixtureId`.
  */
-function furnishRoom(group, room, cx, fy, lighting) {
-  const look = { ...ROOM_TYPES[room.type], ...(room.style != null ? ROOM_STYLES[room.style % ROOM_STYLES.length] : null) };
-  const back = box(group, W, H, T, look.paper, cx, fy + H / 2, -D / 2 - T / 2);
+function furnishRoom(group, room, cx, fy, lighting, preview) {
+  const look = roomLook(room, preview), { paper, pattern } = look;
+  // A printed pattern (dots, gingham, stars, hearts) goes on the wall itself; stripes are boxes below.
+  const printed = pattern.id !== 'stripes' && pattern.id !== 'plain';
+  const back = box(group, W, H, T, printed ? wallMaterial(paper, pattern, W, H) : paper.paper, cx, fy + H / 2, -D / 2 - T / 2);
   back.userData.roomId = room.id;
   const floors = [];
+  const floorPiece = (w, d, x, z) => floors.push(box(group, w, 0.02, d, floorMaterial(look.floor, w, d), x, fy + 0.01, z));
   if (room.type === 'landing') { // around the hole the stairs come up through
     const { x1, z1 } = STAIR_HOLE, front = D / 2 - z1, right = W / 2 - x1;
-    floors.push(box(group, W, 0.02, front, look.floor, cx, fy + 0.01, z1 + front / 2));
-    floors.push(box(group, right, 0.02, D - front, look.floor, cx + x1 + right / 2, fy + 0.01, -D / 2 + (D - front) / 2));
+    floorPiece(W, front, cx, z1 + front / 2);
+    floorPiece(right, D - front, cx + x1 + right / 2, -D / 2 + (D - front) / 2);
   } else {
-    floors.push(box(group, W, 0.02, D, look.floor, cx, fy + 0.01, 0));
+    floorPiece(W, D, cx, 0);
   }
   for (const f of floors) f.userData = { roomId: room.id, floor: true };
   const targets = [back, ...floors];
 
+  // Wallpaper stripes above the wainscot (GDD #68: or plain, or printed on the wall above).
   const wallZ = -D / 2;
-  for (let x = -W / 2 + 0.2; x < W / 2; x += 0.42) {
-    box(group, 0.13, H - 0.6, 0.01, look.stripe, cx + x, fy + 0.6 + (H - 0.6) / 2, wallZ + 0.005);
+  if (pattern.id === 'stripes') {
+    for (let x = -W / 2 + 0.2; x < W / 2; x += 0.42) {
+      box(group, 0.13, H - 0.6, 0.01, paper.stripe, cx + x, fy + 0.6 + (H - 0.6) / 2, wallZ + 0.005);
+    }
   }
-  box(group, W, 0.6, 0.03, look.stripe, cx, fy + 0.3, wallZ + 0.015);
+  box(group, W, 0.6, 0.03, paper.stripe, cx, fy + 0.3, wallZ + 0.015);
   box(group, W, 0.05, 0.06, P.cream, cx, fy + 0.6, wallZ + 0.03);
 
-  const win = look.window;
-  if (win) addWindow(group, cx + win.x, fy + 1.55, wallZ + 0.03, win.w, win.h, look.curtain, lighting.glassMat);
+  const win = ROOM_TYPES[room.type].window;
+  if (win) addWindow(group, cx + win.x, fy + 1.55, wallZ + 0.03, win.w, win.h, look.curtain.color, lighting.glassMat);
   lighting.addPendant(group, cx, fy + H, 0.1);
 
   for (const f of room.fixtures) {
-    const model = buildFixture(f.kind);
+    const model = buildFixture(f.kind, look);
     model.position.set(cx + f.x, fy, f.z);
     model.rotation.y = f.rot ?? 0;
     group.add(model);

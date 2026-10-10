@@ -1,4 +1,4 @@
-// Top HUD: coins, Hearts, Sparkle, and the day label with a bar showing how far through the
+// Top HUD: coins, Hearts, Sparkle, Ribbons, and the day label with a bar showing how far through the
 // open hours (or the evening) we are, with a midday mark once Lunchtime Delivery is owned.
 // Pops a counter when it goes up. The 🔊 button mutes sounds and vibration.
 
@@ -9,7 +9,7 @@ const PHASE_NAMES = { morning: 'Morning', open: 'Open', evening: 'Evening', clos
 const fmt = new Intl.NumberFormat();
 
 export function createHud(state, audio) {
-  const counters = ['coins', 'hearts', 'sparkle'].map((key) => ({
+  const counters = ['coins', 'hearts', 'sparkle', 'ribbons'].map((key) => ({
     key,
     el: document.querySelector(`#hud-${key} b`),
     shown: null,

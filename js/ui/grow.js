@@ -2,7 +2,8 @@
 // upgrades to buy. After the Window Display, "Build a room" closes the sheet so you can tap a + spot
 // on the building (main.js placement mode); rooms further out cost more (GDD §18 #8). After the first
 // room comes the Stairwell, always built right next to the shop, then more floors, each pricier. The button glows when there's something new you can afford. Once the Window
-// Display is built, a separate Dollhouse button appears next to it and opens decorate mode.
+// Display is built, a separate Dollhouse button appears next to it and opens decorate mode. At the top,
+// Decorate rooms opens the room styler (ui/styler.js, GDD #68).
 
 import { nextExpansion, buildExpansion, canBuildRooms, roomSpots, roomCost, canBuildStairwell, buildStairwell, hasStairwell, buildFloor, stairCost, stairRooms } from '../sim/building.js';
 import { displayRoom } from '../sim/collection.js';
@@ -17,7 +18,7 @@ const ROOM_INFO = {
   },
 };
 
-export function createGrow(state, { onDecorate, onPlaceRoom }) {
+export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
   const button = document.getElementById('btn-grow');
   const dollButton = document.getElementById('btn-dollhouse');
   const toolbar = document.getElementById('toolbar');
@@ -40,6 +41,7 @@ export function createGrow(state, { onDecorate, onPlaceRoom }) {
     else if (kind === 'stairs' && buildStairwell(state)) sheet.hidden = true;
     else if (kind === 'floor' && buildFloor(state)) sheet.hidden = true;
     else if (kind === 'place') { sheet.hidden = true; return onPlaceRoom(); }
+    else if (kind === 'style') { sheet.hidden = true; return onStyle(); }
     else if (kind === 'helper') hireHelper(state, id);
     else if (kind === 'upgrade') buyUpgrade(state, id);
     render();
@@ -60,7 +62,10 @@ export function createGrow(state, { onDecorate, onPlaceRoom }) {
 
   function render() {
     const next = nextExpansion(state);
-    let html = '<div class="grow-section">Rooms</div>';
+    let html = `<div class="grow-card small grow-style"><div class="grow-art" aria-hidden="true">🎨</div><div><h3>Decorate rooms</h3>
+      <p>Wallpaper, floors, rugs, curtains and corner pieces, paid for with Ribbons 🎀 from granted wishes and new finds.</p></div>
+      <button class="grow-build" data-buy="style">Decorate · 🎀 ${state.ribbons}</button></div>`;
+    html += '<div class="grow-section">Rooms</div>';
     if (next) {
       const info = ROOM_INFO[next.type];
       const btn = price(next.cost, false) ?? `<button class="grow-build" data-buy="room:${next.type}">Build it! 🪙 ${next.cost}</button>`;

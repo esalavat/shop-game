@@ -1,5 +1,6 @@
 // Debug panel, enabled with ?debug in the URL. Loaded on demand so players never download it.
 
+import { addRibbons } from '../sim/decor.js';
 import { addCoins } from '../sim/economy.js';
 import { addRoom, addStairwell, addFloor, hasStairwell, roomSpots } from '../sim/building.js';
 import { ITEMS } from '../data/items.js';
@@ -14,6 +15,7 @@ export function createDebug({ state, renderer, quality, onViewAll, onReset, onCo
     <div class="debug-panel" hidden>
       <div class="debug-stats"></div>
       <button data-act="coins">+100 coins</button>
+      <button data-act="ribbons">+20 🎀</button>
       <button data-act="fill">Fill shelves</button>
       <button data-act="customer">Spawn customer</button>
       <button data-act="skip">Skip ahead ⏩</button>
@@ -32,6 +34,7 @@ export function createDebug({ state, renderer, quality, onViewAll, onReset, onCo
 
   const actions = {
     coins: () => addCoins(state, 100),
+    ribbons: () => addRibbons(state, 20, 'debug'),
     fill: () => {
       const ids = Object.keys(ITEMS);
       let n = 0;

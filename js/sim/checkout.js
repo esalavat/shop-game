@@ -7,6 +7,7 @@ import { ITEMS } from '../data/items.js';
 import { CUSTOMER } from '../data/customers.js';
 import { addCoins } from './economy.js';
 import { recordSale } from './day.js';
+import { ribbonsForSale } from './decor.js';
 
 export function counterOf(state, roomId) {
   return state.building.rooms.find((r) => r.id === roomId)?.fixtures.find((f) => f.kind === 'counter') ?? null;
@@ -52,6 +53,7 @@ export function completeSale(state, rand = Math.random, { tip: tips = true, by =
   recordSale(state, { amount, tip, items: c.items.map((i) => i.itemId) });
   state.checkout = null;
   events.emit('sale', { amount, tip, by, customerId: c.customerId });
+  ribbonsForSale(state, customer, c.items.map((i) => i.itemId));
   if (customer) {
     customer.basket = [];
     customer.takenFrom = [];

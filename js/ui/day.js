@@ -83,6 +83,9 @@ export function createDayUI(state, thumbs, orderBook, toast, audio) {
       ['💝', st.tips, 'in tips'],
     ].map(([ico, n, what]) => `<div class="stat${animate ? '' : ' done'}"><b>${ico} <i data-n="${n}">${n}</i></b><span>${what}</span></div>`).join('');
     sheet.querySelector('.summary-record').hidden = animate || !st.record;
+    const rib = sheet.querySelector('.summary-ribbons');
+    rib.hidden = !st.ribbons;
+    rib.textContent = `🎀 +${st.ribbons} Ribbon${st.ribbons === 1 ? '' : 's'} today, for room styles`;
 
     const row = (counts) => `<div class="thumb-row">${Object.entries(counts)
       .map(([id, n]) => `<div class="thumb" title="${ITEMS[id].name}"><img alt="${ITEMS[id].name}" src="${thumbs.get(id)}">${n > 1 ? `<i>×${n}</i>` : ''}</div>`)

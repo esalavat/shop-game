@@ -255,3 +255,18 @@ test('a v14 save gets walks in legs and a height for the stairs (GDD #58)', () =
   assert.deepEqual(s.stocker.legs, []);
   assert.equal(s.stocker.carrying.itemId, 'doll');
 });
+
+test('a v16 save gets Ribbons for its Collection and no styles yet (GDD #68)', () => {
+  const store = memoryStorage();
+  const v16 = { ...createState(0), version: 16 };
+  delete v16.ribbons; delete v16.decor; delete v16.day.stats.ribbons;
+  // Every Tea Time item (a complete theme) plus the Cozy Chair: 5 items and 1 theme.
+  v16.collection = { teaset: true, cupcakes: true, trolley: true, caketower: true, chair: true };
+  store.setItem(SAVE_KEY, JSON.stringify(v16));
+  const s = loadGame(store);
+  assert.equal(s.version, STATE_VERSION);
+  assert.equal(s.ribbons, 5 * 2 + 5);
+  assert.deepEqual(s.decor, { owned: {} });
+  assert.equal(s.day.stats.ribbons, 0);
+  assert.equal(s.building.rooms[0].decor, undefined);
+});

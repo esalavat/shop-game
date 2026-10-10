@@ -6,6 +6,12 @@ Design questions (not bugs) belong in [GDD.md](GDD.md) §18.
 
 ## Open
 
+### The shop's corner piece hides behind the counter (2026-10-09, noticed in testing)
+- In the main shop the plant spot is in the back-left corner, behind the counter, so a new corner piece (Decorate
+  rooms → Corner, GDD #68) is mostly hidden by your shopkeeper, Mia and the customer at the till. Other rooms show it
+  near the front. Could move the shop's plant (its fixture position is saved, so it needs a migration) or give the shop
+  a different decor spot.
+
 ### Toasts sit on top of the "Tap a ＋" banner (2026-10-09, noticed in testing)
 - In room placement mode, a toast (e.g. "Your 🪜 Stairwell is open!") appears over the place banner at the top, so
   both are hard to read for a moment. Minor; move toasts below the banner while it shows, or hide the banner first.

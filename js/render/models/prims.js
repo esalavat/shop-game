@@ -32,6 +32,6 @@ export function prism(parent, w, h, d, mat) {
 export function disposeTree(obj) {
   obj.traverse((o) => {
     o.geometry?.dispose();
-    if (o.material?.map) o.material.map.dispose();
+    if (o.material?.map && !o.material.map.userData.keep) o.material.map.dispose(); // shared pattern textures stay
   });
 }

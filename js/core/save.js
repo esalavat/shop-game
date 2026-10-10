@@ -13,6 +13,7 @@ import { defaultFixtures } from '../sim/building.js';
 import { createKeeper } from '../sim/keeper.js';
 import { emptyStats } from '../sim/day.js';
 import { settleBoxes } from '../sim/stock.js';
+import { ribbonsForCollection } from '../sim/decor.js';
 import { CHANNEL } from './channel.js';
 
 /** Old theme room types (v14-v15) and the ROOM_STYLES look each one becomes. */
@@ -109,6 +110,15 @@ const MIGRATIONS = {
       },
     };
   },
+  // v17: the decoration shop (GDD #68): Ribbons, as if earned for everything found so far, and owned
+  // room styles (none yet; rooms without room.decor keep their looks).
+  16: (d) => ({
+    ...d,
+    version: 17,
+    ribbons: ribbonsForCollection(d.collection ?? {}),
+    decor: { owned: {} },
+    day: { ...d.day, stats: { ribbons: 0, ...d.day.stats } },
+  }),
 };
 
 export function migrate(data) {

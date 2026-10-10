@@ -7,6 +7,7 @@ import { events } from '../core/events.js';
 import { dropBox } from './stock.js';
 import { ITEMS, boxCost } from '../data/items.js';
 import { openPageCount, orderableItems } from './catalog.js';
+import { ribbonsForDay, ribbonsForFinds } from './decor.js';
 
 export const DAY_LENGTH = {
   open: 180,    // seconds of open hours
@@ -16,7 +17,7 @@ export const DAY_LENGTH = {
 export const MIDDAY = 0.5; // fraction of open hours when Pip's lunchtime delivery comes (upgrade)
 
 export function emptyStats() {
-  return { coins: 0, tips: 0, served: 0, hearts: 0, sold: {}, wishes: [], record: false };
+  return { coins: 0, tips: 0, served: 0, hearts: 0, ribbons: 0, sold: {}, wishes: [], record: false };
 }
 
 function setPhase(state, phase) {
@@ -65,6 +66,7 @@ export function tickDay(state, dt) {
 
 function closeDay(state) {
   setPhase(state, 'close');
+  ribbonsForDay(state);
   recordBest(state);
   events.emit('dayClosed', { day: state.day.number, stats: state.day.stats });
 }
@@ -147,6 +149,7 @@ export function deliverOrders(state, isDue = (o) => dueInMorning(o, state.day.nu
     }
   }
   events.emit('boxesChanged');
+  ribbonsForFinds(state, discovered);
   const opened = [];
   for (let page = pagesBefore; page < openPageCount(state); page++) {
     opened.push(page);

@@ -50,6 +50,8 @@ import { createDayUI } from './ui/day.js';
 import { createAlbum } from './ui/album.js';
 import { createGrow } from './ui/grow.js';
 import { createDecorate } from './ui/decorate.js';
+import { createStyler } from './ui/styler.js';
+import { SETS } from './data/items.js';
 import { createCreator } from './ui/creator.js';
 import { createJuice } from './ui/juice.js';
 import { createAudio } from './audio/audio.js';
@@ -102,13 +104,15 @@ function roomOrigin(roomId) {
   return { x: L.roomX(room.col), y: L.roomY(room.floor), z: 0 };
 }
 
+let stylePreview = null; // a style tried on in decorate-rooms mode, not bought yet ({ roomId, decor })
+
 function buildWorld() {
   if (world) {
     scene.remove(world.group);
     disposeTree(world.group);
   }
   lighting.resetLamps();
-  const building = createBuilding(state.building.rooms, lighting);
+  const building = createBuilding(state.building.rooms, lighting, stylePreview);
   const group = new THREE.Group();
   group.add(building.group, createEnvironment(building.layout, lighting));
   scene.add(group);
@@ -154,7 +158,7 @@ const spotsView = createSpotsView(state, roomOrigin);
 const bubbles = createShopBubbles({ state, overlay, customersView, checkoutView, thumbs });
 const guide = createGuide({
   state, overlay, roomOrigin,
-  isBlocked: () => !!placing || creator.isOpen || decorate.isOpen || !state.shopkeeper.created || !!document.querySelector('.sheet:not([hidden])'),
+  isBlocked: () => !!placing || creator.isOpen || decorate.isOpen || styler.isOpen || !state.shopkeeper.created || !!document.querySelector('.sheet:not([hidden])'),
 });
 const juice = createJuice({ audio, fx, overlay, keeperView, helpersView, customersView, dollhouseView, checkoutView });
 scene.add(keeperView.object, helpersView.group, spotsView.group, boxesView.group, shelvesView.group, customersView.group, checkoutView.group, dollhouseView.group);
@@ -169,7 +173,13 @@ events.on('buildingChanged', () => {
   dollhouseView.rebuild();
   spotsView.rebuild();
   if (decorate.isOpen) decorate.close();
+  if (styler.isOpen) styler.close();
   focusAll();
+});
+events.on('decorChanged', ({ roomId }) => {
+  buildWorld();
+  const room = roomById(roomId), L = world.building.layout;
+  fx.sparkle(new THREE.Vector3(L.roomX(room.col), L.roomY(room.floor) + ROOM.H * 0.45, 0), { count: 10, spread: 2.2 });
 });
 
 // ---------------------------------------------------------------------------
@@ -183,7 +193,31 @@ const decorate = createDecorate(state, thumbs, {
     if (room) focusRoom(room);
   },
 });
-const grow = createGrow(state, { onDecorate: () => enterDecorate(), onPlaceRoom: () => startPlacing() });
+const grow = createGrow(state, { onDecorate: () => enterDecorate(), onPlaceRoom: () => startPlacing(), onStyle: () => enterStyler() });
+
+// ---------------------------------------------------------------------------
+// Decorate rooms (GDD #68): style the room above the panel with Ribbons
+// ---------------------------------------------------------------------------
+const styler = createStyler(state, {
+  onRoom(room) {
+    focusedRoomId = room.id;
+    const L = world.building.layout, cover = styler.coverFraction();
+    rig.frame(L.roomX(room.col), L.roomY(room.floor) + ROOM.H / 2 - 0.1, ROOM.W + 0.3, (ROOM.H + 0.3) / (1 - cover), false, cover / 2);
+  },
+  onPreview(roomId, decor) {
+    stylePreview = decor ? { roomId, decor } : null;
+    buildWorld();
+  },
+  onBought: () => { audio.play('sparkle'); audio.buzz(15); },
+  onClose: (room) => focusRoom(room),
+});
+
+function enterStyler() {
+  orderBook.close();
+  if (decorate.isOpen) decorate.close();
+  stopPlacing();
+  styler.open(focusedRoomId ?? state.keeper.roomId);
+}
 
 // ---------------------------------------------------------------------------
 // Building a room (GDD #58, §18 #8): after "Build a room" in the Grow sheet, tap a glowing + spot.
@@ -257,6 +291,7 @@ const creator = createCreator(state, {
   onOpen() {
     orderBook.close();
     if (decorate.isOpen) decorate.close();
+    if (styler.isOpen) styler.close();
     const o = roomOrigin(state.keeper.roomId);
     const cover = creator.coverFraction();
     if (!state.keeper.path.length) state.keeper.facing = 0; // turn to face you
@@ -277,6 +312,11 @@ const creator = createCreator(state, {
 attachGestures(canvas, {
   onTap(x, y) {
     if (creator.isOpen || placing) return;
+    if (styler.isOpen) {
+      const hit = pickAt(rig.camera, canvas, x, y, world.building.hitTargets);
+      if (hit?.object.userData.roomId) styler.select(hit.object.userData.roomId);
+      return;
+    }
     if (decorate.isOpen) {
       const hit = pickAt(rig.camera, canvas, x, y, dollhouseView.hitTargets);
       if (hit) decorate.select(hit.object.userData.dollSlot);
@@ -341,7 +381,7 @@ document.getElementById('btn-album').addEventListener('click', () => album.open(
 events.on('orderPlaced', ({ order }) => toast(`Ordered ${ITEMS[order.itemId].name}! Pip brings it ${order.lunch ? 'at lunchtime 🥪' : 'tomorrow 📦'}`));
 events.on('lunchDelivery', ({ delivered }) => {
   toast(`Lunchtime! Pip delivered ${delivered.boxes} box${delivered.boxes > 1 ? 'es' : ''} 📦`);
-  for (const id of delivered.discovered) toast(`✨ New in your Collection: ${ITEMS[id].name}`);
+  for (const id of delivered.discovered) toast(`✨ New in your Collection: ${ITEMS[id].name} +2 🎀`);
   pageToasts(delivered);
 });
 events.on('upgradeBought', ({ id }) => toast(`${UPGRADES[id].icon} ${UPGRADES[id].name}: yours!`));
@@ -351,7 +391,7 @@ events.on('dayStarted', ({ day, delivered, rescued }) => {
   const boxes = delivered.boxes ? ` Pip delivered ${delivered.boxes} box${delivered.boxes > 1 ? 'es' : ''} 📦` : '';
   toast(`Good morning! Day ${day}.${boxes}`);
   if (rescued) toast(`Pip left you a free box of ${ITEMS[rescued].name}, just because 🎁`);
-  for (const id of delivered.discovered) toast(`✨ New in your Collection: ${ITEMS[id].name}`);
+  for (const id of delivered.discovered) toast(`✨ New in your Collection: ${ITEMS[id].name} +2 🎀`);
   pageToasts(delivered);
 });
 function pageToasts(delivered) {
@@ -383,6 +423,20 @@ events.on('expanded', ({ room }) => {
     setTimeout(() => toast('Fill its shelves to sell even more 🛍️'), 1200);
   }
 });
+// Ribbons (GDD #68): a pop-up at the counter for granted wishes and window wants, a toast for a complete theme.
+let toldAboutRibbons = false;
+events.on('ribbons', ({ amount, why }) => {
+  if (why === 'wish' || why === 'window') {
+    const p = checkoutView.counterTop();
+    if (p) overlay.float(p.add(new THREE.Vector3(0.3, 0.9, 0)), `+${amount} 🎀`, 'ribbon', { delay: 0.35 });
+    if (!toldAboutRibbons) {
+      toldAboutRibbons = true;
+      toast(why === 'wish' ? 'Wish granted! +1 🎀 Spend Ribbons in Grow → 🎨 Decorate rooms' : 'They got what they saw in the window! +1 🎀');
+    }
+  }
+});
+events.on('ribbons', ({ why, set, amount }) => { if (why === 'theme') toast(`🌟 ${SETS[set]} complete! +${amount} 🎀`); });
+events.on('wishGranted', () => audio.play('twinkle'));
 events.on('dollhouseChanged', ({ slotId, gained }) => {
   const p = dollhouseView.worldPosition(slotId);
   if (p && gained > 0) overlay.float(p, `+${gained} ✨`, 'sparkle');
@@ -412,7 +466,7 @@ function tapFeedback() {
 /** Bobbing icons over the bonus spots (hidden while decorating or in the creator). */
 const shownMarkers = new Set();
 function updateSpotMarkers() {
-  const list = decorate.isOpen || creator.isOpen ? [] : spotsView.markers();
+  const list = decorate.isOpen || creator.isOpen || styler.isOpen ? [] : spotsView.markers();
   const keep = new Set(list.map((m) => m.id));
   for (const id of shownMarkers) if (!keep.has(id)) { overlay.removeBubble(`spot-${id}`); shownMarkers.delete(id); }
   for (const m of list) {
@@ -465,7 +519,7 @@ const save = () => { if (!resetting) saveGame(state); };
 setInterval(save, AUTOSAVE_SECONDS * 1000);
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 addEventListener('pagehide', save);
-for (const e of ['orderPlaced', 'dayStarted', 'stocked', 'sale', 'phaseChanged', 'dayClosed', 'expanded', 'dollhouseChanged', 'upgradeBought', 'helperHired', 'lunchDelivery']) events.on(e, save);
+for (const e of ['orderPlaced', 'dayStarted', 'stocked', 'sale', 'phaseChanged', 'dayClosed', 'expanded', 'dollhouseChanged', 'upgradeBought', 'helperHired', 'lunchDelivery', 'decorChanged', 'decorBought']) events.on(e, save);
 
 // ---------------------------------------------------------------------------
 // Debug (?debug)

@@ -50,6 +50,7 @@ js/
     customers.js        # Customer types: wants, budgets, looks
     story.js            # Regulars, story beats, triggers
     upgrades.js         # Upgrades (Stock Cart, Comfy Shoes, Lunchtime Delivery) and helpers (Mia): costs, tuning
+    decor.js            # Room styles for the decoration shop (DECOR: paper, pattern, floor, rug, curtain, corner), Ribbon rates, roomLook()
   sim/                  # Pure game logic. No three.js, no DOM.
     state.js            # Creates a fresh game state; schema version
     day.js              # Day phases: morning → open → evening → close
@@ -64,6 +65,7 @@ js/
     tutorial.js         # First-day guide steps (state.tutorial: box → shelf → open → register → done), advanced each tick
     stocker.js          # Bea the stocker: fetches doorstep boxes and unpacks them in any room; Sorting Smarts (state.stocker, saved)
     upgrades.js         # Buying upgrades / hiring helpers (one-time; state.upgrades, state.helpers)
+    decor.js            # Ribbons (earning: wishes granted, window wants, finds, themes, end of day) and buying / putting on room styles (GDD #68)
     route.js            # Walking between rooms and onto the street (planRoute, startRoute/finishRoute/settleRoute/routeTo, doors)
     economy.js          # Coins, Hearts, Sparkle, costs
     story.js            # Checks triggers, queues story moments
@@ -73,7 +75,8 @@ js/
     toon.js             # Toon material factory + shared gradient map, palette
     lighting.js         # Sun/hemi/fill/lamps; time-of-day blending
     camera.js           # Camera rig: room/building framing, pan, pinch, focus
-    building.js         # Builds the room grid shell from state
+    building.js         # Builds the room grid shell from state; each room drawn in its roomLook (styles, plus a preview in decorate-rooms mode)
+    patterns.js         # Canvas textures for wallpaper patterns and floors (cached, never disposed), and swatch pictures for the panel
     rooms/              # Room interior builders per room type
     models/             # Procedural low-poly model builders (items, characters, furniture)
     views/              # Sync state → scene: shelves, customers, boxes, checkout, dollhouse (items in its rooms), keeper, helpers (Mia, Bea)
@@ -86,6 +89,7 @@ js/
     toolbar.js          # Bottom buttons
     orderbook.js, album.js, grow.js (Grow sheet: rooms, helpers, upgrades; Dollhouse button), decorate.js, day.js (summary)
     story.js            # Dialogue cards for story moments
+    styler.js           # Decorate rooms (GDD #68): bottom panel, ◀ ▶ rooms, tabs, preview → Get it with Ribbons
     creator.js          # Shopkeeper creator (bottom panel; camera frames the shopkeeper above it)
     juice.js            # Game feel: sim events → sounds, sparkles, hearts, confetti, haptics
     confetti.js         # Full-screen DOM confetti (Web Animations API)
@@ -119,10 +123,11 @@ docs/                   # GDD, tech plan
 
 ```js
 {
-  version: 16,                         // STATE_VERSION (js/sim/state.js)
+  version: 17,                         // STATE_VERSION (js/sim/state.js)
   day: { number: 1, phase: 'morning', time: 0 },
-  coins: 50, hearts: 0, sparkle: 0,
-  building: { rooms: [{ id, type, col, floor, style?, fixtures: [{ id, kind, x, z, slots? }] }] }, // type: shop | display | room | stairs | landing; style: shelf rooms (v16)
+  coins: 50, hearts: 0, sparkle: 0, ribbons: 4,   // Ribbons 🎀 for room styles (v17)
+  decor: { owned: { 'pattern:stars': true } },     // styles bought (v17); free ones (price 0) aren't listed
+  building: { rooms: [{ id, type, col, floor, style?, decor?, fixtures: [{ id, kind, x, z, slots? }] }] }, // type: shop | display | room | stairs | landing; style: shelf rooms (v16); decor: { kind: optionId } chosen styles (v17)
   stock: { boxes: [...], back: { itemId: count } },
   orders: [{ itemId, qty, arrivesDay }],
   customers: [{ id, type, state, pos, wants, cart, ... }],   // transient, not saved
@@ -149,6 +154,16 @@ docs/                   # GDD, tech plan
 - `ui/decorate.js` is a bottom panel (not a dimmed sheet) so the 3D dollhouse stays visible and tappable above it.
   `main.js` frames the camera with `rig.frame(..., lift)`, where `lift` raises the target above the panel.
 - While decorating, taps only hit the dollhouse's room hitboxes (`views/dollhouse.js`); the shop sim keeps running.
+- **Decorate rooms (GDD #68)** works the same way: `ui/styler.js` is a bottom panel; `main.js` frames the chosen room
+  above it, and taps only pick rooms (`world.building.hitTargets`). A room's look is `roomLook(room, preview)`
+  (`data/decor.js`): base defaults ← the room type's `decor` ← its wallpaper (`ROOM_STYLES[room.style]`) ←
+  `room.decor` ← a preview. Trying on a style you don't own rebuilds the world with `createBuilding(..., { roomId, decor })`
+  and never touches state, so an autosave can't keep an unpaid style; buying calls `buyDecor` then `styleRoom`
+  (`decorChanged` → rebuild). Wallpaper patterns and floors are canvas textures (`render/patterns.js`) printed on the
+  back wall / floor boxes; the corner piece replaces the plant fixture's model (same footprint) and the rug the rug's.
+- Ribbons are earned in the sim: `ribbonsForSale` (from `completeSale`: a wished-for item uses up the oldest matching
+  wish note; a window-peeker's `windowWant`), `ribbonsForFinds` (from `deliverOrders`), `ribbonsForDay` (at closing).
+  All go through `addRibbons`, which also counts `day.stats.ribbons` and emits `ribbons`.
 
 ### 4.3.2 Helpers & upgrades (M7)
 - `sim/helpers.js`: Mia stands at the counter's use spot (the till). When the shopkeeper is at the counter or walking
@@ -394,9 +409,9 @@ Each milestone ends with a push so it's playable on your phone.
 | Stairwell and upstairs rooms (#58 step 2, #61, #64) | ✅ built (waiting for the user's feedback); see §4.3.3, §11.1 |
 | Quick evenings and Close now (#62, #63) | ✅ built (waiting for the user's feedback) |
 | Plain shelf rooms, more floors, prices by distance (#65) | ✅ built (waiting for the user's feedback) |
-| **Decoration shop** (GDD §18 #9) | ⏭ next to design |
+| Decoration shop with Ribbons 🎀 (#68) | ✅ built (waiting for the user's feedback); see §4.3.1 |
 | 24 items on four catalog pages that open as you collect (#66) | ✅ built (waiting for the user's feedback) |
-| Color variants, more items, Collection bonus and page rewards (#59) | after the decoration shop |
+| Color variants, more items, Collection bonus and page rewards (#59) | ⏭ next |
 
 ### 11.1 Plan: Stairwell and upstairs (#58 step 2) — ✅ built 2026-10-09
 The plan as worked out; it was built this way (GDD #61, §4.3.3). Differences: the upstairs half is its own room

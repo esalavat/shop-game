@@ -101,13 +101,21 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   Open tuning question: Sparkle maxes out traffic with one Treasure (GDD §18 #10).
 - **Back to the summary after ordering** (GDD v0.30 #67), done: ✕ on an order book opened from the summary
   reopens it; the toolbar's Day summary button is pink.
-- **Next to design:** the **decoration shop** (its own currency) to restyle rooms (GDD #65).
+- **Decoration shop and Ribbons 🎀, built 2026-10-09, waiting for the user's feedback** (GDD v0.31 #68, §9.5): a new
+  currency, Ribbons, from granted wish notes (+1, the note is used up), window-peekers buying what they pointed at (+1),
+  new Collection items (+2), complete themes (+5) and +1 per 5 happy customers at closing (summary line). 🎀 in the HUD.
+  Grow → 🎨 Decorate rooms: bottom panel, ◀ ▶ or tap a room; tabs Walls (colour + pattern), Floor, Rug, Curtains (rooms
+  with a window), Corner (the plant spot). Tap to try a style on; owned ones go on at once, others show "Get it! 🎀 N".
+  Buy once, use in every room; looks already in the game are free; just for looks. Code: `js/data/decor.js`,
+  `js/sim/decor.js`, `js/ui/styler.js`, `js/render/patterns.js`; save version 17 (existing shops get 🎀 2 per item found +
+  5 per complete theme). Prices and rates are first guesses. Debug panel has +20 🎀. Known: the shop's corner piece is
+  hidden behind the counter (docs/ISSUES.md).
 - **Planned next, in order:** (#59) **more items** (toward 100+, color variants), the **Collection bonus** and page rewards (coins, confetti, a shopkeeper style). Later: more stockers
   (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issue: delivery boxes stack too
   high (delivery-bin idea, docs/ISSUES.md).
 
-**Next:** design the **decoration shop** (GDD §18 #9) with the user in a new session: discuss, update the GDD, then
-build. After that, the rest of #59 (color variants, Collection bonus, page rewards). Still waiting on feedback: the 24 items
+**Next:** the rest of #59 (color variants, more items, Collection bonus, page rewards; maybe a room style as a page
+reward). Still waiting on feedback: the decoration shop and Ribbons (#68), the 24 items
 and catalog pages, everything built 2026-10-09 (Stairwell, shelf rooms,
 floors and prices, quick evenings, Close now), M8 (home-screen install, fps on the Pixel), Bea, the first-day guide.
 

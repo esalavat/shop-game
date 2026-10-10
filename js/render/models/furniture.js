@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import { box, cyl, ball, prism } from './prims.js';
-import { PALETTE as P } from '../toon.js';
+import { PALETTE as P, toon, gradientMap } from '../toon.js';
 import { FIXTURES } from '../../data/fixtures.js';
 import { STAIRS, FLOOR_H } from '../../sim/route.js';
 
@@ -46,11 +46,9 @@ const BUILDERS = {
     g.add(house);
   },
 
-  plant(g) {
-    cyl(g, 0.18, 0.14, 0.3, 8, P.brick, 0, 0.15, 0);
-    ball(g, 0.3, P.leaf, 0, 0.5, 0, 0);
-    ball(g, 0.2, P.leafLight, 0.12, 0.72, 0.05, 0);
-    ball(g, 0.06, P.pink, -0.18, 0.62, 0.18, 0);
+  // The room's corner piece (GDD #68): a plant unless restyled.
+  plant(g, look) {
+    CORNERS[look?.corner.id] ? CORNERS[look.corner.id](g) : CORNERS.plant(g);
   },
 
   // The Stairwell's spiral staircase (GDD #58): wedge steps once around a pole, rising a floor. Built
@@ -82,18 +80,151 @@ const BUILDERS = {
     rail(half, -(half + gap) / 2, 0.05, half - gap);       // ...and behind it
   },
 
-  rug(g) {
-    const outer = cyl(g, 0.7, 0.7, 0.02, 14, P.lilac, 0, 0.02, 0);
-    const inner = cyl(g, 0.5, 0.5, 0.022, 14, '#ddd1ff', 0, 0.022, 0);
-    outer.castShadow = inner.castShadow = false;
+  rug(g, look) {
+    const rug = look?.rug ?? { shape: 'round', color: P.lilac, color2: '#ddd1ff' };
+    RUGS[rug.shape]?.(g, rug.color, rug.color2);
   },
 };
 
-export function buildFixture(kind) {
+/** Build a fixture; `look` is the room's style (data/decor.js roomLook) for its rug and corner piece. */
+export function buildFixture(kind, look = null) {
   const g = new THREE.Group();
-  BUILDERS[kind](g);
+  BUILDERS[kind](g, look);
   return g;
 }
+
+/** A flat rug piece: a shape extruded 0.02 up, lying on the floor. */
+function flat(g, shape, color, y) {
+  const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.02, bevelEnabled: false, curveSegments: 10 });
+  geo.rotateX(-Math.PI / 2);
+  const m = new THREE.Mesh(geo, toon(color));
+  m.position.y = y;
+  m.receiveShadow = true;
+  g.add(m);
+}
+
+function heartShape(r) {
+  const s = new THREE.Shape();
+  s.moveTo(0, -r * 0.9);
+  s.bezierCurveTo(-r * 1.6, r * 0.2, -r * 0.6, r * 1.3, 0, r * 0.45);
+  s.bezierCurveTo(r * 0.6, r * 1.3, r * 1.6, r * 0.2, 0, -r * 0.9);
+  return s;
+}
+
+function starShape(r) {
+  const s = new THREE.Shape();
+  for (let i = 0; i < 10; i++) {
+    const a = Math.PI / 2 + (i * Math.PI) / 5, rr = i % 2 ? r * 0.5 : r;
+    i ? s.lineTo(Math.cos(a) * rr, Math.sin(a) * rr) : s.moveTo(Math.cos(a) * rr, Math.sin(a) * rr);
+  }
+  return s;
+}
+
+/** Rug shapes (GDD #68), about 1.4 across like the walkable rug footprint. */
+const RUGS = {
+  none() {},
+  round(g, a, b) {
+    const outer = cyl(g, 0.7, 0.7, 0.02, 14, a, 0, 0.02, 0);
+    const inner = cyl(g, 0.5, 0.5, 0.022, 14, b, 0, 0.022, 0);
+    outer.castShadow = inner.castShadow = false;
+  },
+  rect(g, a, b) {
+    box(g, 1.5, 0.02, 1.0, b, 0, 0.02, 0).castShadow = false;
+    for (let i = 0; i < 4; i++) box(g, 0.2, 0.022, 1.0, a, -0.6 + i * 0.4, 0.021, 0).castShadow = false;
+  },
+  heart(g, a, b) {
+    flat(g, heartShape(0.62), a, 0.01);
+    flat(g, heartShape(0.42), b, 0.015);
+  },
+  star(g, a, b) {
+    flat(g, starShape(0.78), a, 0.01);
+    flat(g, starShape(0.5), b, 0.015);
+  },
+  flower(g, a, b) {
+    for (let i = 0; i < 6; i++) {
+      const t = (i / 6) * Math.PI * 2;
+      cyl(g, 0.3, 0.3, 0.02, 12, a, Math.cos(t) * 0.38, 0.02, Math.sin(t) * 0.38).castShadow = false;
+    }
+    cyl(g, 0.32, 0.32, 0.024, 12, b, 0, 0.022, 0).castShadow = false;
+  },
+};
+
+const GUMBALL_GLASS = new THREE.MeshToonMaterial({ color: '#ffffff', gradientMap, transparent: true, opacity: 0.45 });
+
+/** Corner pieces (GDD #68), each fitting the plant's footprint (FIXTURES.plant). */
+const CORNERS = {
+  plant(g) {
+    cyl(g, 0.18, 0.14, 0.3, 8, P.brick, 0, 0.15, 0);
+    ball(g, 0.3, P.leaf, 0, 0.5, 0, 0);
+    ball(g, 0.2, P.leafLight, 0.12, 0.72, 0.05, 0);
+    ball(g, 0.06, P.pink, -0.18, 0.62, 0.18, 0);
+  },
+  fern(g) {
+    cyl(g, 0.17, 0.13, 0.28, 8, P.cream, 0, 0.14, 0);
+    for (let i = 0; i < 7; i++) {
+      const leaf = new THREE.Group();
+      leaf.rotation.y = (i / 7) * Math.PI * 2;
+      const blade = box(leaf, 0.09, 0.03, 0.5, i % 2 ? P.leaf : P.leafLight, 0, 0, 0.2);
+      blade.rotation.x = -0.6;
+      leaf.position.y = 0.42;
+      g.add(leaf);
+    }
+  },
+  cactus(g) {
+    cyl(g, 0.16, 0.13, 0.24, 8, P.peach, 0, 0.12, 0);
+    cyl(g, 0.11, 0.11, 0.5, 8, '#7cc59a', 0, 0.48, 0);
+    ball(g, 0.11, '#7cc59a', 0, 0.73, 0, 1);
+    cyl(g, 0.06, 0.06, 0.22, 6, '#7cc59a', 0.15, 0.55, 0).rotation.z = -0.5;
+    ball(g, 0.05, P.pink, 0, 0.85, 0, 0);
+  },
+  flowers(g) {
+    cyl(g, 0.1, 0.13, 0.36, 8, P.sky, 0, 0.18, 0);
+    for (const [x, z, c] of [[0, 0, P.pink], [0.1, 0.06, P.butter], [-0.1, 0.05, P.lilac], [0.04, -0.1, P.peach], [-0.05, -0.06, P.pink]]) {
+      cyl(g, 0.012, 0.012, 0.3, 4, P.leaf, x * 0.6, 0.5, z * 0.6);
+      ball(g, 0.075, c, x, 0.68, z, 0);
+    }
+  },
+  lamp(g) {
+    cyl(g, 0.16, 0.18, 0.04, 10, P.cream, 0, 0.02, 0);
+    cyl(g, 0.02, 0.02, 1.1, 6, P.cream, 0, 0.57, 0);
+    cyl(g, 0.12, 0.22, 0.26, 10, P.butter, 0, 1.2, 0);
+  },
+  books(g) {
+    const w = 0.42, h = 0.95, d = 0.32;
+    box(g, w, h, 0.03, P.wood, 0, h / 2, -d / 2 + 0.015);
+    box(g, 0.03, h, d, P.wood, -w / 2, h / 2, 0);
+    box(g, 0.03, h, d, P.wood, w / 2, h / 2, 0);
+    for (const y of [0.02, 0.33, 0.64, h]) box(g, w, 0.03, d, P.wood, 0, y, 0);
+    const colors = [P.pink, P.sky, P.butter, P.mint, P.lilac, P.peach];
+    for (let shelf = 0; shelf < 3; shelf++) {
+      for (let i = 0; i < 5; i++) {
+        const bh = 0.2 + ((i * 7 + shelf * 3) % 4) * 0.02;
+        box(g, 0.06, bh, 0.22, colors[(i + shelf * 2) % colors.length], -0.15 + i * 0.075, 0.035 + shelf * 0.31 + bh / 2, 0.02);
+      }
+    }
+  },
+  balloons(g) {
+    cyl(g, 0.08, 0.1, 0.08, 8, P.ink, 0, 0.04, 0);
+    for (const [x, y, z, c] of [[0, 1.2, 0, P.pink], [-0.15, 1.05, 0.05, P.sky], [0.15, 1.08, -0.04, P.butter], [0.02, 0.98, 0.14, P.lilac]]) {
+      const string = cyl(g, 0.006, 0.006, y - 0.1, 3, P.cream, x / 2, (y - 0.1) / 2 + 0.06, z / 2);
+      string.castShadow = false;
+      ball(g, 0.14, c, x, y, z, 1).scale.y = 1.15;
+    }
+  },
+  gumball(g) {
+    cyl(g, 0.14, 0.18, 0.4, 8, P.pink, 0, 0.2, 0);
+    cyl(g, 0.15, 0.15, 0.05, 8, P.cream, 0, 0.42, 0);
+    const glass = ball(g, 0.2, GUMBALL_GLASS, 0, 0.62, 0, 2);
+    glass.castShadow = false;
+    const colors = [P.pink, P.butter, P.mint, P.sky, P.lilac, P.peach];
+    for (let i = 0; i < 12; i++) {
+      const a = i * 2.4, r = 0.1 + (i % 3) * 0.02;
+      ball(g, 0.04, colors[i % colors.length], Math.cos(a) * r * 0.9, 0.5 + (i % 4) * 0.05, Math.sin(a) * r * 0.9, 0);
+    }
+    box(g, 0.08, 0.06, 0.04, P.cream, 0, 0.26, 0.17);
+    box(g, 0.1, 0.06, 0.06, '#e0679a', 0, 0.82, 0);
+  },
+};
 
 /**
  * The Dream Dollhouse on its pedestal: an open-front house, two rooms per storey. Its furniture is

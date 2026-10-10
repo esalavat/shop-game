@@ -6,7 +6,7 @@ export const ROOM_SIZE = { W: 3.4, H: 2.5, D: 2.6, T: 0.16 };
 export const ROOM_TYPES = {
   shop: {
     name: 'Shop',
-    paper: '#ffe1ec', stripe: '#ffd0e2', floor: '#e8b98a', curtain: '#ff9ec4',
+    decor: { paper: 'pink', curtain: 'pink' }, // default looks (data/decor.js); restyled with Ribbons (GDD #68)
     // The window sits behind the counter as the shopkeeper's backdrop; no shelf there, so she
     // never hides any stock.
     window: { x: -1.0, w: 0.8, h: 0.7 },
@@ -20,7 +20,7 @@ export const ROOM_TYPES = {
   },
   display: {
     name: 'Window Display',
-    paper: '#fde7f3', stripe: '#f9d6ea', floor: '#e8b98a', curtain: '#c8b6ff',
+    decor: { paper: 'rose', curtain: 'lilac' },
     window: { x: 0, w: 1.2, h: 0.8 },
     fixtures: [
       { kind: 'rug', x: 0, z: 0.35 },
@@ -31,7 +31,7 @@ export const ROOM_TYPES = {
   },
   stock: {
     name: 'Stockroom',
-    paper: '#e3f6ea', stripe: '#d3efdd', floor: '#d9b27c', curtain: '#9fe0c8',
+    decor: { paper: 'mint', curtain: 'mint' },
     window: { x: -0.9, w: 0.8, h: 0.7 },
     fixtures: [],
   },
@@ -39,7 +39,7 @@ export const ROOM_TYPES = {
   // back-left corner (STAIRS in sim/route.js) and one shelf beside it, downstairs and up.
   stairs: {
     name: 'Stairwell', icon: '🪜',
-    paper: '#fff4dc', stripe: '#ffeabf', floor: '#e8b98a', curtain: '#ffd98a',
+    decor: { paper: 'butter', curtain: 'butter' },
     window: null,
     fixtures: [
       { kind: 'stairs', x: -1.1, z: -0.7 },
@@ -49,7 +49,7 @@ export const ROOM_TYPES = {
   },
   landing: {
     name: 'Stairwell', icon: '🪜',
-    paper: '#fff4dc', stripe: '#ffeabf', floor: '#e8b98a', curtain: '#ffd98a',
+    decor: { paper: 'butter', curtain: 'butter' },
     window: null,
     fixtures: [
       { kind: 'stairhole', x: -1.1, z: -0.7 },
@@ -57,10 +57,10 @@ export const ROOM_TYPES = {
     ],
   },
   // Expansion rooms (GDD §18 #8): plain shelf rooms, three shelves along the back wall. Each wears one of
-  // ROOM_STYLES (room.style); a decoration shop will let you restyle them later.
+  // ROOM_STYLES (room.style) until restyled with Ribbons (room.decor, GDD #68).
   room: {
     name: 'Shelf Room', icon: '🛍️',
-    paper: '#e4f1ff', stripe: '#d2e7ff', floor: '#e8b98a', curtain: '#a8d8ff',
+    decor: { paper: 'sky', curtain: 'sky' },
     window: null, // the shelves fill the back wall
     fixtures: [
       { kind: 'rug', x: 0, z: 0.25 },
@@ -72,14 +72,14 @@ export const ROOM_TYPES = {
   },
 };
 
-/** Wallpapers for shelf rooms (room.style), handed out in turn as rooms are built. */
+/** Wallpapers for shelf rooms (room.style), handed out in turn as rooms are built (ids in data/decor.js). */
 export const ROOM_STYLES = [
-  { paper: '#e4f1ff', stripe: '#d2e7ff', curtain: '#a8d8ff' }, // sky
-  { paper: '#e3f6ea', stripe: '#d3efdd', curtain: '#9fe0c8' }, // mint
-  { paper: '#eef8dc', stripe: '#e1f1c8', curtain: '#ff8f8f' }, // leaf
-  { paper: '#ece3ff', stripe: '#e0d4ff', curtain: '#c8b6ff' }, // lilac
-  { paper: '#fff4dc', stripe: '#ffeabf', curtain: '#ffd98a' }, // butter
-  { paper: '#ffe9df', stripe: '#ffdacb', curtain: '#ffb8a0' }, // peach
+  { paper: 'sky', curtain: 'sky' },
+  { paper: 'mint', curtain: 'mint' },
+  { paper: 'leaf', curtain: 'coral' },
+  { paper: 'lilac', curtain: 'lilac' },
+  { paper: 'butter', curtain: 'butter' },
+  { paper: 'peach', curtain: 'peach' },
 ];
 
 /**
