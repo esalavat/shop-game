@@ -1,5 +1,5 @@
-// The Collection album: every item as a sticker. Found ones are in color; the rest are silhouettes.
-// A little house badge marks what's on show in the Dream Dollhouse.
+// The Collection album: every item as a sticker, one section per theme (GDD #66). Found ones are in
+// color; the rest are silhouettes. A little house badge marks what's on show in the Dream Dollhouse.
 
 import { ITEMS, SETS } from '../data/items.js';
 import { dollhouseItems } from '../sim/collection.js';
@@ -16,14 +16,19 @@ export function createAlbum(state, thumbs) {
     count.textContent = found.length === ids.length
       ? `All ${ids.length} treasures found! 🎉`
       : `${found.length} of ${ids.length} treasures found`;
-    grid.innerHTML = ids.map((id) => {
+    const sticker = (id) => {
       const item = ITEMS[id], have = state.collection[id];
       return `<div class="sticker${have ? '' : ' locked'}">
         <img alt="" src="${thumbs.get(id)}">
         ${onShow.has(id) ? '<i class="badge" title="In your Dream Dollhouse">🏠</i>' : ''}
         <div class="card-name">${item.name}</div>
-        <div class="card-sub">${have ? SETS[item.set] : 'Order one to find it'}</div>
       </div>`;
+    };
+    grid.innerHTML = Object.entries(SETS).map(([set, name]) => {
+      const inSet = ids.filter((id) => ITEMS[id].set === set);
+      const got = inSet.filter((id) => state.collection[id]).length;
+      return `<div class="album-set"><span>${name}</span><span>${got === inSet.length ? '🌟' : ''} ${got} / ${inSet.length}</span></div>
+        ${inSet.map(sticker).join('')}`;
     }).join('');
   }
 

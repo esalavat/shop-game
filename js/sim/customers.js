@@ -9,7 +9,7 @@
 //         along the street). waitingQueue when the line is full; straight to leaving if they found nothing.
 
 import { events } from '../core/events.js';
-import { ITEMS } from '../data/items.js';
+import { orderableItems } from './catalog.js';
 import { CUSTOMER, LOOKS, ADULT_SCALE, KID_SCALE } from '../data/customers.js';
 import { findPath } from './nav.js';
 import { newId, shopRoomId, findFixture, freeSlots, dropBox } from './stock.js';
@@ -94,7 +94,7 @@ function headInside(state, c) {
 
 function chooseWants(state, rand) {
   const stocked = stockedItems(state);
-  const all = Object.keys(ITEMS);
+  const all = orderableItems(state); // wishes point at things you can order now (GDD #66)
   const first = stocked.length && rand() < CUSTOMER.wantsStocked ? pick(rand, stocked) : pick(rand, all);
   const wants = [first];
   if (stocked.length && rand() < CUSTOMER.secondItem) wants.push(pick(rand, stocked));

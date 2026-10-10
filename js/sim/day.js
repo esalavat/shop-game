@@ -6,6 +6,7 @@
 import { events } from '../core/events.js';
 import { dropBox } from './stock.js';
 import { ITEMS, boxCost } from '../data/items.js';
+import { openPageCount, orderableItems } from './catalog.js';
 
 export const DAY_LENGTH = {
   open: 180,    // seconds of open hours
@@ -116,7 +117,7 @@ export function startNextDay(state) {
  * Returns the item id, or null if the shop wasn't stuck.
  */
 export function rescueIfStuck(state) {
-  const cheapest = Object.keys(ITEMS).reduce((a, b) => (boxCost(b) < boxCost(a) ? b : a));
+  const cheapest = orderableItems(state).reduce((a, b) => (boxCost(b) < boxCost(a) ? b : a));
   if (!soldOut(state) || state.orders.length || state.coins >= boxCost(cheapest)) return null;
   dropBox(state, cheapest, ITEMS[cheapest].perBox);
   events.emit('boxesChanged');
@@ -134,9 +135,10 @@ function deliverLunch(state) {
 /** Turn due orders into boxes on the doorstep. New kinds of items join the Collection. */
 export function deliverOrders(state, isDue = (o) => dueInMorning(o, state.day.number)) {
   const due = state.orders.filter(isDue);
-  if (!due.length) return { boxes: 0, discovered: [] };
+  if (!due.length) return { boxes: 0, discovered: [], opened: [] };
   state.orders = state.orders.filter((o) => !due.includes(o));
   const discovered = [];
+  const pagesBefore = openPageCount(state);
   for (const o of due) {
     dropBox(state, o.itemId, o.qty);
     if (!state.collection[o.itemId]) {
@@ -145,7 +147,12 @@ export function deliverOrders(state, isDue = (o) => dueInMorning(o, state.day.nu
     }
   }
   events.emit('boxesChanged');
-  return { boxes: due.length, discovered };
+  const opened = [];
+  for (let page = pagesBefore; page < openPageCount(state); page++) {
+    opened.push(page);
+    events.emit('pageOpened', { page });
+  }
+  return { boxes: due.length, discovered, opened };
 }
 
 /** Keep today's tally for the closing summary. */

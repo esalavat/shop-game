@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.28 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.29 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -72,6 +72,7 @@
 | 63 | **Close now in the evening** (user): during the evening the day button says **Close now**; two taps (one if nobody's left) close the shop on the spot. Everyone still in the shop goes home without paying, and **whatever they were holding goes back on the shelves** (its own spot if it's free, else another shelf, else a box on the doorstep) | v0.26 |
 | 64 | **The Stairwell's spot is fixed** (user; changes #61): it's still a Grow purchase (🪙 350, after the first expansion room), but you don't choose where it goes: it's always built **right next to the main shop**, and the Window Display and any rooms on that side **move over one place**. **Upstairs rooms must sit on top of a room below** (nothing floats) | v0.27 |
 | 65 | **Plain shelf rooms, more floors, prices by distance** (user; replaces the theme rooms of #58 and Sorting Smarts of #60): expansion rooms are **plain shelf rooms** (3 shelves, a pastel wallpaper each, handed out in turn); a **decoration shop** with its own currency will let you restyle them later. No theme bonus. **More floors:** after the Stairwell, Grow offers **Another floor**: the stairs go up one more floor with a landing and a shelf; **each staircase costs more** (🪙 350 for the Stairwell, then 700, 1200, 1900, 2800, then +1200 each). **Room prices grow with distance from the middle** (the shop and the Stairwell) so a **compact, squarish house is cheapest**: a spot's *ring* is how far out it is sideways or up, whichever is more (🪙 250, 400, 600, 850, 1150, 1500, then +450 a ring), and every floor up adds 15% over the same spot below. Each ＋ shows its price. Upstairs rooms always sit on a room below. Theme rooms already built on `/dev/` became shelf rooms with their stock; Sorting Smarts was refunded | v0.28 |
+| 66 | **24 items on four catalog pages** (user; first step of #59): six themes × four items. The order book has **four pages** (tabs), **one item per theme on each page**, fancier and more profitable as you go: **Starter** (open from the start, box profit 🪙 12-18), **Favorites** (opens when you've found **4** items, 🪙 21-32), **Fancy Finds** (**10** found, 🪙 36-56), **Treasures** (**16** found, 🪙 70-120). A page opening gets a toast, confetti and a "new" dot on its tab. **Items you've already found can always be ordered again**, whatever page they're on. Customers only **wish for items you can order now**. The album shows one section per theme ("2 / 4"). The six original items keep their prices. Prices and Sparkle (about price ÷ 4) are first guesses; the user may swap or rename items later. Color variants, the Collection bonus and page rewards are still to come (#59) | v0.29 |
 
 ## 1. Pitch
 
@@ -138,7 +139,7 @@ Each job is a short, playful interaction. Early on, you do them all. As the shop
 - Open the **order book**, a picture catalog of cute items, and tap what you'd like.
 - **Pip the delivery bunny** 💡 brings the boxes the **next morning**. The **Lunchtime delivery** upgrade (#37) lets Pip come at midday too: orders placed in the morning or the first half of open hours arrive when the day bar reaches halfway. A mark at the halfway point of the day bar shows when, and glows while a lunch order is on its way (#52).
 - The main choice is what to get with your coins. Fancier items cost more and earn more. Each card shows the box cost, the sell price per item, and the profit for the box (#54).
-- New catalog pages unlock as you grow and through story events.
+- **Catalog pages (v0.29, #66):** the order book has four tabbed pages (Starter, Favorites, Fancy Finds, Treasures), one item per theme on each. Pages open as your Collection grows (at 4, 10 and 16 items found); anything already found can always be reordered. 💡 Later pages could also come from story events.
 
 ### 5.2 Stocking shelves
 - Tap a box to open it (*pop!*). Items hop out, and you tap or drag them onto shelves.
@@ -182,7 +183,17 @@ Your very own dollhouse, displayed in the shop's front window.
 
 ### 6.2 The Collection
 - Every item you **receive in a delivery** (or get as a story gift) is added to your **Collection**, a sticker-book style album.
-- **v0 album (v0.9):** one page with every item as a sticker (found = in color, not yet = silhouette with "Order one to find it"), a "4 of 6 found" count, and a 🏠 badge on items in your dollhouse. Themed pages and page rewards come when each theme has several items.
+- **v0 album (v0.9):** one page with every item as a sticker (found = in color, not yet = silhouette with "Order one to find it"), a "4 of 6 found" count, and a 🏠 badge on items in your dollhouse.
+- **24 items (v0.29, #66):** the album has one section per theme with four stickers each and a "1 / 4" count (🌟 when complete). Page rewards come next (#59).
+
+  | Page (opens at) | Tea Time | Cozy Parlor | Fairy Garden | Sweet Dreams | Doll Friends | Little Houses |
+  |---|---|---|---|---|---|---|
+  | **Starter** (start) | Tiny Tea Set 6→10 | Cozy Chair 8→14 | Mushroom Lamp 8→14 | Star Nightlight 6→10 | Teddy Bear 7→12 | Tiny Birdhouse 6→10 |
+  | **Favorites** (4 found) | Cupcake Stand 10→17 | Rocking Chair 11→19 | Fairy Swing 11→19 | Rosy Bed 10→18 | Petal Doll 12→20 | Cottage Dollhouse 24→40 |
+  | **Fancy Finds** (10) | Tea Trolley 26→44 | Velvet Sofa 30→50 | Firefly Lantern 28→48 | Canopy Bed 34→58 | Bunny Family 32→54 | Treehouse 40→68 |
+  | **Treasures** (16) | Royal Cake Tower 50→85 | Grand Piano 60→100 | Unicorn Carousel 65→110 | Cloud Princess Bed 70→120 | Porcelain Princess 55→95 | Castle Dollhouse 90→150 |
+
+  (cost → sell price per item. Boxes hold 3 on the first two pages, 2 after that, except the Cottage Dollhouse at 2.)
 - Anything in your Collection can be placed in the Dream Dollhouse **for free and forever**. It doesn't use up shop stock.
 - Collection pages fill in by theme (Tea Time, Sweet Dreams Bedroom, Pet Friends, Princess Castle…). Completing a page gives a reward.
 - **Growing to 100+ items (v0.23, #59):** prices scale up the way they do now (fancier = costs more, more profit). Many items come in **color variants**, each its own sticker. New **catalog pages open in the order book as you find more items**; the fanciest come last.
@@ -385,7 +396,8 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - [x] **Plain shelf rooms, more floors, prices by distance** (#65)
 - [x] **Stairwell and upstairs rooms** (#58, step 2, #61)
 - [ ] More than one stocker (#60, later)
-- [ ] **More items, color variants, catalog pages that open as you collect, Collection bonus and page rewards** (#59)
+- [x] **24 items on four catalog pages that open as you collect** (#66, first step of #59)
+- [ ] **Color variants, more items toward 100+, Collection bonus and page rewards** (#59)
 - Building grid expansion (X and Y), room types, pan/zoom
 - More morning picks and special days
 - First regulars and story moments
@@ -413,3 +425,4 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 7. ~~**Evening ends too slowly with a big building**~~ (user, 2026-10-09): closing waited for every customer to walk off-screen, and the last ones could wander from room to room. **Resolved in v0.25 (decision #62):** after 10 s of twilight shoppers pay for what they have or go home, and the day closes once they've paid.
 8. ~~**Rethink the building**~~ (user, 2026-10-09). **Resolved in v0.27-v0.28 (decisions #64, #65):** the Stairwell always goes right of the shop, rooms are plain shelf rooms, floors keep going up (each staircase pricier), and rooms cost more the further they are from the middle, sideways or up. Prices are first guesses to tune with play. A **decoration shop** (its own currency, styles each room) is next to design.
 9. **Decoration shop** (user, 2026-10-09; next to design, in a new session): rooms are plain shelf rooms now (#65); a decoration shop with **its own currency** will let you style each room (wallpaper, floor, decor). To decide: what the currency is and how you earn it (Hearts? Sparkle? a new one from happy customers or Collection pages?), what can be styled per room (wallpaper, floor, rug, plants, lamps, a sign), how you pick a room to decorate (tap it? a mode like the Dream Dollhouse decorate panel?), prices, and whether styles do anything besides look nice. Rooms already carry `room.style` (ROOM_STYLES, `js/data/rooms.js`), a starting point for saved styles.
+10. **Sparkle tops out fast with fancy items** (2026-10-09, #66): visitor traffic is already at its 1.5× cap at 30 Sparkle, and one Treasure (e.g. the Castle Dollhouse, 35) gets there alone. Rethink the Sparkle curve (higher cap, or more Sparkle needed) when tuning the new items.

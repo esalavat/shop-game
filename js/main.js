@@ -36,7 +36,7 @@ import { UPGRADES, HELPERS } from './data/upgrades.js';
 import { separate } from './sim/crowd.js';
 import { checkoutTap, keeperAtCounter } from './sim/checkout.js';
 import { displayRoom } from './sim/collection.js';
-import { ITEMS } from './data/items.js';
+import { ITEMS, PAGES } from './data/items.js';
 import { buildRoom, roomSpots, roomCost } from './sim/building.js';
 import { attachGestures } from './input/touch.js';
 import { createHud } from './ui/hud.js';
@@ -342,6 +342,7 @@ events.on('orderPlaced', ({ order }) => toast(`Ordered ${ITEMS[order.itemId].nam
 events.on('lunchDelivery', ({ delivered }) => {
   toast(`Lunchtime! Pip delivered ${delivered.boxes} box${delivered.boxes > 1 ? 'es' : ''} 📦`);
   for (const id of delivered.discovered) toast(`✨ New in your Collection: ${ITEMS[id].name}`);
+  pageToasts(delivered);
 });
 events.on('upgradeBought', ({ id }) => toast(`${UPGRADES[id].icon} ${UPGRADES[id].name}: yours!`));
 const HELPER_JOBS = { cashier: "She'll mind the register.", stocker: "She'll keep the shelves stocked." };
@@ -351,7 +352,11 @@ events.on('dayStarted', ({ day, delivered, rescued }) => {
   toast(`Good morning! Day ${day}.${boxes}`);
   if (rescued) toast(`Pip left you a free box of ${ITEMS[rescued].name}, just because 🎁`);
   for (const id of delivered.discovered) toast(`✨ New in your Collection: ${ITEMS[id].name}`);
+  pageToasts(delivered);
 });
+function pageToasts(delivered) {
+  for (const page of delivered.opened) toast(`${PAGES[page].icon} New page in the Order Book: ${PAGES[page].name}!`);
+}
 events.on('boxPicked', ({ spare, by }) => {
   if (by !== 'keeper') return; // Bea needs no instructions
   if (spare) toast('Two boxes on the cart! Tap a shelf to unpack 🛒');

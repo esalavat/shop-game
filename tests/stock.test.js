@@ -21,15 +21,15 @@ test('a new shop starts with two boxes to unpack, already in the Collection', ()
 test('ordering costs coins and the box arrives the next morning', () => {
   const s = createState();
   const before = s.coins;
-  assert.ok(placeOrder(s, 'doll'));
-  assert.equal(s.coins, before - boxCost('doll'));
+  assert.ok(placeOrder(s, 'teddy'));
+  assert.equal(s.coins, before - boxCost('teddy'));
   assert.equal(s.boxes.length, 2);
   startNextDay(s);
   assert.equal(s.day.number, 2);
   assert.equal(s.orders.length, 0);
-  const box = s.boxes.find((b) => b.itemId === 'doll');
-  assert.equal(box.qty, ITEMS.doll.perBox);
-  assert.ok(s.collection.doll);
+  const box = s.boxes.find((b) => b.itemId === 'teddy');
+  assert.equal(box.qty, ITEMS.teddy.perBox);
+  assert.ok(s.collection.teddy);
 });
 
 test('cannot order without enough coins', () => {

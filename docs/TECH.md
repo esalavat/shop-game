@@ -58,6 +58,7 @@ js/
     customers.js        # Spawning, browsing, buying, wish notes (state machines); walk to the room that has their item
     checkout.js         # Queue, scanning, tips
     marketing.js        # Morning picks, special days, Sparkle → foot traffic
+    catalog.js          # Order book pages: which are open (by items found), canOrder, orderableItems (GDD #66)
     collection.js       # Dream Dollhouse placing, Sparkle, foot-traffic boost, window spot (unlocks happen in day.js)
     helpers.js          # Hired helpers doing jobs: Mia the cashier (state.cashier, live-only)
     tutorial.js         # First-day guide steps (state.tutorial: box → shelf → open → register → done), advanced each tick
@@ -394,7 +395,8 @@ Each milestone ends with a push so it's playable on your phone.
 | Quick evenings and Close now (#62, #63) | ✅ built (waiting for the user's feedback) |
 | Plain shelf rooms, more floors, prices by distance (#65) | ✅ built (waiting for the user's feedback) |
 | **Decoration shop** (GDD §18 #9) | ⏭ next to design |
-| More items, color variants, catalog pages, Collection bonus and page rewards (#59) | after the decoration shop |
+| 24 items on four catalog pages that open as you collect (#66) | ✅ built (waiting for the user's feedback) |
+| Color variants, more items, Collection bonus and page rewards (#59) | after the decoration shop |
 
 ### 11.1 Plan: Stairwell and upstairs (#58 step 2) — ✅ built 2026-10-09
 The plan as worked out; it was built this way (GDD #61, §4.3.3). Differences: the upstairs half is its own room

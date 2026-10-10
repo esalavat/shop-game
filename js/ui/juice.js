@@ -68,6 +68,7 @@ export function createJuice({ audio, fx, overlay, keeperView, helpersView, custo
   events.on('expanded', celebrate);
   events.on('helperHired', celebrate);
   events.on('upgradeBought', celebrate);
+  events.on('pageOpened', celebrate);
 
   // Bouncy UI: a soft tap on every button (the specific sounds above play on top).
   document.getElementById('app').addEventListener('click', (e) => {

@@ -93,14 +93,20 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   Sorting Smarts). Grow → Build a room → tap a ＋ (each shows its price: by ring around the middle, sideways or up,
   +15% per floor, so a squarish house is cheapest). Grow → Another floor raises the Stairwell (each staircase costs
   more). Routes climb floor by floor. Prices are first guesses (`js/data/rooms.js`).
+- **24 items on four catalog pages, built 2026-10-09, waiting for the user's feedback** (GDD v0.29 #66, the first step of
+  #59): 6 themes × 4 items; order book tabs Starter / Favorites / Fancy Finds / Treasures, opening at 4 / 10 / 16 items
+  found (toast + confetti + a "new" dot); found items can always be reordered; customers only wish for orderable items;
+  album sections per theme. `js/sim/catalog.js`, `PAGES` and `page` in `js/data/items.js`, 18 new models in
+  `js/render/models/items.js`. No save change. The user may swap or rename items later; the item table is in GDD §6.2.
+  Open tuning question: Sparkle maxes out traffic with one Treasure (GDD §18 #10).
 - **Next to design:** the **decoration shop** (its own currency) to restyle rooms (GDD #65).
-- **Planned next, in order:** (#59) **more items** (toward 100+, color variants, catalog pages that open as you
-  collect), the **Collection bonus** and page rewards (coins, confetti, a shopkeeper style). Later: more stockers
+- **Planned next, in order:** (#59) **more items** (toward 100+, color variants), the **Collection bonus** and page rewards (coins, confetti, a shopkeeper style). Later: more stockers
   (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issue: delivery boxes stack too
   high (delivery-bin idea, docs/ISSUES.md).
 
 **Next:** design the **decoration shop** (GDD §18 #9) with the user in a new session: discuss, update the GDD, then
-build. After that, #59 (more items). Still waiting on feedback: everything built 2026-10-09 (Stairwell, shelf rooms,
+build. After that, the rest of #59 (color variants, Collection bonus, page rewards). Still waiting on feedback: the 24 items
+and catalog pages, everything built 2026-10-09 (Stairwell, shelf rooms,
 floors and prices, quick evenings, Close now), M8 (home-screen install, fps on the Pixel), Bea, the first-day guide.
 
 **Releases:** the latest is **v2026.10.9.3** (2026-10-09): shelf rooms with prices by distance, the Stairwell and

@@ -76,10 +76,10 @@ test('Lunchtime Delivery: orders before midday arrive halfway through the day', 
   const s = createState();
   s.upgrades.lunch = true;
   s.coins = 500;
-  placeOrder(s, 'doll'); // morning
+  placeOrder(s, 'teddy'); // morning
   openShop(s);
   s.day.time = DAY_LENGTH.open * 0.4;
-  placeOrder(s, 'bed');
+  placeOrder(s, 'nightlight');
   s.day.time = DAY_LENGTH.open * 0.6;
   placeOrder(s, 'lamp'); // too late for lunch
   const before = s.boxes.length;
@@ -87,22 +87,22 @@ test('Lunchtime Delivery: orders before midday arrive halfway through the day', 
   tickDay(s, DAY_LENGTH.open * 0.2);
   assert.equal(s.boxes.length, before + 2);
   assert.deepEqual(s.orders.map((o) => o.itemId), ['lamp']);
-  assert.ok(s.collection.doll && s.collection.bed);
+  assert.ok(s.collection.teddy && s.collection.nightlight);
 });
 
 test('without the upgrade, or closing before midday, orders come the next morning', () => {
   const s = createState();
   s.coins = 500;
-  placeOrder(s, 'doll');
+  placeOrder(s, 'teddy');
   assert.equal(s.orders[0].arrivesDay, 2);
   s.upgrades.lunch = true;
-  placeOrder(s, 'bed');
+  placeOrder(s, 'nightlight');
   openShop(s);
   closeEarly(s);
   tickDay(s, 10);
   startNextDay(s);
   assert.equal(s.orders.length, 0);
-  assert.ok(s.boxes.some((b) => b.itemId === 'bed') && s.boxes.some((b) => b.itemId === 'doll'));
+  assert.ok(s.boxes.some((b) => b.itemId === 'nightlight') && s.boxes.some((b) => b.itemId === 'teddy'));
 });
 
 function cashierShop() {

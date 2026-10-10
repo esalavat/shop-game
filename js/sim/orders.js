@@ -7,6 +7,7 @@ import { addCoins } from './economy.js';
 import { newId } from './stock.js';
 import { hasUpgrade } from './upgrades.js';
 import { DAY_LENGTH, MIDDAY } from './day.js';
+import { canOrder } from './catalog.js';
 
 export function canAfford(state, itemId) {
   return state.coins >= boxCost(itemId);
@@ -19,7 +20,7 @@ export function lunchDeliveryOpen(state) {
 }
 
 export function placeOrder(state, itemId) {
-  if (!ITEMS[itemId] || !canAfford(state, itemId)) return null;
+  if (!canOrder(state, itemId) || !canAfford(state, itemId)) return null;
   addCoins(state, -boxCost(itemId));
   const lunch = lunchDeliveryOpen(state);
   const order = { id: newId(state, 'o'), itemId, qty: ITEMS[itemId].perBox, arrivesDay: state.day.number + (lunch ? 0 : 1) };
