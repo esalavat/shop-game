@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.46 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.47 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -91,6 +91,7 @@
 | 82 | **A simpler order book until you need more** (user; the order book half of §18 #17): **no color dots** on the cards until **Bright opens**; then every card shows all three dots, Dazzle's 🔒 with what it still needs. Of the **locked page tabs, only the next one shows** (with its lock note); the rest appear one at a time as they become next. Once round 1 is done all four tabs are open. The album still ends with the teaser for Bright colors. The Grow sheet half of #17 (and #16) is still to design | v0.44 |
 | 83 | **Helpers and upgrades come as a ladder** (user; the Grow sheet half of §18 #17, resolves #16, and re-spaces the prices, which were too close together): each appears once you've made enough customers happy (Hearts ❤️, all time) and costs about 1.4-1.5× the one before. **Stock Cart** 🪙 60 at 0 ❤️ · **Comfy Shoes** 100 at 10 · **Mia** 200 at 25 · **Gift Wrap** 300 at 40 · **Lunchtime Delivery** 450 at 60 · **Bea** 650 at 90 · **Speedy Scanner** 900 at 130 · **Ollie** 1,300 at 180 · **Roller Skates** 1,800 at 250 (and Bea) · **Tall Shelves** 2,600 at 350 · **Rosa** 3,800 at 450 (and the Window Display) · **Theo** 6,000 at 650 · **Juno** 15,000 at 1,000. These prices replace earlier ones (#36, #72, #76, #80). The Grow sheet's **Helpers and upgrades** list shows what you can get now, then **only the next one** as a 🔒 teaser ("Coming at 130 ❤️ · 30 more to go", or "Hire Bea first"); what you already have folds into a small **Already yours** row of icons at the bottom (instead of #16's switch). The register room's "build another floor first" card is gone; it shows up once you can build one. Measured (`npm run balance`, 4 seeds): they arrive on days 2, 4, 5, 7, 11, 11, 13, 18, 23, 26, 29, 32, 40 | v0.45 |
 | 84 | **The ladder a little easier** (user: Grow felt too slow): every rung needs about a third fewer Hearts and costs about 20% less, same order and spacing. **Stock Cart** 🪙 60 at 0 ❤️ · **Comfy Shoes** 80 at 5 · **Mia** 160 at 15 · **Gift Wrap** 240 at 25 · **Lunchtime Delivery** 360 at 40 · **Bea** 520 at 60 · **Speedy Scanner** 720 at 85 · **Ollie** 1,000 at 120 · **Roller Skates** 1,400 at 160 · **Tall Shelves** 2,000 at 225 · **Rosa** 3,000 at 300 · **Theo** 4,800 at 425 · **Juno** 12,000 at 650. Measured: days 2, 4, 5, 6, 9, 11, 13, 16, 20, 24, 27, 29, 34 (was up to day 40) | v0.46 |
+| 85 | **No more Gift Wrap or Comfy Shoes** (user, after playing the start: both felt useless; Gift Wrap barely mattered once Mia was hired, and Comfy Shoes came when the shop was too small for walking speed to matter). **Tips grow with the sale:** ring someone up yourself and they tip about **10%** of what they paid (a random 5-15%, at least 🪙 1), so tips grow with fancier items and with Bright and Dazzle prices; cashiers still don't get tips. **Roller Skates speed everyone up** (your shopkeeper and every stocker, ×1.4) and **no longer need Bea**: 🪙 1,400 at 160 ❤️ as before. Shops that bought either upgrade get **their coins back** (Comfy Shoes 🪙 80, Gift Wrap 🪙 150, what most paid) with a toast on the next load (**save v21**). The ladder is now 11 rungs: Stock Cart, Mia, Lunchtime Delivery, Bea, Speedy Scanner, Ollie, Roller Skates, Tall Shelves, Rosa, Theo, Juno | v0.47 |
 
 ## 1. Pitch
 
@@ -491,6 +492,7 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - [ ] **Instant Delivery** upgrade: orders arrive right away (§11; design to discuss)
 - [x] **Color rounds: two more colors of every item, ×16 prices, 72 stickers** (#77, part of #59)
 - [x] **Sweet Shop and Pet Corner: 32 items, 96 stickers** (#79, part of #59)
+- [x] **Tips by sale, Roller Skates for everyone; Gift Wrap and Comfy Shoes gone** (#85)
 - [x] **Helpers and upgrades as a ladder:** each appears with enough Hearts, prices spaced out, bought ones fold away (#83)
 - [x] **Simpler order book:** color dots once Bright opens, only the next locked tab (#82)
 - [x] **Balancing pass:** Sparkle and Collection visitors without an early cap, ×12 rounds, growth prices by percentage, Hearts for pages (#80)

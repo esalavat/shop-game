@@ -14,7 +14,7 @@ import { recordSale } from './day.js';
 import { ribbonsForSale } from './decor.js';
 import { hasUpgrade } from './upgrades.js';
 import { notePagesOpen } from './catalog.js';
-import { SCANNER, GIFT_WRAP_TIPS } from '../data/upgrades.js';
+import { SCANNER } from '../data/upgrades.js';
 
 const isRegisterRoom = (room) => room?.type === 'shop' || room?.type === 'register';
 
@@ -79,7 +79,7 @@ export function completeSale(state, rand = Math.random, { tip: tips = true, by =
   const customer = state.customers.find((x) => x.id === c.customerId);
   const amount = c.items.reduce((sum, i) => sum + ITEMS[i.itemId].price, 0);
   const [lo, hi] = CUSTOMER.tip;
-  const tip = tips ? (lo + Math.floor(rand() * (hi - lo + 1))) * (hasUpgrade(state, 'giftwrap') ? GIFT_WRAP_TIPS : 1) : 0;
+  const tip = tips ? Math.max(1, Math.round(amount * (lo + rand() * (hi - lo)))) : 0; // grows with what they bought (GDD #85)
   addCoins(state, amount + tip);
   state.hearts += 1;
   recordSale(state, { amount, tip, items: c.items.map((i) => i.itemId) });

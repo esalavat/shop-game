@@ -11,7 +11,7 @@ export const CUSTOMER = {
   browseTime: [1.4, 2.8],   // seconds spent looking at a shelf
   wantsStocked: 0.75,       // chance the first wish is something already on the shelves
   secondItem: 0.3,          // chance they want a second thing
-  tip: [1, 3],              // coins tipped when you ring them up yourself
+  tip: [0.05, 0.15],        // tip when you ring them up yourself: this share of what they paid, at random, at least 1 (GDD #85)
   kidChance: 0.35,
   greetedSecondItem: 0.6,   // chance a customer the shopkeeper greets at the door picks up a second thing (GDD #41)
 };

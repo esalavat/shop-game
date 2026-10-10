@@ -33,7 +33,7 @@ test('there is a sample save for every save version since the first release', ()
 
 /**
  * What migrations change on purpose, so "progress intact" compares against it: v16 turned theme rooms
- * into shelf rooms and refunded Sorting Smarts (GDD §18 #8).
+ * into shelf rooms and refunded Sorting Smarts (GDD §18 #8); v21 refunded Comfy Shoes and Gift Wrap (#85).
  */
 const THEMES = ['tea', 'parlor', 'fairy', 'bedroom', 'dolls', 'houses'];
 function expected(save) {
@@ -41,6 +41,10 @@ function expected(save) {
   if (d.version < 16) {
     if (d.upgrades?.sorting) { d.coins += 120; delete d.upgrades.sorting; }
     for (const r of d.building.rooms) if (THEMES.includes(r.type)) r.type = 'room';
+  }
+  if (d.version < 21) { // Comfy Shoes and Gift Wrap refunded (GDD #85)
+    if (d.upgrades?.shoes) { d.coins += 80; delete d.upgrades.shoes; }
+    if (d.upgrades?.giftwrap) { d.coins += 150; delete d.upgrades.giftwrap; }
   }
   return d;
 }

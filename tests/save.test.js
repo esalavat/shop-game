@@ -297,3 +297,23 @@ test('a v19 save keeps every catalog page the old thresholds had opened (GDD #79
   assert.equal(s.version, STATE_VERSION);
   assert.equal(s.pagesOpen, 5);
 });
+
+test('a v20 save gets its coins back for Comfy Shoes and Gift Wrap, once, and keeps its other upgrades (GDD #85)', () => {
+  const store = memoryStorage();
+  const v20 = { ...createState(0), version: 20, coins: 500, upgrades: { cart: true, shoes: true, giftwrap: true, scanner: true } };
+  store.setItem(SAVE_KEY, JSON.stringify(v20));
+  const s = loadGame(store);
+  assert.equal(s.version, STATE_VERSION);
+  assert.deepEqual(s.upgrades, { cart: true, scanner: true });
+  assert.equal(s.coins, 500 + 80 + 150);
+  assert.deepEqual(s.refunds.map((r) => [r.name, r.coins]), [['Comfy Shoes', 80], ['Gift Wrap', 150]]);
+  saveGame(s, store);
+  const again = loadGame(store);
+  assert.equal(again.coins, 500 + 80 + 150, 'refunded once');
+  assert.equal(again.refunds, undefined, 'the refund note is never saved');
+  // Without them, nothing changes.
+  store.setItem(SAVE_KEY, JSON.stringify({ ...createState(0), version: 20, coins: 500 }));
+  const plain = loadGame(store);
+  assert.equal(plain.coins, 500);
+  assert.equal(plain.refunds, undefined);
+});

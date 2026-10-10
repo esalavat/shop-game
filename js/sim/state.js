@@ -7,10 +7,10 @@ import { dropBox } from './stock.js';
 import { emptyStats } from './day.js';
 import { ribbonsForCollection } from './decor.js';
 
-export const STATE_VERSION = 20;
+export const STATE_VERSION = 21;
 
 /** Live-only fields: never saved, reset on every load (customers just walk in again). */
-export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer', 'cashier', 'greeter', 'dresser', 'registers'];
+export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer', 'cashier', 'greeter', 'dresser', 'registers', 'refunds'];
 
 export function resetTransient(state) {
   state.customers = [];

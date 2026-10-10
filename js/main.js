@@ -598,6 +598,9 @@ if (new URLSearchParams(location.search).has('debug')) {
 // ---------------------------------------------------------------------------
 dayUI.resume();
 giftCompleteThemes(state); // themes finished before the update get their gifts now (GDD #70)
+// Upgrades taken out of the game (GDD #85): their coins came back when the save was upgraded.
+for (const r of state.refunds ?? []) toast(`${r.name} is gone from the shop, so here's your 🪙 ${r.coins} back!`);
+delete state.refunds;
 if (!state.shopkeeper.created) creator.open(); // new game, or the first time after the update
 else if (state.day.number === 1 && state.day.phase === 'morning') toast('Stock your shelves, then tap Open shop ☀️');
 fx.warmUp(renderer, rig.camera);

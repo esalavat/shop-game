@@ -19,12 +19,12 @@ test('upgrades and helpers cost coins once and can only be bought once', () => {
   const s = createState();
   s.hearts = 9999; // past every rung of the ladder (GDD #83)
   s.coins = 1000;
-  assert.ok(buyUpgrade(s, 'shoes'));
-  assert.equal(s.coins, 1000 - UPGRADES.shoes.cost);
-  assert.equal(buyUpgrade(s, 'shoes'), false);
+  assert.ok(buyUpgrade(s, 'scanner'));
+  assert.equal(s.coins, 1000 - UPGRADES.scanner.cost);
+  assert.equal(buyUpgrade(s, 'scanner'), false);
   assert.ok(hireHelper(s, 'cashier'));
   assert.equal(hireHelper(s, 'cashier'), false);
-  assert.equal(s.coins, 1000 - UPGRADES.shoes.cost - HELPERS.cashier.cost);
+  assert.equal(s.coins, 1000 - UPGRADES.scanner.cost - HELPERS.cashier.cost);
   s.coins = 0;
   assert.equal(buyUpgrade(s, 'cart'), false);
   assert.ok(!hasUpgrade(s, 'cart'));
@@ -63,11 +63,11 @@ test('a full shelf leaves the spare box on the cart', () => {
   assert.equal(s.keeper.spare, null);
 });
 
-test('Comfy Shoes make the shopkeeper quicker', () => {
-  const time = (shoes) => {
+test('Roller Skates make the shopkeeper quicker too (GDD #85)', () => {
+  const time = (skates) => {
     const s = createState();
     s.hearts = 9999; // past every rung of the ladder (GDD #83)
-    if (shoes) s.upgrades.shoes = true;
+    if (skates) s.upgrades.skates = true;
     walkToFixture(s, new Map([['r1', buildNav(s.building.rooms[0])]]), shelvesOf(s)[1]);
     let t = 0;
     while (s.keeper.path.length && t < 20) { tickKeeper(s, 0.1); t += 0.1; }
@@ -184,21 +184,31 @@ test('Ollie the greeter greets everyone walking in; Rosa needs the Window Displa
   assert.ok(dresserOnDuty(s) && showingOff(s));
 });
 
-test('Speedy Scanner scans two per tap; Gift Wrap doubles tips', async () => {
+test('Speedy Scanner scans two per tap; tips grow with the sale (GDD #85)', async () => {
   const { startCheckout, checkoutTap } = await import('../js/sim/checkout.js');
   const s = createState();
   s.hearts = 9999; // past every rung of the ladder (GDD #83)
   const customer = { id: 'c1', basket: ['teaset', 'teaset', 'chair'], state: 'waiting' };
   s.customers.push(customer);
   s.upgrades.scanner = true;
-  s.upgrades.giftwrap = true;
   startCheckout(s, customer);
   checkoutTap(s);
   assert.equal(s.checkout.items.filter((i) => i.scanned).length, 2);
   checkoutTap(s);
   const coins = s.coins;
-  checkoutTap(s, () => 0); // the smallest tip, doubled
-  assert.equal(s.coins, coins + 10 + 10 + 14 + 2);
+  checkoutTap(s, () => 0); // the smallest tip: 5% of 34, rounded
+  assert.equal(s.coins, coins + 34 + 2);
+  const tipOn = (basket, r) => {
+    const t = createState();
+    const c = { id: 'c2', basket, state: 'waiting' };
+    t.customers.push(c);
+    startCheckout(t, c);
+    for (const _ of basket) checkoutTap(t);
+    return checkoutTap(t, () => r) === 'sold' && t.day.stats.tips;
+  };
+  assert.equal(tipOn(['teaset'], 0), 1, 'always at least 1');
+  assert.equal(tipOn(['castle'], 0.5), 15, 'about 10% of a 🪙 150 Castle');
+  assert.ok(tipOn(['castle3'], 0.5) > 1000, 'Dazzle tips are big');
 });
 
 test('Tall Shelves give every shelf, old and new, a top row filled last (GDD #72)', async () => {
@@ -229,21 +239,21 @@ test('helpers and upgrades come as a ladder: each appears at more Hearts and cos
   s.coins = 1e6;
   let l = ladder(s);
   assert.deepEqual(l.available.map((r) => r.id), ['cart']);
-  assert.equal(l.next.id, 'shoes');
-  assert.deepEqual(l.next.why, { hearts: UPGRADES.shoes.hearts });
+  assert.equal(l.next.id, 'cashier');
+  assert.deepEqual(l.next.why, { hearts: HELPERS.cashier.hearts });
   assert.equal(hireHelper(s, 'cashier'), false, 'not enough happy customers yet');
   s.hearts = HELPERS.cashier.hearts;
   assert.ok(canHire(s, 'cashier'));
   assert.ok(buyUpgrade(s, 'cart'));
   l = ladder(s);
-  assert.deepEqual(l.available.map((r) => r.id), ['shoes', 'cashier']);
+  assert.deepEqual(l.available.map((r) => r.id), ['cashier']);
   assert.deepEqual(l.owned.map((r) => r.id), ['cart']);
-  assert.equal(l.next.id, 'giftwrap');
+  assert.equal(l.next.id, 'lunch');
   // Rosa needs the Window Display as well as her Hearts: the teaser says so, and later rungs still come.
-  s.hearts = HELPERS.dresser.hearts;
+  s.hearts = HELPERS.stocker2.hearts;
   l = ladder(s);
-  assert.equal(l.next.id, 'skates', 'Roller Skates wait for a stocker');
-  assert.deepEqual(l.next.why, { needs: 'stocker' });
-  assert.ok(!l.available.some((r) => r.id === 'dresser'));
+  assert.equal(l.next.id, 'dresser');
+  assert.deepEqual(l.next.why, { needs: 'display' });
+  assert.ok(l.available.some((r) => r.id === 'skates'), 'Roller Skates no longer wait for a stocker');
   assert.ok(l.available.some((r) => r.id === 'tall'));
 });

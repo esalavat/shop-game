@@ -8,7 +8,7 @@ import { planRoute, startRoute, finishRoute, settleRoute, routeStart, walkRoute,
 import { boxSpot, findFixture, DOORWAY_Z } from './stock.js';
 import { performTask } from './tasks.js';
 import { hasUpgrade } from './upgrades.js';
-import { SHOES_SPEED } from '../data/upgrades.js';
+import { SKATES_SPEED } from '../data/upgrades.js';
 
 export const KEEPER_SPEED = 1.7; // room units per second
 
@@ -75,7 +75,7 @@ export function keeperGreeting(state) {
 }
 
 export function tickKeeper(state, dt) {
-  const speed = KEEPER_SPEED * (hasUpgrade(state, 'shoes') ? SHOES_SPEED : 1);
+  const speed = KEEPER_SPEED * (hasUpgrade(state, 'skates') ? SKATES_SPEED : 1); // Roller Skates for everyone (GDD #85)
   if (walkRoute(state, state.keeper, speed, dt)) arrive(state);
 }
 

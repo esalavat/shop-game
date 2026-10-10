@@ -136,11 +136,7 @@ test('Theo comes after Bea and Juno after Theo; they never head for the same box
   assert.ok(s.stockers.every((b) => !b.carrying && !b.spare));
 });
 
-test('Roller Skates need a stocker first, then make stockers finish the doorstep boxes sooner', () => {
-  const s0 = createState();
-  s0.hearts = 9999; // past every rung of the ladder (GDD #83)
-  s0.coins = 1000;
-  assert.equal(buyUpgrade(s0, 'skates'), false, 'no stocker to wear them');
+test('Roller Skates make stockers finish the doorstep boxes sooner', () => {
   const timeToEmpty = (skates) => {
     const { s, navs } = beaShop();
     if (skates) {

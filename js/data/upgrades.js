@@ -4,19 +4,18 @@
 
 export const UPGRADES = {
   cart: { name: 'Stock Cart', icon: '🛒', cost: 60, hearts: 0, desc: 'Carry two boxes at once, so restocking takes half the walking.' },
-  shoes: { name: 'Comfy Shoes', icon: '👟', cost: 80, hearts: 5, desc: 'Bouncy new shoes: your shopkeeper walks faster.' },
   lunch: { name: 'Lunchtime Delivery', icon: '🥪', cost: 360, hearts: 40, desc: 'Pip comes at midday too. Order before lunch and it arrives halfway through the day.' },
   scanner: { name: 'Speedy Scanner', icon: '⚡', cost: 720, hearts: 85, desc: 'Each tap at the register scans two items, and cashiers scan faster too.' },
   tall: { name: 'Tall Shelves', icon: '📚', cost: 2000, hearts: 225, desc: 'Every shelf gets a row on top: room for 12 things instead of 9, so you restock less often.' },
-  skates: { name: 'Roller Skates', icon: '🛼', cost: 1400, hearts: 160, needs: 'stocker', desc: 'Roller skates for your stockers: they zip boxes from the doorstep to the shelves much faster.' },
-  giftwrap: { name: 'Gift Wrap', icon: '🎁', cost: 240, hearts: 25, desc: 'Pretty wrapping paper: tips are twice as big when you ring people up yourself.' },
+  skates: { name: 'Roller Skates', icon: '🛼', cost: 1400, hearts: 160, desc: 'Roller skates for everyone: your shopkeeper and your stockers zip around the shop much faster.' },
 };
 
 export const SCANNER = { perTap: 2, helperSpeed: 0.6 }; // Speedy Scanner: items per tap; cashiers' scan time × this
-export const GIFT_WRAP_TIPS = 2;                          // Gift Wrap: tips × this
 
-export const SHOES_SPEED = 1.4;  // walking speed multiplier with Comfy Shoes (your shopkeeper only)
-export const SKATES_SPEED = 1.4; // stockers' walking speed multiplier with Roller Skates (GDD #76)
+export const SKATES_SPEED = 1.4; // walking speed multiplier with Roller Skates, for the shopkeeper and every stocker (GDD #76, #85)
+
+/** Upgrades taken out (GDD #85) and the coins given back to shops that had bought them (save v21). */
+export const REFUNDS = { shoes: { name: 'Comfy Shoes', coins: 80 }, giftwrap: { name: 'Gift Wrap', coins: 150 } };
 
 export const HELPERS = {
   cashier: {

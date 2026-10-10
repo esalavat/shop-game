@@ -15,6 +15,7 @@ import { emptyStats } from '../sim/day.js';
 import { settleBoxes } from '../sim/stock.js';
 import { ribbonsForCollection } from '../sim/decor.js';
 import { CHANNEL } from './channel.js';
+import { REFUNDS } from '../data/upgrades.js';
 
 /** Old theme room types (v14-v15) and the ROOM_STYLES look each one becomes. */
 const THEME_STYLE = { tea: 0, parlor: 1, fairy: 2, bedroom: 3, dolls: 4, houses: 5 };
@@ -133,6 +134,16 @@ const MIGRATIONS = {
     const found = Object.values(d.collection ?? {}).filter(Boolean).length;
     const OLD_STEPS = [0, 4, 10, 16, 24, 28, 34, 40, 48, 52, 58, 64];
     return { ...d, version: 20, pagesOpen: OLD_STEPS.filter((at) => found >= at).length };
+  },
+  // v21: Comfy Shoes and Gift Wrap are gone (GDD #85): Roller Skates speed everyone up, and tips grow
+  // with the sale. Shops that had bought them get their coins back; `refunds` (live-only) lets the game
+  // say so on this load.
+  20: (d) => {
+    const upgrades = { ...d.upgrades };
+    const refunds = Object.keys(REFUNDS).filter((id) => upgrades[id]).map((id) => ({ id, ...REFUNDS[id] }));
+    for (const r of refunds) delete upgrades[r.id];
+    const coins = refunds.reduce((n, r) => n + r.coins, d.coins);
+    return { ...d, version: 21, upgrades, coins, ...(refunds.length ? { refunds } : {}) };
   },
 };
 
