@@ -243,7 +243,7 @@ Not released yet: the balancing script, the balancing pass (#80), "new items" (#
 - **Tests:** `npm test` (node --test, zero dependencies). Add tests for new sim behavior.
 - **Run locally:** `npm run serve`, then open http://localhost:8123 (`scripts/serve.js` also takes a
   `PORT` env var; the preview config in `.claude/launch.json` lets it pick a free port). Add `?debug` for the debug
-  panel: +100 coins, +50 ❤️ (opens Hearts-gated pages and helpers), +20 🎀, fill shelves, spawn customer, skip ahead, add rooms, reset save. The local server disables
+  panel (resources only; the user buys rooms through the normal menus): +1000 🪙, +50 ❤️ (opens Hearts-gated pages and helpers), +20 🎀, fill shelves, spawn customer, skip ahead, reset save. The local server disables
   caching on purpose.
 - **Verify in the browser at phone size** (375x812) before pushing.
 - **Deploy:** push to `main` → the test build at `/dev/` (GitHub Actions `.github/workflows/pages.yml` runs

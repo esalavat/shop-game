@@ -2,29 +2,25 @@
 
 import { addRibbons } from '../sim/decor.js';
 import { addCoins } from '../sim/economy.js';
-import { addRoom, addStairwell, addFloor, hasStairwell, roomSpots } from '../sim/building.js';
 import { ITEMS } from '../data/items.js';
 import { spawnCustomer } from '../sim/customers.js';
 import { openShop, DAY_LENGTH } from '../sim/day.js';
 import { notePagesOpen } from '../sim/catalog.js';
 import { events } from '../core/events.js';
 
-export function createDebug({ state, renderer, quality, onViewAll, onReset, onCopyMain, onStockChanged }) {
+export function createDebug({ state, renderer, quality, onReset, onCopyMain, onStockChanged }) {
   const root = document.createElement('div');
   root.id = 'debug';
   root.innerHTML = `
     <button class="debug-toggle" aria-label="Debug">🐞</button>
     <div class="debug-panel" hidden>
       <div class="debug-stats"></div>
-      <button data-act="coins">+100 coins</button>
+      <button data-act="coins">+1000 🪙</button>
       <button data-act="hearts">+50 ❤️</button>
       <button data-act="ribbons">+20 🎀</button>
       <button data-act="fill">Fill shelves</button>
       <button data-act="customer">Spawn customer</button>
       <button data-act="skip">Skip ahead ⏩</button>
-      <button data-act="right">Add room →</button>
-      <button data-act="up">Upstairs ↑</button>
-      <button data-act="all">Whole shop</button>
       ${onCopyMain ? '<button data-act="copyMain" class="danger">Copy main save</button>' : ''}
       <button data-act="reset" class="danger">Reset save</button>
     </div>`;
@@ -33,10 +29,8 @@ export function createDebug({ state, renderer, quality, onViewAll, onReset, onCo
   const stats = root.querySelector('.debug-stats');
   root.querySelector('.debug-toggle').addEventListener('click', () => (panel.hidden = !panel.hidden));
 
-  const cols = () => state.building.rooms.map((r) => r.col);
-
   const actions = {
-    coins: () => addCoins(state, 100),
+    coins: () => addCoins(state, 1000),
     ribbons: () => addRibbons(state, 20, 'debug'),
     hearts: () => { // happy customers open catalog pages and the next helpers and upgrades (GDD #80, #83)
       state.hearts += 50;
@@ -58,18 +52,6 @@ export function createDebug({ state, renderer, quality, onViewAll, onReset, onCo
       else if (d.phase === 'open') d.time = Math.max(d.time, DAY_LENGTH.open - 5);
       else if (d.phase === 'evening') d.time = DAY_LENGTH.evening;
     },
-    right: () => {
-      const col = Math.max(...cols()) + 1;
-      addRoom(state, 'room', col, 0);
-    },
-    up: () => {
-      // The Stairwell first, then rooms upstairs beside it, then another floor.
-      if (!hasStairwell(state)) return addStairwell(state);
-      const spot = roomSpots(state).find((p) => p.floor > 0);
-      if (spot) addRoom(state, 'room', spot.col, spot.floor);
-      else addFloor(state);
-    },
-    all: onViewAll,
     reset: () => { if (confirm('Erase the save and start over?')) onReset(); },
     copyMain: () => { if (confirm('Replace this save with a copy of the main game\'s save?')) onCopyMain(); },
   };

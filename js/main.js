@@ -581,7 +581,6 @@ if (new URLSearchParams(location.search).has('debug')) {
   import('./ui/debug.js').then(({ createDebug }) => {
     debug = createDebug({
       state, renderer, quality,
-      onViewAll: focusAll,
       onStockChanged: () => shelvesView.rebuild(),
       onReset() {
         resetting = true;
