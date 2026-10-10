@@ -50,11 +50,19 @@ export const THEME_LOOKS = {
   bedroom3: ['outfit', '#26215e', 'Galaxy outfit'],
   dolls3: ['accessory', 'bunny3', 'Midnight Bunny Ears'],
   houses3: ['accessory', 'crown3', 'Diamond Crown'],
+  // Sweet Shop and Pet Corner (GDD #79)
+  sweets: ['outfit', '#ff8fd0', 'Cotton Candy outfit'],
+  sweets2: ['outfit', '#8fe03a', 'Sour Apple outfit'],
+  sweets3: ['outfit', '#6b3a2a', 'Chocolate Truffle outfit'],
+  pets: ['accessory', 'kitty', 'Kitty Ears'],
+  pets2: ['accessory', 'kitty2', 'Ginger Kitty Ears'],
+  pets3: ['accessory', 'kitty3', 'Silver Kitty Ears'],
 };
 const REWARD_ACCESSORIES = [
   ['flowers', 'Flower crown 🌸'], ['bunny', 'Bunny ears 🐰'], ['crown', 'Crown 👑'],
   ['flowers2', 'Sunset crown 🌺'], ['bunny2', 'Candy ears 🐰'], ['crown2', 'Ruby crown 👑'],
   ['flowers3', 'Jewel crown 💐'], ['bunny3', 'Midnight ears 🐰'], ['crown3', 'Diamond crown 💎'],
+  ['kitty', 'Kitty ears 🐱'], ['kitty2', 'Ginger ears 🐱'], ['kitty3', 'Silver ears 🐱'],
 ];
 
 /** Choices in the shopkeeper creator (ui/creator.js). */

@@ -124,11 +124,18 @@ export function createOrderBook(state, thumbs) {
     pending.textContent = [lunch.length && `Arriving at lunchtime: ${list(lunch)}`, later.length && `Arriving tomorrow: ${list(later)}`].filter(Boolean).join(' · ');
   }
 
-  /** Chips like "🏪 4  📦 3  🚚 3" (the legend is at the top of the book), or "None in the shop!". Only for items you've found. */
+  /**
+   * Chips like "🏪 4  📦 3  🚚 3" (the legend is at the top of the book), "None in the shop!", or "Not
+   * ordered yet" for a color you haven't found, so every card has the line and the grid lines up.
+   */
   function showStock(el, id) {
-    el.hidden = !state.collection[id];
-    if (el.hidden) return;
     const { shelf, boxed, coming } = stockCount(state, id);
+    el.classList.toggle('unfound', !state.collection[id] && !coming);
+    if (!state.collection[id] && !coming) {
+      el.classList.remove('none');
+      el.textContent = 'Not ordered yet';
+      return;
+    }
     const chips = [['🏪', shelf], ['📦', boxed], ['🚚', coming]].filter(([, n]) => n).map(([icon, n]) => `<span>${icon} ${n}</span>`);
     el.classList.toggle('none', !shelf && !boxed);
     el.innerHTML = !shelf && !boxed ? `None in the shop!${coming ? ` <span>🚚 ${coming}</span>` : ''}` : chips.join('');

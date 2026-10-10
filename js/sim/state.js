@@ -7,7 +7,7 @@ import { dropBox } from './stock.js';
 import { emptyStats } from './day.js';
 import { ribbonsForCollection } from './decor.js';
 
-export const STATE_VERSION = 19;
+export const STATE_VERSION = 20;
 
 /** Live-only fields: never saved, reset on every load (customers just walk in again). */
 export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer', 'cashier', 'greeter', 'dresser', 'registers'];
@@ -50,6 +50,7 @@ export function createState(now = Date.now()) {
     orders: [],
     boxes: [],
     collection: {},
+    pagesOpen: 1, // catalog steps opened so far; they stay open (sim/catalog.js, GDD #79)
     dollhouse: { slots: {} }, // slotId -> itemId (data/dollhouse.js); on show once the Window Display is built
     wishes: [],
     decor: { owned: {} }, // room styles bought with Ribbons ('kind:id' -> true; sim/decor.js); each room wears room.decor

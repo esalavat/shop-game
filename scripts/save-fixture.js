@@ -16,6 +16,7 @@ import { placeInDollhouse } from '../js/sim/collection.js';
 import { placeOrder } from '../js/sim/orders.js';
 import { createStocker } from '../js/sim/stocker.js';
 import { ITEMS } from '../js/data/items.js';
+import { notePagesOpen } from '../js/sim/catalog.js';
 import { UPGRADES, HELPERS } from '../js/data/upgrades.js';
 
 const path = `tests/fixtures/saves/v${STATE_VERSION}.json`;
@@ -38,6 +39,7 @@ for (const id of Object.keys(HELPERS)) hireHelper(s, id);
 const shop = s.building.rooms.find((r) => r.type === 'shop');
 if (s.helpers.stocker && !s.stocker) s.stocker = createStocker(shop.id);
 for (const id of Object.keys(ITEMS)) s.collection[id] = true;
+notePagesOpen(s);
 placeInDollhouse(s, 'bedroom', 'bed');
 placeInDollhouse(s, 'parlor', 'chair');
 placeInDollhouse(s, 'tearoom', 'teaset');

@@ -293,6 +293,120 @@ const BUILDERS = {
     for (const x of [-0.035, 0.035]) box(g, 0.022, 0.03, 0.004, P.sky, x, 0.095, 0.056);
     star(g, 0.014, 0.004, P.butter, 0, 0.115, 0.057);
   },
+  // ---- Sweet Shop (GDD #79) ----
+  lollipops(g, c) {
+    cyl(g, 0.05, 0.055, 0.1, 12, toonGlass, 0, 0.05, 0); // the jar
+    cyl(g, 0.056, 0.056, 0.015, 12, c, 0, 0.105, 0); // lid band
+    for (let i = 0; i < 6; i++) ball(g, 0.016, [P.pink, P.butter, P.mint][i % 3], Math.cos(i) * 0.025, 0.02 + (i % 3) * 0.022, Math.sin(i) * 0.025, 0); // candies inside
+    for (const [x, z, h, col] of [[-0.025, 0, 0.2, c], [0.02, -0.015, 0.22, P.lilac], [0.01, 0.025, 0.18, P.butter]]) {
+      cyl(g, 0.004, 0.004, h - 0.06, 4, P.cream, x, 0.06 + (h - 0.06) / 2, z);
+      cyl(g, 0.032, 0.032, 0.012, 12, col, x, h, z).rotation.x = Math.PI / 2;
+      mesh(g, new THREE.TorusGeometry(0.018, 0.004, 4, 12), P.cream, x, h, z + 0.007);
+    }
+  },
+  gumdrops(g, c) {
+    cyl(g, 0.045, 0.055, 0.05, 10, P.pink, 0, 0.025, 0); // pot
+    cyl(g, 0.008, 0.012, 0.1, 6, P.trunk, 0, 0.1, 0);
+    ball(g, 0.075, c, 0, 0.18, 0);
+    const drops = [P.pink, P.butter, P.lilac, '#ff6f91', P.sky];
+    for (let i = 0; i < 10; i++) {
+      const a = i * 2.4, y = 0.14 + (i % 4) * 0.025, r = Math.sqrt(0.075 ** 2 - (y - 0.18) ** 2) + 0.004; // on the surface
+      mesh(g, new THREE.ConeGeometry(0.016, 0.022, 6), drops[i % drops.length], Math.cos(a) * r, y, Math.sin(a) * r);
+    }
+  },
+  soda(g, c) {
+    box(g, 0.2, 0.09, 0.09, c, 0, 0.045, 0); // counter
+    box(g, 0.21, 0.012, 0.1, P.cream, 0, 0.095, 0);
+    for (let i = 0; i < 4; i++) box(g, 0.035, 0.07, 0.003, i % 2 ? P.cream : c, -0.075 + i * 0.05, 0.045, 0.046); // stripes
+    cyl(g, 0.012, 0.012, 0.08, 6, P.butter, 0.06, 0.14, -0.02); // tap
+    cyl(g, 0.006, 0.006, 0.03, 5, P.butter, 0.06, 0.17, 0.0).rotation.x = Math.PI / 2;
+    for (const [x, col] of [[-0.06, P.pink], [0.0, P.mint]]) { // sundae glasses
+      cyl(g, 0.018, 0.008, 0.045, 8, toonGlass, x, 0.125, 0.015);
+      ball(g, 0.02, col, x, 0.155, 0.015, 0);
+      ball(g, 0.007, '#ff4f6f', x, 0.177, 0.015, 0); // cherry
+    }
+    for (const x of [-0.07, 0.07]) { // stools
+      cyl(g, 0.004, 0.004, 0.06, 4, P.butter, x, 0.03, 0.08);
+      cyl(g, 0.022, 0.022, 0.012, 10, P.pink, x, 0.066, 0.08);
+    }
+  },
+  gingerbread(g, c) {
+    box(g, 0.17, 0.12, 0.13, c, 0, 0.06, 0);
+    prism(g, 0.21, 0.09, 0.15, P.cream).position.y = 0.12; // icing roof
+    for (let i = 0; i < 5; i++) ball(g, 0.012, [P.pink, P.mint, P.butter][i % 3], -0.07 + i * 0.035, 0.135, 0.075, 0); // gumdrop trim
+    box(g, 0.04, 0.06, 0.008, P.pink, 0, 0.03, 0.066);
+    ball(g, 0.006, P.cream, 0.012, 0.03, 0.072, 0);
+    for (const x of [-0.055, 0.055]) {
+      box(g, 0.035, 0.035, 0.008, P.butter, x, 0.08, 0.066);
+      box(g, 0.035, 0.006, 0.01, P.cream, x, 0.08, 0.068);
+    }
+    for (const side of [-1, 1]) { // candy canes at the door
+      cyl(g, 0.006, 0.006, 0.08, 5, P.cream, side * 0.1, 0.04, 0.08);
+      mesh(g, new THREE.TorusGeometry(0.014, 0.006, 4, 8, Math.PI), '#ff4f6f', side * 0.1 - side * 0.014, 0.08, 0.08);
+    }
+    cyl(g, 0.012, 0.012, 0.04, 6, P.cream, 0.06, 0.2, -0.02); // chimney
+  },
+  // ---- Pet Corner (GDD #79) ----
+  kitten(g, c) {
+    cyl(g, 0.085, 0.07, 0.05, 12, P.wood, 0, 0.025, 0); // basket
+    mesh(g, new THREE.TorusGeometry(0.083, 0.01, 5, 14), P.wood, 0, 0.05, 0).rotation.x = Math.PI / 2;
+    ball(g, 0.06, P.pink, 0, 0.05, 0).scale.set(1.25, 0.3, 1.25); // cushion
+    ball(g, 0.045, c, 0, 0.085, 0).scale.set(1.2, 0.85, 1); // curled body
+    ball(g, 0.035, c, 0.02, 0.125, 0.03); // head
+    for (const side of [-1, 1]) mesh(g, new THREE.ConeGeometry(0.013, 0.025, 4), c, 0.02 + side * 0.02, 0.16, 0.03);
+    for (const side of [-1, 1]) ball(g, 0.005, P.ink, 0.02 + side * 0.012, 0.13, 0.062, 0);
+    ball(g, 0.005, P.pink, 0.02, 0.12, 0.065, 0);
+    ball(g, 0.012, c, -0.035, 0.075, 0.045, 0).scale.set(2.4, 0.8, 0.9); // tail curled round the front
+    ball(g, 0.012, P.sky, 0.065, 0.065, 0.045, 0); // yarn ball
+  },
+  kennel(g, c) {
+    box(g, 0.16, 0.1, 0.13, c, 0, 0.05, -0.01);
+    prism(g, 0.19, 0.07, 0.15, '#ff8f8f').position.set(0, 0.1, -0.01);
+    const door = new THREE.Shape();
+    door.moveTo(-0.03, 0); door.lineTo(0.03, 0); door.lineTo(0.03, 0.04); door.absarc(0, 0.04, 0.03, 0, Math.PI, false); door.closePath();
+    mesh(g, new THREE.ExtrudeGeometry(door, { depth: 0.004, bevelEnabled: false }), P.ink, 0, 0, 0.056);
+    box(g, 0.05, 0.016, 0.004, P.cream, 0, 0.12, 0.058); // name plate
+    // a puppy sitting out front
+    ball(g, 0.032, P.butter, 0.05, 0.03, 0.08).scale.set(1, 1.1, 0.9);
+    ball(g, 0.027, P.butter, 0.05, 0.075, 0.09);
+    for (const side of [-1, 1]) ball(g, 0.013, P.wood, 0.05 + side * 0.026, 0.07, 0.09, 0).scale.set(0.6, 1.4, 0.6); // floppy ears
+    ball(g, 0.007, P.ink, 0.05, 0.07, 0.117, 0);
+    cyl(g, 0.03, 0.025, 0.012, 10, '#ff6f91', -0.05, 0.006, 0.08); // food bowl
+  },
+  birdcage(g, c) {
+    cyl(g, 0.07, 0.075, 0.015, 14, c, 0, 0.008, 0);
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * Math.PI * 2;
+      cyl(g, 0.003, 0.003, 0.13, 3, P.butter, Math.cos(a) * 0.065, 0.08, Math.sin(a) * 0.065);
+    }
+    mesh(g, new THREE.SphereGeometry(0.067, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2), c, 0, 0.145, 0);
+    mesh(g, new THREE.TorusGeometry(0.014, 0.004, 4, 10), P.butter, 0, 0.225, 0);
+    cyl(g, 0.003, 0.003, 0.1, 4, P.wood, 0, 0.08, 0).rotation.z = Math.PI / 2; // perch
+    ball(g, 0.022, P.butter, 0, 0.105, 0).scale.set(0.9, 1, 1.1); // the songbird
+    ball(g, 0.015, P.butter, 0, 0.13, 0.012, 0);
+    mesh(g, new THREE.ConeGeometry(0.006, 0.014, 4), '#ff9a3c', 0, 0.13, 0.03).rotation.x = Math.PI / 2;
+    ball(g, 0.004, P.ink, 0.008, 0.135, 0.022, 0);
+  },
+  stable(g, c) {
+    box(g, 0.22, 0.12, 0.12, c, 0, 0.06, -0.02);
+    prism(g, 0.26, 0.08, 0.14, '#b05a5a').position.set(0, 0.12, -0.02);
+    for (const x of [-0.05, 0.05]) { // stall doors with an X
+      box(g, 0.07, 0.07, 0.006, P.cream, x, 0.035, 0.041);
+      for (const r of [0.8, -0.8]) box(g, 0.08, 0.008, 0.008, c, x, 0.035, 0.045).rotation.z = r;
+    }
+    star(g, 0.016, 0.004, P.butter, 0, 0.15, 0.052);
+    // a pony with a pink mane in front
+    const pony = new THREE.Group();
+    pony.position.set(0.02, 0, 0.09);
+    g.add(pony);
+    box(pony, 0.08, 0.04, 0.035, P.cream, 0, 0.065, 0);
+    for (const [x, z] of [[-0.03, -0.012], [0.03, -0.012], [-0.03, 0.012], [0.03, 0.012]]) cyl(pony, 0.006, 0.006, 0.045, 5, P.cream, x, 0.023, z);
+    box(pony, 0.025, 0.045, 0.025, P.cream, 0.04, 0.095, 0).rotation.z = -0.4;
+    box(pony, 0.03, 0.022, 0.024, P.cream, 0.058, 0.115, 0);
+    box(pony, 0.01, 0.045, 0.028, P.pink, 0.028, 0.1, 0).rotation.z = -0.4; // mane
+    ball(pony, 0.012, P.pink, -0.045, 0.065, 0, 0).scale.set(1, 2, 1); // tail
+    ball(pony, 0.004, P.ink, 0.065, 0.12, 0.013, 0);
+  },
 };
 
 export function buildItem(itemId) {

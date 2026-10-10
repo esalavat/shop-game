@@ -2,19 +2,19 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createState } from '../js/sim/state.js';
 import { ITEMS, PAGES, SETS, STEPS, ROUNDS, boxProfit, stepOf, colorsOf } from '../js/data/items.js';
-import { openPageCount, canOrder, orderableItems, toNextPage, roundOpen } from '../js/sim/catalog.js';
+import { openPageCount, canOrder, orderableItems, toNextPage, roundOpen, notePagesOpen } from '../js/sim/catalog.js';
 import { placeOrder } from '../js/sim/orders.js';
 import { startNextDay } from '../js/sim/day.js';
 import { events } from '../js/core/events.js';
 
-test('24 items in three colors: one per theme on every page of every round, and each step earns more per box', () => {
-  assert.equal(Object.keys(ITEMS).length, 24 * ROUNDS.length);
-  assert.equal(Object.keys(SETS).length, 6 * ROUNDS.length);
+test('32 items in three colors: one per theme on every page of every round, and each step earns more per box', () => {
+  assert.equal(Object.keys(ITEMS).length, 32 * ROUNDS.length);
+  assert.equal(Object.keys(SETS).length, 8 * ROUNDS.length);
   for (let step = 0; step < STEPS.length; step++) {
     const ids = Object.keys(ITEMS).filter((id) => stepOf(id) === step);
     const round = STEPS[step].round;
-    assert.equal(ids.length, 6, `step ${step}`);
-    assert.equal(new Set(ids.map((id) => ITEMS[id].set)).size, 6, `step ${step}: one per theme`);
+    assert.equal(ids.length, 8, `step ${step}`);
+    assert.equal(new Set(ids.map((id) => ITEMS[id].set)).size, 8, `step ${step}: one per theme`);
     assert.ok(ids.every((id) => ITEMS[id].round === round));
     if (step > 0) {
       const prev = Object.keys(ITEMS).filter((id) => stepOf(id) === step - 1);
@@ -24,7 +24,7 @@ test('24 items in three colors: one per theme on every page of every round, and 
   }
 });
 
-test('color rounds: ×16 prices, a new color for each, and Bright opens once all 24 are found (GDD #77)', () => {
+test('color rounds: ×16 prices, a new color for each, and Bright opens once all 32 are found (GDD #77)', () => {
   assert.equal(ITEMS.teaset2.price, ITEMS.teaset.price * 16);
   assert.equal(ITEMS.castle3.cost, ITEMS.castle.cost * 256);
   assert.deepEqual(colorsOf('cottage2'), ['cottage', 'cottage2', 'cottage3']);
@@ -37,6 +37,7 @@ test('color rounds: ×16 prices, a new color for each, and Bright opens once all
   }
   const s = createState();
   for (const id of Object.keys(ITEMS)) if (ITEMS[id].round === 0 && id !== 'castle') s.collection[id] = true;
+  notePagesOpen(s); // as if found one delivery at a time
   assert.ok(!roundOpen(s, 1));
   assert.ok(!canOrder(s, 'teaset2'));
   assert.equal(openPageCount(s), PAGES.length);
@@ -71,6 +72,7 @@ test('finding enough items opens the next page, with an event', () => {
   const offs = [events.on('pageOpened', ({ page }) => opened.push(page)), events.on('dayStarted', (e) => (delivered = e.delivered))];
   placeOrder(s, 'teddy');
   placeOrder(s, 'lamp');
+  placeOrder(s, 'kitten');
   startNextDay(s);
   offs.forEach((off) => off());
   assert.deepEqual(opened, [1]);
@@ -93,5 +95,21 @@ test('customers only wish for things you can order', async () => {
   for (let i = 0; i < 200; i++) {
     const c = spawnCustomer(s);
     assert.ok(c.wants.every((id) => canOrder(s, id)), c.wants.join());
+  }
+});
+
+test('an opened page stays open, even with fewer finds than it needs now (GDD #79)', () => {
+  const s = createState();
+  s.pagesOpen = 5; // e.g. opened under the old thresholds
+  assert.ok(canOrder(s, 'cupcakes') && canOrder(s, 'castle'));
+  assert.ok(canOrder(s, 'lollipops2') && !canOrder(s, 'gumdrops2'));
+  assert.ok(roundOpen(s, 1));
+  assert.ok(toNextPage(s).need >= 1);
+});
+
+test('the order book lists each page cheapest first', () => {
+  for (let page = 0; page < PAGES.length; page++) {
+    const prices = Object.values(ITEMS).filter((i) => i.round === 0 && i.page === page).map((i) => i.price);
+    assert.deepEqual(prices, [...prices].sort((a, b) => a - b), `page ${page}`);
   }
 });

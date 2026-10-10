@@ -161,12 +161,20 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   `js/data/items.js`, `sim/catalog.js`, `js/ui/orderbook.js`. No save change. Economy past round 1 still to tune (GDD §18 #15).
   **Customers shop by item, not color** (#78, user): wants and wishes are round-1 ids; any color on the shelf will do and
   they pay that color's price (`baseOf` in `js/data/items.js`, used in `sim/customers.js`, `sim/decor.js`, `sim/stocker.js`).
+- **Sweet Shop and Pet Corner, built 2026-10-09, waiting for feedback** (GDD v0.41 #79): 8 new items (Lollipop Jar, Gumdrop
+  Tree, Soda Fountain, Gingerbread House; Kitten Basket, Puppy Kennel, Songbird Cage, Pony Stable), one per page, priced inside
+  each page's band (×16 a round unchanged), so 32 items and 96 stickers. Pages open at 0 / 5 / 13 / 21, Bright at 32, Dazzle at 64.
+  **Opened pages never close: save version 20**, `state.pagesOpen` (`notePagesOpen` in `js/sim/catalog.js`; the migration
+  counts what the old thresholds had opened). Rewards: Candy / Paw prints wallpaper patterns (`js/render/patterns.js`), new floors,
+  rug, rose gold wallpaper, Cotton Candy / Sour Apple / Chocolate Truffle outfits, Kitty Ears ×3 (`character.js`). Order book
+  (user): each page cheapest first (BASE in `js/data/items.js` is listed that way, tested), every card has a stock line ("Not
+  ordered yet"), buy buttons line up.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
-- **Planned next, in order:** (#59) **more items and themes** (toward 100+). Later: more stockers
+- **Planned next:** the balancing pass (Sparkle cap §18 #10, coins after round 1 §18 #15). Later: more items past 100 (#59), more stockers
   (#60), **Instant Delivery** (GDD §11, on the §17 roadmap, design to discuss), Heart/Sparkle milestone unlocks (§18 #6). 
 
-**Next:** the rest of #59 (more items and themes toward 100+). Waiting on feedback: Roller Skates (#76), room prices (#75), register rooms (#73), the
+**Next:** the balancing pass (GDD §18 #10, #15). Waiting on feedback: Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71).
 
 **Releases:** the latest is **v2026.10.9.12** (2026-10-09): color rounds (#77) and shopping by item (#78); before it

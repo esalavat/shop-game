@@ -55,6 +55,27 @@ function star(g, x, y, r) {
   g.fill();
 }
 
+/** A wrapped sweet: a round middle with a twist of wrapper either side. */
+function candy(g, x, y, r) {
+  g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+  for (const side of [-1, 1]) {
+    g.beginPath();
+    g.moveTo(x + side * r * 0.8, y);
+    g.lineTo(x + side * r * 2, y - r * 0.75);
+    g.lineTo(x + side * r * 2, y + r * 0.75);
+    g.closePath();
+    g.fill();
+  }
+}
+
+/** A paw print: a big pad and four toes. */
+function paw(g, x, y, r) {
+  g.beginPath(); g.ellipse(x, y + r * 0.35, r * 0.62, r * 0.5, 0, 0, Math.PI * 2); g.fill();
+  for (const [dx, dy] of [[-0.62, -0.25], [-0.22, -0.62], [0.22, -0.62], [0.62, -0.25]]) {
+    g.beginPath(); g.arc(x + dx * r, y + dy * r, r * 0.22, 0, Math.PI * 2); g.fill();
+  }
+}
+
 const WALL_PATTERNS = {
   dots(g, s, ink) {
     g.fillStyle = ink;
@@ -78,9 +99,20 @@ const WALL_PATTERNS = {
     heart(g, s * 0.27, s * 0.3, s * 0.12);
     heart(g, s * 0.77, s * 0.8, s * 0.1);
   },
+  // Sweet Shop and Pet Corner rewards (GDD #79)
+  candy(g, s, ink) {
+    g.fillStyle = ink;
+    candy(g, s * 0.27, s * 0.3, s * 0.075);
+    candy(g, s * 0.75, s * 0.78, s * 0.065);
+  },
+  paws(g, s, ink) {
+    g.fillStyle = ink;
+    paw(g, s * 0.27, s * 0.3, s * 0.12);
+    paw(g, s * 0.75, s * 0.78, s * 0.1);
+  },
 };
 
-/** Patterned wallpaper (dots, gingham, stars, hearts) for a wall w x h; tiles are `size` across. */
+/** Patterned wallpaper (dots, gingham, stars, hearts, candy, paws) for a wall w x h; tiles are `size` across. */
 export function wallMaterial(paper, pattern, w, h, size = 0.42) {
   const draw = WALL_PATTERNS[pattern.id];
   // Motifs a touch stronger than the stripe colour so they read on a phone.

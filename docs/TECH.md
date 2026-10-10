@@ -59,7 +59,7 @@ js/
     customers.js        # Spawning, browsing, buying, wish notes (state machines); walk to the room that has their item
     checkout.js         # Queue, scanning, tips
     marketing.js        # Morning picks, special days, Sparkle → foot traffic
-    catalog.js          # Order book steps (every page of every color round): which are open (by items found), canOrder, orderableItems (GDD #66, #77)
+    catalog.js          # Order book steps (every page of every color round): which are open (by items found, and never closing: state.pagesOpen / notePagesOpen), canOrder, orderableItems (GDD #66, #77, #79)
     collection.js       # Dream Dollhouse placing, Sparkle, foot-traffic boost, window spot (unlocks happen in day.js)
     helpers.js          # Hired helpers doing jobs: Mia the cashier (state.cashier, live-only); Ollie the greeter and Rosa the window dresser standing at the bonus spots (state.greeter / state.dresser, live-only, GDD #72)
     tutorial.js         # First-day guide steps (state.tutorial: box → shelf → open → register → done), advanced each tick
@@ -124,11 +124,12 @@ docs/                   # GDD, tech plan
 
 ```js
 {
-  version: 19,                         // STATE_VERSION (js/sim/state.js)
+  version: 20,                         // STATE_VERSION (js/sim/state.js)
   day: { number: 1, phase: 'morning', time: 0 },
   coins: 50, hearts: 0, sparkle: 0, ribbons: 4,   // Ribbons 🎀 for room styles (v17)
   decor: { owned: { 'pattern:stars': true } },     // styles bought (v17); free ones (price 0) aren't listed
   themeGifts: ['tea'],                 // themes whose coin gift was given, in order (v18, GDD #70)
+  pagesOpen: 5,                        // catalog steps opened so far; they never close (v20, GDD #79, sim/catalog.js)
   building: { rooms: [{ id, type, col, floor, style?, decor?, fixtures: [{ id, kind, x, z, slots? }] }] }, // type: shop | display | room | stairs | landing; style: shelf rooms (v16); decor: { kind: optionId } chosen styles (v17)
   stock: { boxes: [...], back: { itemId: count } },
   orders: [{ itemId, qty, arrivesDay }],
@@ -439,6 +440,7 @@ Each milestone ends with a push so it's playable on your phone.
 | Delivery bin (#74) | ✅ built (waiting for the user's feedback); `js/ui/bin.js`, `BIN` in `sim/stock.js` |
 | Register rooms (#73) | ✅ built (waiting for the user's feedback); `registerOf` in `sim/checkout.js`, `addRegisterRoom` in `sim/building.js` |
 | Color rounds: two more colors of every item, ×16 prices a round (#77, part of #59) | ✅ approved, released v2026.10.9.12 |
+| Sweet Shop and Pet Corner: 32 items, 96 stickers; order book cheapest first, lined-up cards (#79) | ✅ built, waiting for feedback |
 | More items and themes toward 100+ (#59) | ⏭ later |
 
 ### 11.1 Plan: Stairwell and upstairs (#58 step 2) — ✅ built 2026-10-09

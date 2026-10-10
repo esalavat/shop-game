@@ -354,17 +354,21 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 
 .card img { width: 84px; height: 84px; }
 .card-name { font-weight: 800; font-size: 14px; text-align: center; }
+/* Order book cards line up like a grid: names get two lines' room, and the buy button sits at the bottom. */
+.cards .card-name { min-height: 2.5em; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
 .card-sub { font-size: 12px; opacity: 0.7; text-align: center; }
 .card-have { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin: -2px 0 6px; font-size: 12px; font-weight: 800; color: #6a5a8a; }
 .card-have span { padding: 0 6px; border-radius: 999px; background: #f1ebfa; }
 .card-have.none { padding: 1px 8px; border-radius: 999px; background: #ffe0ec; color: #b8336a; }
 .card-have.none span { background: none; padding: 0; }
+.card-have.unfound { padding: 1px 8px; border-radius: 999px; background: #f4eff6; color: #9a8aa8; }
 .card-have[hidden] { display: none; }
 .stock-legend { margin: 0 2px 6px; font-size: 11px; font-weight: 700; opacity: 0.65; }
 .card-profit { margin: 4px 0 6px; padding: 1px 8px; border-radius: 999px; background: #d4f3e6; font-size: 12px; font-weight: 800; }
 
 .card .buy {
   width: 100%;
+  margin-top: auto;
   padding: 8px 0;
   border: 0;
   border-radius: 12px;

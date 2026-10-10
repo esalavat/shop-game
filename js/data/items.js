@@ -7,37 +7,46 @@
 //   kind:    what sort of thing it is, for Dream Dollhouse slots (data/dollhouse.js)
 //   sparkle: how much Sparkle it adds when placed in the Dream Dollhouse (more special = more)
 //   round:   which color round it's from (ROUNDS, GDD #77); base: the round-1 item it's a color of
-// Each page has one item per theme. Prices and Sparkle are first guesses, tunable here.
+// Each page has one item per theme, listed (and shown in the order book) cheapest first; every page
+// earns more per box than the one before (GDD #79). Prices and Sparkle are first guesses, tunable here.
 // BASE lists round 1; ITEMS adds each one's Bright and Dazzle colors (COLORS) at ×16 prices a round.
 
 const BASE = {
   // Page 1: Starter (box profit 12-18)
   teaset: { name: 'Tiny Tea Set', model: 'teaset', color: '#ff9ec4', cost: 6, price: 10, perBox: 3, set: 'tea', page: 0, kind: 'table', sparkle: 3 },
+  nightlight: { name: 'Star Nightlight', model: 'nightlight', color: '#ffd98a', cost: 6, price: 10, perBox: 3, set: 'bedroom', page: 0, kind: 'light', sparkle: 3 },
+  birdhouse: { name: 'Tiny Birdhouse', model: 'birdhouse', color: '#a8d8ff', cost: 6, price: 10, perBox: 3, set: 'houses', page: 0, kind: 'toy', sparkle: 3 },
+  lollipops: { name: 'Lollipop Jar', model: 'lollipops', color: '#ff8fb8', cost: 6, price: 11, perBox: 3, set: 'sweets', page: 0, kind: 'table', sparkle: 3 },
+  teddy: { name: 'Teddy Bear', model: 'teddy', color: '#d9a67a', cost: 7, price: 12, perBox: 3, set: 'dolls', page: 0, kind: 'friend', sparkle: 3 },
+  kitten: { name: 'Kitten Basket', model: 'kitten', color: '#ffb877', cost: 7, price: 13, perBox: 3, set: 'pets', page: 0, kind: 'friend', sparkle: 3 },
   chair: { name: 'Cozy Chair', model: 'chair', color: '#9fe0c8', cost: 8, price: 14, perBox: 3, set: 'parlor', page: 0, kind: 'seat', sparkle: 4 },
   lamp: { name: 'Mushroom Lamp', model: 'lamp', color: '#ff8f8f', cost: 8, price: 14, perBox: 3, set: 'fairy', page: 0, kind: 'light', sparkle: 4 },
-  nightlight: { name: 'Star Nightlight', model: 'nightlight', color: '#ffd98a', cost: 6, price: 10, perBox: 3, set: 'bedroom', page: 0, kind: 'light', sparkle: 3 },
-  teddy: { name: 'Teddy Bear', model: 'teddy', color: '#d9a67a', cost: 7, price: 12, perBox: 3, set: 'dolls', page: 0, kind: 'friend', sparkle: 3 },
-  birdhouse: { name: 'Tiny Birdhouse', model: 'birdhouse', color: '#a8d8ff', cost: 6, price: 10, perBox: 3, set: 'houses', page: 0, kind: 'toy', sparkle: 3 },
   // Page 2: Favorites (box profit 21-32)
   cupcakes: { name: 'Cupcake Stand', model: 'cupcakes', color: '#ffb8d9', cost: 10, price: 17, perBox: 3, set: 'tea', page: 1, kind: 'table', sparkle: 4 },
+  bed: { name: 'Rosy Bed', model: 'bed', color: '#c8b6ff', cost: 10, price: 18, perBox: 3, set: 'bedroom', page: 1, kind: 'bed', sparkle: 5 },
+  gumdrops: { name: 'Gumdrop Tree', model: 'gumdrops', color: '#9fe0c8', cost: 10, price: 18, perBox: 3, set: 'sweets', page: 1, kind: 'toy', sparkle: 5 },
   rocker: { name: 'Rocking Chair', model: 'rocker', color: '#ffd98a', cost: 11, price: 19, perBox: 3, set: 'parlor', page: 1, kind: 'seat', sparkle: 5 },
   swing: { name: 'Fairy Swing', model: 'swing', color: '#c8f0b0', cost: 11, price: 19, perBox: 3, set: 'fairy', page: 1, kind: 'toy', sparkle: 5 },
-  bed: { name: 'Rosy Bed', model: 'bed', color: '#c8b6ff', cost: 10, price: 18, perBox: 3, set: 'bedroom', page: 1, kind: 'bed', sparkle: 5 },
   doll: { name: 'Petal Doll', model: 'doll', color: '#ffd98a', cost: 12, price: 20, perBox: 3, set: 'dolls', page: 1, kind: 'friend', sparkle: 6 },
+  kennel: { name: 'Puppy Kennel', model: 'kennel', color: '#a8d8ff', cost: 13, price: 22, perBox: 3, set: 'pets', page: 1, kind: 'friend', sparkle: 6 },
   cottage: { name: 'Cottage Dollhouse', model: 'cottage', color: '#ffb8a0', cost: 24, price: 40, perBox: 2, set: 'houses', page: 1, kind: 'toy', sparkle: 10 },
   // Page 3: Fancy Finds (box profit 36-56)
   trolley: { name: 'Tea Trolley', model: 'trolley', color: '#9fe0c8', cost: 26, price: 44, perBox: 2, set: 'tea', page: 2, kind: 'table', sparkle: 11 },
-  sofa: { name: 'Velvet Sofa', model: 'sofa', color: '#b48bd6', cost: 30, price: 50, perBox: 2, set: 'parlor', page: 2, kind: 'seat', sparkle: 12 },
+  soda: { name: 'Soda Fountain', model: 'soda', color: '#ffb8d9', cost: 27, price: 46, perBox: 2, set: 'sweets', page: 2, kind: 'table', sparkle: 11 },
   lantern: { name: 'Firefly Lantern', model: 'lantern', color: '#8fd19e', cost: 28, price: 48, perBox: 2, set: 'fairy', page: 2, kind: 'light', sparkle: 12 },
-  canopy: { name: 'Canopy Bed', model: 'canopy', color: '#ffb8d9', cost: 34, price: 58, perBox: 2, set: 'bedroom', page: 2, kind: 'bed', sparkle: 14 },
+  sofa: { name: 'Velvet Sofa', model: 'sofa', color: '#b48bd6', cost: 30, price: 50, perBox: 2, set: 'parlor', page: 2, kind: 'seat', sparkle: 12 },
+  birdcage: { name: 'Songbird Cage', model: 'birdcage', color: '#c8b6ff', cost: 31, price: 52, perBox: 2, set: 'pets', page: 2, kind: 'toy', sparkle: 13 },
   bunnies: { name: 'Bunny Family', model: 'bunnies', color: '#fff6ee', cost: 32, price: 54, perBox: 2, set: 'dolls', page: 2, kind: 'friend', sparkle: 13 },
+  canopy: { name: 'Canopy Bed', model: 'canopy', color: '#ffb8d9', cost: 34, price: 58, perBox: 2, set: 'bedroom', page: 2, kind: 'bed', sparkle: 14 },
   treehouse: { name: 'Treehouse', model: 'treehouse', color: '#d7a877', cost: 40, price: 68, perBox: 2, set: 'houses', page: 2, kind: 'toy', sparkle: 17 },
   // Page 4: Treasures (box profit 70-120)
   caketower: { name: 'Royal Cake Tower', model: 'caketower', color: '#ff9ec4', cost: 50, price: 85, perBox: 2, set: 'tea', page: 3, kind: 'table', sparkle: 20 },
+  gingerbread: { name: 'Gingerbread House', model: 'gingerbread', color: '#c98a5a', cost: 54, price: 90, perBox: 2, set: 'sweets', page: 3, kind: 'toy', sparkle: 21 },
+  princess: { name: 'Porcelain Princess', model: 'princess', color: '#c8b6ff', cost: 55, price: 95, perBox: 2, set: 'dolls', page: 3, kind: 'friend', sparkle: 22 },
   piano: { name: 'Grand Piano', model: 'piano', color: '#fff6ee', cost: 60, price: 100, perBox: 2, set: 'parlor', page: 3, kind: 'toy', sparkle: 24 },
   carousel: { name: 'Unicorn Carousel', model: 'carousel', color: '#c8b6ff', cost: 65, price: 110, perBox: 2, set: 'fairy', page: 3, kind: 'toy', sparkle: 26 },
   cloudbed: { name: 'Cloud Princess Bed', model: 'cloudbed', color: '#a8d8ff', cost: 70, price: 120, perBox: 2, set: 'bedroom', page: 3, kind: 'bed', sparkle: 28 },
-  princess: { name: 'Porcelain Princess', model: 'princess', color: '#c8b6ff', cost: 55, price: 95, perBox: 2, set: 'dolls', page: 3, kind: 'friend', sparkle: 22 },
+  stable: { name: 'Pony Stable', model: 'stable', color: '#ffb8a0', cost: 76, price: 130, perBox: 2, set: 'pets', page: 3, kind: 'toy', sparkle: 31 },
   castle: { name: 'Castle Dollhouse', model: 'castle', color: '#ffb8d9', cost: 90, price: 150, perBox: 2, set: 'houses', page: 3, kind: 'toy', sparkle: 35 },
 };
 
@@ -47,8 +56,8 @@ const BASE = {
  */
 export const ROUNDS = [
   { name: '', opensAt: 0, mult: 1 },
-  { name: 'Bright', icon: '🌈', opensAt: 24, mult: 16 },
-  { name: 'Dazzle', icon: '💎', opensAt: 48, mult: 256 },
+  { name: 'Bright', icon: '🌈', opensAt: 32, mult: 16 },
+  { name: 'Dazzle', icon: '💎', opensAt: 64, mult: 256 },
 ];
 
 /** The colors items come in, by name. */
@@ -69,10 +78,14 @@ const COLORS = {
   canopy: ['Electric Blue', 'Midnight'], bunnies: ['Hot Pink', 'Silver'], treehouse: ['Lime', 'Amethyst'],
   caketower: ['Sunshine', 'Sapphire'], piano: ['Cherry', 'Midnight'], carousel: ['Tangerine', 'Silver'],
   cloudbed: ['Sunshine', 'Rose Gold'], princess: ['Turquoise', 'Ruby'], castle: ['Violet', 'Gold'],
+  // Sweet Shop and Pet Corner (GDD #79)
+  lollipops: ['Lime', 'Ruby'], gumdrops: ['Electric Blue', 'Emerald'], soda: ['Turquoise', 'Rose Gold'], gingerbread: ['Hot Pink', 'Amethyst'],
+  kitten: ['Tangerine', 'Silver'], kennel: ['Cherry', 'Sapphire'], birdcage: ['Sunshine', 'Gold'], stable: ['Violet', 'Midnight'],
 };
 
 const THEMES = {
   tea: 'Tea Time', parlor: 'Cozy Parlor', fairy: 'Fairy Garden', bedroom: 'Sweet Dreams', dolls: 'Doll Friends', houses: 'Little Houses',
+  sweets: 'Sweet Shop', pets: 'Pet Corner',
 };
 
 /** The theme id for a round: 'tea', then 'tea2', 'tea3'. */
@@ -108,9 +121,9 @@ export const colorsOf = (id) => ROUNDS.map((r, round) => themeId(ITEMS[id].base,
 /** Order book catalog pages (GDD #66): each opens once you've found `opensAt` items for your Collection. */
 export const PAGES = [
   { name: 'Starter', icon: '🌱', opensAt: 0 },
-  { name: 'Favorites', icon: '💖', opensAt: 4 },
-  { name: 'Fancy Finds', icon: '🎀', opensAt: 10 },
-  { name: 'Treasures', icon: '👑', opensAt: 16 },
+  { name: 'Favorites', icon: '💖', opensAt: 5 },
+  { name: 'Fancy Finds', icon: '🎀', opensAt: 13 },
+  { name: 'Treasures', icon: '👑', opensAt: 21 },
 ];
 
 /**

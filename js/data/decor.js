@@ -30,6 +30,7 @@ export const DECOR = {
     { id: 'electric', name: 'Electric blue', paper: '#d3e2ff', stripe: '#a9c3ff', price: 15 },
     { id: 'amethyst', name: 'Amethyst', paper: '#e0cdf7', stripe: '#c3a3ee', price: 20 },
     { id: 'gold', name: 'Gold', paper: '#fff0c2', stripe: '#f2cf5c', price: 20 },
+    { id: 'rosegold', name: 'Rose gold', paper: '#fbe2da', stripe: '#eab3a3', price: 20 },
   ],
   pattern: [
     { id: 'stripes', name: 'Stripes', price: 0 },
@@ -38,6 +39,8 @@ export const DECOR = {
     { id: 'gingham', name: 'Gingham', price: 8 },
     { id: 'stars', name: 'Stars', price: 10 },
     { id: 'hearts', name: 'Hearts', price: 10 },
+    { id: 'candy', name: 'Candy', price: 10 },
+    { id: 'paws', name: 'Paw prints', price: 10 },
   ],
   floor: [
     { id: 'honey', name: 'Honey wood', style: 'planks', color: '#e8b98a', price: 0 },
@@ -51,6 +54,8 @@ export const DECOR = {
     { id: 'tangerinecheck', name: 'Tangerine checker', style: 'checker', color: '#ffb877', color2: '#fff6ee', price: 15 },
     { id: 'rubycheck', name: 'Ruby checker', style: 'checker', color: '#e0457b', color2: '#fff6ee', price: 20 },
     { id: 'emeraldtiles', name: 'Emerald tiles', style: 'tiles', color: '#6fd6a8', color2: '#effff6', price: 20 },
+    { id: 'bubblegumcheck', name: 'Bubblegum checker', style: 'checker', color: '#ff7cc0', color2: '#fff6ee', price: 15 },
+    { id: 'sapphiretiles', name: 'Sapphire tiles', style: 'tiles', color: '#6f93e8', color2: '#eef4ff', price: 20 },
   ],
   rug: [
     { id: 'lilac', name: 'Lilac', shape: 'round', color: '#c8b6ff', color2: '#ddd1ff', price: 0 },
@@ -65,6 +70,7 @@ export const DECOR = {
     { id: 'cherry', name: 'Cherry heart', shape: 'heart', color: '#ff2d6f', color2: '#ff9ec4', price: 15 },
     { id: 'lime', name: 'Lime flower', shape: 'flower', color: '#a6e22e', color2: '#ffe066', price: 15 },
     { id: 'galaxy', name: 'Galaxy star', shape: 'star', color: '#3a2f8f', color2: '#ffd166', price: 20 },
+    { id: 'sunny', name: 'Sunny star', shape: 'star', color: '#ff9a3c', color2: '#ffe066', price: 15 },
   ],
   curtain: [
     { id: 'pink', name: 'Pink', color: '#ff9ec4', price: 0 },
@@ -121,6 +127,9 @@ export const THEME_STYLES = {
   bedroom2: ['paper', 'electric'], dolls2: ['curtain', 'tangerine'], houses2: ['floor', 'tangerinecheck'],
   tea3: ['floor', 'rubycheck'], parlor3: ['paper', 'amethyst'], fairy3: ['floor', 'emeraldtiles'],
   bedroom3: ['rug', 'galaxy'], dolls3: ['paper', 'gold'], houses3: ['curtain', 'midnight'],
+  // Sweet Shop and Pet Corner (GDD #79)
+  sweets: ['pattern', 'candy'], sweets2: ['floor', 'bubblegumcheck'], sweets3: ['paper', 'rosegold'],
+  pets: ['pattern', 'paws'], pets2: ['rug', 'sunny'], pets3: ['floor', 'sapphiretiles'],
 };
 
 /** The full name of a style, e.g. "Gingham wallpaper". */

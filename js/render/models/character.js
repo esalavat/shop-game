@@ -1,6 +1,6 @@
 // Chunky bean-shaped characters: big head, rosy cheeks, simple hair styles, and an optional
 // accessory. Girls' hair: bob, bun, pigtails, ponytail; boys' (GDD #43): short, spiky, curly, swoop.
-// Accessories: bow, glasses, sun hat, bow tie, cap; theme rewards (GDD #70): flower crown, bunny ears, crown.
+// Accessories: bow, glasses, sun hat, bow tie, cap; theme rewards (GDD #70, #79): flower crown, bunny ears, crown, kitty ears.
 // `root` is moved and turned; `inner` is bobbed and wobbled for walk/idle animation.
 
 import * as THREE from 'three';
@@ -20,6 +20,9 @@ const TINTS = {
   crown: { gold: GOLD, gem: GEM },
   crown2: { gold: GOLD, gem: '#d0103a' },
   crown3: { gold: '#dfe6ef', gem: '#8fe3ff' },
+  kitty: { ear: '#5a4a5e', inner: EAR_IN },
+  kitty2: { ear: '#ff9a3c', inner: '#ffe0c2' },
+  kitty3: { ear: '#c9cfd8', inner: '#2546b8' },
 };
 const EYE = '#3a2a3a', CHEEK = '#ff9fb0', SHOE = '#5a3a55', BOW = '#ff7fb0', FRAMES = '#5a3a55', CAP = '#8fc8f0', BRIM = '#6fb0e0';
 
@@ -131,6 +134,16 @@ function addAccessory(inner, accessory, hair) {
       const inside = ball(inner, 0.045, tint.inner, side * 0.112, 1.23, 0.0, 0);
       inside.scale.set(0.55, 1.9, 0.3);
       inside.rotation.z = -side * 0.22;
+    }
+  } else if (accessory === 'kitty') { // pointy cat ears on a headband (GDD #79)
+    for (const side of [-1, 1]) {
+      const ear = mesh(inner, new THREE.ConeGeometry(0.12, 0.14, 4), tint.ear, side * 0.15, 1.15, 0.0);
+      ear.rotation.set(0, Math.PI / 4, -side * 0.3);
+      ear.scale.z = 0.45;
+      const inside = mesh(inner, new THREE.ConeGeometry(0.07, 0.085, 4), tint.inner, side * 0.15, 1.14, 0.04);
+      inside.rotation.set(0, Math.PI / 4, -side * 0.3);
+      inside.scale.z = 0.3;
+      inside.castShadow = false;
     }
   } else if (accessory === 'crown') { // a little gold crown with points and a pink gem
     const tilt = -0.15;

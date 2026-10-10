@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.40 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.41 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -85,6 +85,7 @@
 | 76 | **Roller Skates 🛼** (user): Comfy Shoes only speeds up your shopkeeper, so stockers get their own upgrade: **Roller Skates** (🪙 180, in Upgrades, locked until Bea is hired) make **every stocker walk 40% faster** (the same boost Comfy Shoes gives your shopkeeper). Unpacking takes as long as before. Price a first guess | v0.38 |
 | 77 | **Color rounds** (user; part of #59): every item comes back in **two more colors**, bolder each time, in **rounds**. **Round 1** is the game as it was (24 items, four pages, six themes, same rewards). Once you've found **all 24**, **round 2, Bright** (hot pink, tangerine, lime, electric blue, ...) starts the catalog over: its Starter colors open at **24** found, Favorites at **28**, Fancy Finds at **34**, Treasures at **40**. **Round 3, Dazzle** (gold, ruby, emerald, midnight, ...) opens the same way at **48, 52, 58, 64**: 72 stickers in all. **Prices go up ×16 a round** (cost and sell price; box sizes stay), so each round's Starter costs more than the last round's Treasures: Tiny Tea Set sells for 10, then 160, then 2,560; the Castle Dollhouse for 150, 2,400, 38,400. **Order book:** still one card per item, with a **color dot for each round**; tap a dot to see that color's cost, price, profit and stock, and order it. A dot that isn't open yet shows 🔒 and how many more finds it needs; the card starts on the newest color you can order. **Each round's colors are new themes** (18 in all, e.g. "Tea Time ✦ Bright"), each with its own album section and the same kinds of rewards: 🎀 5, a **coin gift** (round 1 as before; each round's gifts are ×16: 🪙 1,600 for the first Bright theme, +800 each after), a **bolder room style** and a **bolder shopkeeper style** (e.g. Strawberry → Hot Strawberry → Ruby outfit; Flower Crown → Sunset → Jewel Flower Crown). Each color is its own sticker (+2% visitors, +2 🎀 when found). Album sections for a round show once that round has opened. Numbers are first guesses | v0.39 |
 | 78 | **Customers shop by item, not color** (user): a customer who wants a Tiny Tea Set takes **any color** of it from the shelves (the first one they come to) and pays **that color's price**, so a shelf of Tangerine Tea Sets serves Tea Set shoppers at 🪙 160 each. Wish notes and window wants are for the item too: any color grants them. Customers never wish for a particular color, and stockers count an item as "on the shelves" in any color | v0.40 |
+| 79 | **Sweet Shop and Pet Corner: 32 items, 96 stickers** (user; the rest of #59 for now): two new themes, one item on each page like the others. **Sweet Shop:** Lollipop Jar, Gumdrop Tree, Soda Fountain, Gingerbread House. **Pet Corner:** Kitten Basket, Puppy Kennel, Songbird Cage, Pony Stable. Each comes in Bright and Dazzle too, so **8 themes × 4 items × 3 colors = 96 stickers**. **Prices** fit inside each page's existing band (new items fill the gaps, the old ones keep their prices), so every page still earns more per box than the one before and each round's cheapest item still sells for more than the last round's dearest; **×16 a round stays** (the Bright and Dazzle prices don't change). **Thresholds scale with 8 items a page:** pages open at **0 / 5 / 13 / 21** found, **Bright at 32** (all of round 1), Dazzle at **64**, so each round's pages open at +0 / +5 / +13 / +21. **A page that's open stays open** (saved), so existing shops keep every page the old numbers opened, and the new items are there on pages they already have. **Rewards:** Sweet Shop → Candy wallpaper, Bubblegum checker floor, Rose gold wallpaper · Cotton Candy, Sour Apple, Chocolate Truffle outfits; Pet Corner → Paw prints wallpaper, Sunny star rug, Sapphire tiles floor · Kitty Ears (plain, Ginger, Silver). Coin gifts as before, so 8 themes a round. **Order book** (user): each page lists items **cheapest first**, left to right, top to bottom, and every card has a stock line ("Not ordered yet" for a color you haven't found), with the buy buttons lined up across a row | v0.41 |
 
 ## 1. Pitch
 
@@ -208,7 +209,17 @@ Your very own dollhouse, displayed in the shop's front window.
   (cost → sell price per item. Boxes hold 3 on the first two pages, 2 after that, except the Cottage Dollhouse at 2.)
 - Anything in your Collection can be placed in the Dream Dollhouse **for free and forever**. It doesn't use up shop stock.
 - Collection pages fill in by theme (Tea Time, Sweet Dreams Bedroom, Pet Friends, Princess Castle…). Completing a page gives a reward.
-- **Color rounds (v0.39, #77):** after the 24 items, every item comes back in a **Bright** color (round 2) and then a **Dazzle** color (round 3). Each round starts the four pages over (opening at 24 / 28 / 34 / 40 found, then 48 / 52 / 58 / 64) with prices ×16 the round before, and its six themes are new album sections with their own rewards. The order book shows one card per item with a dot per color. Customers want an item, not a color: any color on the shelves will do, at its own price (#78).
+- **Sweet Shop and Pet Corner (v0.41, #79):** two more themes bring round 1 to **32 items** (8 a page), 96 stickers with the colors. Pages open at 0 / 5 / 13 / 21 found and stay open once opened. Each page lists items cheapest first:
+
+  | Page (opens at) | Sweet Shop | Pet Corner |
+  |---|---|---|
+  | **Starter** (start) | Lollipop Jar 6→11 | Kitten Basket 7→13 |
+  | **Favorites** (5 found) | Gumdrop Tree 10→18 | Puppy Kennel 13→22 |
+  | **Fancy Finds** (13) | Soda Fountain 27→46 | Songbird Cage 31→52 |
+  | **Treasures** (21) | Gingerbread House 54→90 | Pony Stable 76→130 |
+
+  Bright / Dazzle colors: Lollipop Jar Lime / Ruby, Gumdrop Tree Electric Blue / Emerald, Soda Fountain Turquoise / Rose Gold, Gingerbread House Hot Pink / Amethyst, Kitten Basket Tangerine / Silver, Puppy Kennel Cherry / Sapphire, Songbird Cage Sunshine / Gold, Pony Stable Violet / Midnight.
+- **Color rounds (v0.39, #77):** after the 24 items, every item comes back in a **Bright** color (round 2) and then a **Dazzle** color (round 3). Each round starts the four pages over (opening at 24 / 28 / 34 / 40 found, then 48 / 52 / 58 / 64; since #79, 32 / 37 / 45 / 53 and 64 / 69 / 77 / 85) with prices ×16 the round before, and its six themes are new album sections with their own rewards. The order book shows one card per item with a dot per color. Customers want an item, not a color: any color on the shelves will do, at its own price (#78).
 
   | Item | Bright (round 2) | Dazzle (round 3) |
   |---|---|---|
@@ -474,7 +485,8 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - [x] **Register rooms**, one per floor above the shop, each with a cashier (#73)
 - [ ] **Instant Delivery** upgrade: orders arrive right away (§11; design to discuss)
 - [x] **Color rounds: two more colors of every item, ×16 prices, 72 stickers** (#77, part of #59)
-- [ ] **More items and themes toward 100+** (#59)
+- [x] **Sweet Shop and Pet Corner: 32 items, 96 stickers** (#79, part of #59)
+- [ ] **More items and themes past 100** (#59, later)
 - [x] **Decoration shop with Ribbons 🎀:** style every room's walls, floor, rug, curtains and corner (#68)
 - Building grid expansion (X and Y), room types, pan/zoom
 - More morning picks and special days
@@ -508,5 +520,5 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 12. ~~**More helpers and upgrades**~~ (user, 2026-10-09). **Resolved in v0.35 (#72).**
 13. **Room prices make a pyramid, not a square** (user, 2026-10-09): with prices by ring around the middle plus +15% per floor (#65), building wide on the ground floor stays cheaper than going up, so shops naturally grow into a pyramid instead of the squarish house #65 meant to encourage. ✅ **Resolved (#75):** prices by ring only, the same on every floor, +🪙 50 per shelf room built; cheaper staircases.
 14. **Pinch out further on a big house** (user, 2026-10-09): the furthest you can zoom out by pinching should grow with the house, so a big shop fits on screen. ✅ **Done (2026-10-09):** past the usual limit, pinching out keeps going until the whole house fits, drifting to its middle (`limits.fit` in `js/render/camera.js`).
-15. **Coins after the color rounds** (2026-10-09, #77): with prices ×16 a round, rooms, staircases, upgrades and helpers (a few hundred coins) get cheap fast once Bright colors sell. The Collection bonus also maxes out (+50%) during round 1. Retune those (or scale them with the round) after playing a round 2 shop.
+15. **Coins after the color rounds** (2026-10-09, #77): with prices ×16 a round, rooms, staircases, upgrades and helpers (a few hundred coins) get cheap fast once Bright colors sell. The Collection bonus also maxes out (+50%) during round 1 (at 25 finds, before the 32 of round 1 since #79). Retune those (or scale them with the round) after playing a round 2 shop.
 16. **Hide purchased upgrades** (user, 2026-10-09): a switch in the Grow sheet to hide upgrades (and helpers) you've already bought, so the list shows only what's left to get. Not designed or scheduled yet.

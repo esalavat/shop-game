@@ -127,6 +127,13 @@ const MIGRATIONS = {
     const { stocker, ...rest } = d;
     return { ...rest, version: 19, stockers: stocker ? [{ ...stocker, who: 'stocker' }] : [] };
   },
+  // v20: Sweet Shop and Pet Corner (GDD #79) moved the page thresholds up. Pages now stay open once
+  // opened (state.pagesOpen), starting with what the old thresholds had opened, so none close.
+  19: (d) => {
+    const found = Object.values(d.collection ?? {}).filter(Boolean).length;
+    const OLD_STEPS = [0, 4, 10, 16, 24, 28, 34, 40, 48, 52, 58, 64];
+    return { ...d, version: 20, pagesOpen: OLD_STEPS.filter((at) => found >= at).length };
+  },
 };
 
 export function migrate(data) {

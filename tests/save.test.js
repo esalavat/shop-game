@@ -283,3 +283,17 @@ test('a v17 save gets theme coin gifts on the next load, not in the migration (G
   assert.deepEqual(s.themeGifts, []);
   assert.equal(s.coins, v17.coins);
 });
+
+test('a v19 save keeps every catalog page the old thresholds had opened (GDD #79)', () => {
+  const store = memoryStorage();
+  const v19 = { ...createState(0), version: 19 };
+  delete v19.pagesOpen;
+  // 25 items found: all of round 1 as it was (Bright's Starter colors were open at 24) plus one Bright.
+  const old = ['teaset', 'chair', 'lamp', 'nightlight', 'teddy', 'birdhouse', 'cupcakes', 'rocker', 'swing', 'bed', 'doll', 'cottage',
+    'trolley', 'sofa', 'lantern', 'canopy', 'bunnies', 'treehouse', 'caketower', 'piano', 'carousel', 'cloudbed', 'princess', 'castle', 'teaset2'];
+  v19.collection = Object.fromEntries(old.map((id) => [id, true]));
+  store.setItem(SAVE_KEY, JSON.stringify(v19));
+  const s = loadGame(store);
+  assert.equal(s.version, STATE_VERSION);
+  assert.equal(s.pagesOpen, 5);
+});
