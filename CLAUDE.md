@@ -133,7 +133,10 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   3. ✅ **Up to three stockers**: Bea, then Theo (🪙 350), then Juno (🪙 500); each waits a little further from the right
      wall and they never head for the same box. **Save version 19:** `state.stocker` became `state.stockers` (each with
      `who`, its HELPERS id: 'stocker' | 'stocker2' | 'stocker3'); stock events say `by: 'keeper'` or that id.
-  4. A second register on the same counter, with Kai the cashier (🪙 400), two lines.
+  4. A second register on the same counter, with Kai the cashier (🪙 400), two lines. **Waiting on the user:** the
+     counter has no room to grow (wall on the left, the line on the right, customers in front would hide the
+     cashier). Proposed: once bought, the counter turns to run front-to-back down the left side with two tills,
+     cashiers behind it, two short lines side-on on its right.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
 - **Planned next, in order:** (#59) **more items** (toward 100+, color variants). Later: more stockers
