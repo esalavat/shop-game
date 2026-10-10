@@ -199,6 +199,8 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 - **Smaller decorate panel, 2026-10-10** (user: hard to see the room): each row of choices is one line you swipe sideways
   (with a fade at the right edge), slimmer tabs; 606 → about 300 px tall at phone size. Rows keep their scroll across taps
   (`render` in `js/ui/styler.js`). Not released yet.
+- **Smaller shopkeeper creator, 2026-10-10** (user: couldn't see the changes): the same swipe-sideways rows as the decorate panel,
+  each with its name beside it; about 340 px tall at phone size (`render` in `js/ui/creator.js`). Not released yet.
 - **Fixed 2026-10-10: the Dream Dollhouse picker ran off the screen** with every color found (user's Pixel): capped at 48% of the
   screen, items scroll, Done always visible (docs/ISSUES.md). Not released yet.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,

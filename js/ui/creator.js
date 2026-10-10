@@ -57,6 +57,7 @@ export function createCreator(state, { onChange, onOpen, onClose, onLocked }) {
 
   function render() {
     const look = state.shopkeeper;
+    const scrolled = [...rows.querySelectorAll('.creator-opts')].map((o) => o.scrollLeft); // rows scroll sideways: keep them put
     rows.innerHTML = ROWS.map((r) => {
       const cls = (v) => `${look[r.key] === v ? ' on' : ''}${ownsLook(state, r.key, v) ? '' : ' locked'}`;
       const opts = r.colors
@@ -64,6 +65,11 @@ export function createCreator(state, { onChange, onOpen, onClose, onLocked }) {
         : optionsFor(r, look).map(([v, name]) => `<button class="${cls(v).trim()}" data-key="${r.key}" data-value="${v}">${ownsLook(state, r.key, v) ? name : `🔒 ${name}`}</button>`);
       return `<div class="creator-row"><span>${r.label}</span><div class="creator-opts">${opts.join('')}</div></div>`;
     }).join('');
+    rows.querySelectorAll('.creator-opts').forEach((o, i) => {
+      o.scrollLeft = scrolled[i] ?? 0;
+      const on = o.querySelector('.on'); // the current choice in view
+      if (on && (on.offsetLeft < o.scrollLeft || on.offsetLeft + on.offsetWidth > o.scrollLeft + o.clientWidth)) o.scrollLeft = on.offsetLeft - o.clientWidth / 2 + on.offsetWidth / 2;
+    });
   }
 
   function open() {

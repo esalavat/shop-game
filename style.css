@@ -770,10 +770,15 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
   box-shadow: 0 3px 0 var(--shadow);
 }
 .creator-random:active { transform: translateY(2px) rotate(-20deg); box-shadow: 0 1px 0 var(--shadow); }
-.creator-rows { display: flex; flex-direction: column; gap: 8px; }
-.creator-row { display: flex; flex-direction: column; gap: 4px; }
-.creator-row > span { font-size: 12px; font-weight: 800; opacity: 0.65; }
-.creator-opts { display: flex; flex-wrap: wrap; gap: 6px; }
+/* Each row is one line you swipe sideways, its name beside it, so the panel stays short and your shopkeeper in view. */
+.creator-rows { display: flex; flex-direction: column; gap: 2px; }
+.creator-row { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.creator-row > span { flex: 0 0 52px; font-size: 11px; font-weight: 800; line-height: 1.15; opacity: 0.65; }
+.creator-opts { position: relative; display: flex; flex-wrap: nowrap; gap: 6px; min-width: 0; padding: 3px 28px 5px 2px; overflow-x: auto;
+  overscroll-behavior-x: contain; scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
+.creator-opts::-webkit-scrollbar { display: none; }
+.creator-opts button { flex-shrink: 0; white-space: nowrap; }
 
 .creator-opts button {
   min-height: 36px;
