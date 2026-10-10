@@ -423,7 +423,7 @@ Each milestone ends with a push so it's playable on your phone.
 | 24 items on four catalog pages that open as you collect (#66) | ✅ approved |
 | Collection bonus and theme rewards: coins, shopkeeper styles (#70, part of #59) | ✅ built (waiting for the user's feedback) |
 | Stock counts in the order book (#71) | ✅ built (waiting for the user's feedback); `stockCount` in `sim/stock.js` |
-| More helpers and upgrades (#72) | 🚧 step 1 built (greeter, window dresser, scanner, gift wrap) |
+| More helpers and upgrades (#72) | 🚧 steps 1-2 built (greeter, window dresser, scanner, gift wrap; tall shelves) |
 | Color variants and more items (#59) | ⏭ later |
 
 ### 11.1 Plan: Stairwell and upstairs (#58 step 2) — ✅ built 2026-10-09

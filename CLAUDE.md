@@ -123,11 +123,14 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   #71): chips on each found item's card, 🏪 on shelves / 📦 in boxes / 🚚 coming, or "None in the shop!"; legend under the
   tabs. `stockCount` in `js/sim/stock.js`. No save change.
 - **More helpers and upgrades (GDD v0.35 #72), in progress, built in four steps:**
-  1. ✅ **Ollie the Greeter** (🪙 250, stands left of the door and greets everyone) and **Rosa the Window Dresser** (🪙 300,
+  1. ✅ **Ollie the Greeter** (🪙 250, stands out by the left corner and greets everyone) and **Rosa the Window Dresser** (🪙 300,
      after the Window Display; shows off the Dream Dollhouse); their bonus rings go away once hired. Live-only
      `state.greeter` / `state.dresser` (`js/sim/helpers.js`). **Speedy Scanner** (🪙 120: two items per tap, cashiers
      faster) and **Gift Wrap** (🪙 150: tips ×2). No save change.
-  2. Tall Shelves (🪙 250, one more row on every shelf). 3. Up to three stockers (Bea, Theo 🪙 350, Juno 🪙 500).
+  2. ✅ **Tall Shelves** (🪙 250): every shelf gets a top row, 12 slots instead of 9, filled last (`fitShelves` in
+     `js/sim/upgrades.js`, run on purchase and whenever a room is built; `tallSlots` in `js/data/fixtures.js`). Slot
+     arrays just get longer, so no save change.
+  3. Up to three stockers (Bea, Theo 🪙 350, Juno 🪙 500).
   4. A second register on the same counter, with Kai the cashier (🪙 400), two lines.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.

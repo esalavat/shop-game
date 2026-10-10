@@ -6,8 +6,8 @@ import { PALETTE as P, toon, gradientMap } from '../toon.js';
 import { FIXTURES } from '../../data/fixtures.js';
 import { STAIRS, FLOOR_H } from '../../sim/route.js';
 
-/** Heights of the shelf boards that items will sit on (used when stocking). */
-export const SHELF_LEVELS = [0.06, 0.58, 1.1];
+/** Heights of the shelf boards that items will sit on (used when stocking); the last is the top, for Tall Shelves. */
+export const SHELF_LEVELS = [0.06, 0.58, 1.1, 1.6];
 
 const BUILDERS = {
   shelf(g) {
@@ -16,7 +16,7 @@ const BUILDERS = {
     box(g, 0.06, hh, 0.42, P.cream, -w / 2, hh / 2, 0);
     box(g, 0.06, hh, 0.42, P.cream, w / 2, hh / 2, 0);
     box(g, w, hh, 0.03, '#f9e6ee', 0, hh / 2, -0.2);
-    for (const y of SHELF_LEVELS) box(g, w, 0.05, 0.42, P.cream, 0, y, 0);
+    for (const y of SHELF_LEVELS.slice(0, 3)) box(g, w, 0.05, 0.42, P.cream, 0, y, 0);
     box(g, w + 0.08, 0.06, 0.46, P.cream, 0, hh, 0);
     box(g, w * 0.5, 0.12, 0.02, P.pink, 0, hh - 0.1, 0.2); // little sign strip
   },

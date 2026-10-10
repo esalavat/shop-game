@@ -190,3 +190,20 @@ test('Speedy Scanner scans two per tap; Gift Wrap doubles tips', async () => {
   checkoutTap(s, () => 0); // the smallest tip, doubled
   assert.equal(s.coins, coins + 10 + 10 + 14 + 2);
 });
+
+test('Tall Shelves give every shelf, old and new, a top row filled last (GDD #72)', async () => {
+  const { buyUpgrade } = await import('../js/sim/upgrades.js');
+  const { buildRoom, roomSpots, buildExpansion } = await import('../js/sim/building.js');
+  const { freeSlots } = await import('../js/sim/stock.js');
+  const s = createState();
+  s.coins = 5000;
+  const shelves = () => s.building.rooms.flatMap((r) => r.fixtures.filter((f) => f.slots));
+  assert.ok(shelves().every((f) => f.slots.length === 9));
+  assert.ok(buyUpgrade(s, 'tall'));
+  assert.ok(shelves().every((f) => f.slots.length === 12));
+  assert.deepEqual(freeSlots(shelves()[0]).slice(-3), [9, 10, 11]);
+  buildExpansion(s);
+  const spot = roomSpots(s)[0];
+  assert.ok(buildRoom(s, spot.col, spot.floor));
+  assert.ok(shelves().every((f) => f.slots.length === 12));
+});

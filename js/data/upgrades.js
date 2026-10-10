@@ -6,6 +6,7 @@ export const UPGRADES = {
   shoes: { name: 'Comfy Shoes', icon: '👟', cost: 80, desc: 'Bouncy new shoes: your shopkeeper walks faster.' },
   lunch: { name: 'Lunchtime Delivery', icon: '🥪', cost: 100, desc: 'Pip comes at midday too. Order before lunch and it arrives halfway through the day.' },
   scanner: { name: 'Speedy Scanner', icon: '⚡', cost: 120, desc: 'Each tap at the register scans two items, and cashiers scan faster too.' },
+  tall: { name: 'Tall Shelves', icon: '📚', cost: 250, desc: 'Every shelf gets a row on top: room for 12 things instead of 9, so you restock less often.' },
   giftwrap: { name: 'Gift Wrap', icon: '🎁', cost: 150, desc: 'Pretty wrapping paper: tips are twice as big when you ring people up yourself.' },
 };
 

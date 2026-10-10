@@ -8,11 +8,12 @@
 //   account for it.
 //   slots / fillOrder: item spots (shelves). Slot i is board floor(i/3), column i%3;
 //                     new stock fills the middle board first, then top, then bottom.
+//   tallSlots: with the Tall Shelves upgrade (GDD #72) shelves get a fourth row, on top (filled last).
 
 export const FIXTURES = {
   shelf: {
     name: 'Shelf', size: { w: 1.1, d: 0.42, h: 1.65 }, use: { dx: 0, dz: 0.62, face: Math.PI },
-    slots: 9, fillOrder: [3, 4, 5, 6, 7, 8, 0, 1, 2],
+    slots: 9, tallSlots: 12, fillOrder: [3, 4, 5, 6, 7, 8, 0, 1, 2, 9, 10, 11],
   },
   // The shopkeeper stands behind it, turned a little toward customers at its right end.
   counter: { name: 'Counter', size: { w: 0.95, d: 0.5, h: 0.85 }, use: { dx: 0, dz: -0.52, face: Math.PI / 6 } },

@@ -6,6 +6,7 @@ import { FIXTURES } from '../data/fixtures.js';
 import { EXPANSIONS } from '../data/dollhouse.js';
 import { addCoins } from './economy.js';
 import { newId } from './stock.js';
+import { fitShelves } from './upgrades.js';
 
 export const hasRoom = (state, col, floor) =>
   state.building.rooms.some((r) => r.col === col && r.floor === floor);
@@ -36,6 +37,7 @@ export function addRoom(state, type, col, floor) {
   if (floor > 0 && !hasRoom(state, col, floor - 1)) return null; // nothing floats
   const room = type === 'room' ? makeShelfRoom(state, col, floor) : makeRoom(newId(state, 'r'), type, col, floor);
   state.building.rooms.push(room);
+  fitShelves(state);
   events.emit('buildingChanged', { room });
   return room;
 }
@@ -162,6 +164,7 @@ export function addStairwell(state) {
   const bottom = makeRoom(newId(state, 'r'), 'stairs', col, 0);
   const top = makeRoom(newId(state, 'r'), 'landing', col, 1);
   state.building.rooms.push(bottom, top);
+  fitShelves(state);
   events.emit('buildingChanged', { room: bottom });
   return bottom;
 }
@@ -193,6 +196,7 @@ export function addFloor(state) {
   top.fixtures.push({ id: `${top.id}-f${top.fixtures.length}`, kind: 'stairs', x: -1.1, z: -0.7 });
   const room = makeRoom(newId(state, 'r'), 'landing', top.col, top.floor + 1);
   state.building.rooms.push(room);
+  fitShelves(state);
   events.emit('buildingChanged', { room });
   return room;
 }

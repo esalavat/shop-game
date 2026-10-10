@@ -40,8 +40,8 @@ export function cashierReady(state) {
   return keeperAtCounter(state) || miaAtTill(state);
 }
 
-/** Ollie stands a little left of the shopkeeper's greeter spot, turned toward the door, so he doesn't hide the counter. */
-const OLLIE = { x: GREETER.x - 0.65, z: GREETER.z, face: 0.6 };
+/** Ollie stands out by the left corner, turned toward the door, so he doesn't hide the counter. */
+const OLLIE = { x: GREETER.x - 1.3, z: GREETER.z, face: 0.6 };
 
 /** Someone standing still at a spot (room-local), or null if not hired. */
 function stander(state, id, roomId, spot) {
