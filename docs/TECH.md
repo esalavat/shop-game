@@ -358,10 +358,17 @@ One Pages site holds two builds (GDD #56):
 - `index.html` shows a "Reload" card if the game hasn't started within 10 s or `main.js` fails to load.
 - Prototypes live under `prototypes/` and are also published (e.g. `/prototypes/camera/`), which is handy for phone testing.
 
-### 9.2 Store builds (later)
+### 9.2 Store builds (later; target early December 2026, GDD #89)
 - Add Capacitor (`package.json`, `capacitor.config.json`, `ios/`, `android/`; the native folders are already gitignored, as in *migration*).
 - A tiny copy script assembles `dist/` (index.html, style.css, js/, vendor/, assets/) as Capacitor's `webDir`.
 - Native plugins only where needed (haptics, status bar, splash, and maybe Preferences for saves).
+- **Saves in native storage:** iOS can clear a web view's `localStorage` when the phone is low on space, so store builds
+  keep the save natively (Preferences or Filesystem).
+- **Decoration packs** (GDD §16): non-consumable in-app purchases through Apple / Google billing with a Restore Purchases
+  button, via a small open-source purchase plugin (no RevenueCat or other data-collecting service, so the privacy labels
+  stay "Data Not Collected"). Owned packs come from the store on launch, so a lost save never loses a purchase. The web
+  build never sells packs; `?debug` unlocks them for testing.
+- **Save transfer code** from the web build into the app (also needed before the repo moves to a new GitHub address).
 
 ### 9.3 Offline and install (PWA)
 - `manifest.webmanifest` + PNG icons in `icons/` make "Add to Home screen" give a proper app icon

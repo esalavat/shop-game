@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.50 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.51 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -95,6 +95,8 @@
 | 86 | **Decorating opens with the first shelf room; theme styles are prizes only** (user: on day 7 with one room they had 🎀 90 and nothing worth decorating). Until the **first shelf room** is built there are **no Ribbons at all**: no 🎀 in the HUD, no Decorate rooms card in Grow, nothing earned. When it's built, decorating opens with confetti and the Collection's **one-time Ribbons are paid in full** for everything found so far, so nobody misses them however long they wait: **+1 🎀 per item** (was +2) and **+3 🎀 per complete theme** (was +5), about 🎀 30 by day 7. Everyday Ribbons (wishes, window wants, happy customers) start then. No unlock fee. A complete theme is still announced before then, and its room and shopkeeper styles are yours whenever decorating opens. **Theme reward room styles can't be bought with Ribbons** any more (they show 🌟 and "Complete Tea Time to get it"); anyone who bought one keeps it. Existing shops: decorating is already open, nothing changes (**save v22**, `decorOpen`). To do next: make the reward styles fun and different from the Ribbon shop's, matching each theme and round (§18 #18) | v0.48 |
 | 87 | **Collection prizes are picture wallpapers** (user; resolves §18 #18): completing a theme gives its own **picture wallpaper**, unlike anything in the Ribbon shop: Tea Time → **Teacups**, Cozy Parlor → **Picture frames** (and armchairs), Fairy Garden → **Toadstools** (and fairy wings), Sweet Dreams → **Moon and clouds**, Doll Friends → **Teddy faces**, Little Houses → **Tiny houses**, Sweet Shop → **Lollipops** (and wrapped sweets), Pet Corner → **Cat faces** (and paw prints). Each round's theme gives the same picture **in that round's colours**: pastels, **Bright** neons, **Dazzle** jewel tones with gold outlines. The background is the room's wallpaper colour, so it still matters. Prizes can't be bought; the decorator shows them with 🌟 once their round has opened. **The old prizes** (gingham, stars, hearts, candy, paw prints, the cherry rug, grape curtains, bold wallpapers and floors...) **are on sale for Ribbons**, so the Ribbon shop is back to 52 looks; shops that had won one keep it (**save v23** copies them into `decor.owned`) | v0.49 |
 | 88 | **Taller rooms, no front railing upstairs** (user): every room is about 12% taller (ceiling 2.8 instead of 2.5), so more wallpaper shows above the shelves; the low railing along the front of upstairs rooms is gone (it hid the floor). The railing round the stair hole stays (tap it to go down). Smaller decorate and creator panels (one swipe row per choice) and a scrolling Dream Dollhouse picker came the same day | v0.50 |
+| 89 | **Store release and how the game makes money** (user; resolves §18 #1): **free to download, no ads ever.** Everything in the game today stays free. Money comes from **decoration packs** sold for real money, **$1.99 or $2.99** each, about **one new pack a month**, starting with **Christmas** (the first store release aims for early December 2026). Packs are **sold directly at a fixed price** (no Ribbons or coins for real money, nothing random) and are **just for looks** (no items that sell, nothing that changes coins, Sparkle or customers). **Packs are always for sale**: featured in their season, never "gone forever". Released **worldwide** except mainland China (needs a government game licence); English only to start. Packs are themed on holidays and ideas, not northern-hemisphere seasons (Christmas is summer in Australia). Published by an **LLC** so the developer's own name and address stay private (§16). **The web build stays free and is never promoted**: it's the test build, so changes can be tried without phone releases, may go behind a login later, and never sells packs (the debug panel unlocks them for testing) | v0.51 |
+| 90 | **Decorating the outside of the shop** (user; designed with the Christmas pack, §18 #19): the street and the front of the house can be decorated too, e.g. Christmas decorations by the street trees and **lights on the house**. **Some pieces are free for everyone, some come in the paid packs.** Details (where pieces go, how you place them, which are free) to design before building | v0.51 |
 
 ## 1. Pitch
 
@@ -448,14 +450,19 @@ Big buttons sit at the **bottom of the screen**: order book, posters, helpers, d
 - **Mute toggle** (🔊 in the HUD, saved) turns off sounds and vibration.
 - **Later:** a cheerful music-box / ukulele loop that changes with the time of day, with its own toggle.
 
-## 16. Monetization (future store builds)
+## 16. Monetization and store release (decided v0.51, #89)
 
-❓ Undecided and out of scope for the web build. Options that fit the audience and the age rules (§3.1):
-- **Paid up-front, no ads, no IAP:** simplest and the most parent-friendly.
-- **Free to try + one-time unlock** of the full game: lets players try before a parent pays.
-- **Cosmetic packs** (outfits, decor themes) sold directly with no randomness, behind platform parental controls.
+- **Free download, no ads.** Everything in the game as of v0.51 stays free.
+- **Decoration packs** for real money, **$1.99-$2.99**, about one a month, **Christmas first** (aim: in the stores by early December 2026). Each is a fixed bundle at a fixed price, bought once through Apple / Google billing (non-consumable, with **Restore Purchases**), behind the stores' own parental controls (Ask to Buy, Family Link).
+- **What a pack can hold:** room styles (walls, floors, rugs, curtains, corner pieces), shopkeeper outfits and accessories, **outside decorations** (street, trees, lights on the house, #90), maybe Dream Dollhouse pieces. **Never** sellable items or anything that changes coins, Sparkle, Hearts or customers.
+- **Always for sale.** Featured in season (and a few free seasonal pieces for everyone show the pack off), but never limited-time. The pack shop lives in the decorate panel: no pop-ups pushing purchases.
+- **Themes, not hemispheres:** holidays and ideas (Christmas, Valentine's, St Patrick's Day, ...), since players are worldwide.
+- **Worldwide** except mainland China; English only to start. Apple and Google collect VAT / GST.
+- **Publisher:** an LLC with a registered agent, business address and phone (the EU Digital Services Act shows a seller's address, phone and email on the App Store; Google shows the address for apps that sell things), its own bank account, EIN and D-U-N-S number, company developer accounts on both stores, and a business domain for the privacy policy, support page and email.
+- **Web build:** free, never promoted, used for testing; may go behind a login; never sells packs (the debug panel unlocks them).
+- **Privacy:** still no ads, analytics or tracking SDKs in any build (§3.1); the store builds' privacy labels say "Data Not Collected".
 
-Never: ads, loot boxes, energy timers, or pay-to-skip.
+Never: ads, loot boxes, premium currencies, energy timers, pay-to-skip, or limited-time pressure.
 
 ## 17. Roadmap
 
@@ -516,11 +523,13 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - Seasons
 - Share codes / friends' dollhouses (preset reactions only, age-gated)
 - Second location
-- Capacitor builds for iOS / Android
+- [ ] **Store release (iOS + Android, Capacitor) with the first decoration pack, Christmas, by early December 2026** (#89): native saves, a save transfer code from the web, purchases + Restore, store listings
+- [ ] **Outside decorations** (street, trees, lights on the house), free and paid pieces (#90)
+- [ ] A new decoration pack about every month (#89)
 
 ## 18. Open Questions
 
-1. Monetization model for the store builds (§16), which can wait until then.
+1. ✅ **Resolved (#89).** Monetization model for the store builds (§16): free, no ads, decoration packs for real money.
 2. **Early economy is too tight** (playtest, Day 1): with 50 coins and 18 shelf slots you can sell out in the first minute of a 3-minute day. Options for the upgrades milestone: bigger or extra shelves, a lunchtime delivery, more starting coins or stock, cheaper bulk boxes, slower browsing. **Resolved in v0.12 (decision #39):** no change. Close early covers it, and the user says early progress feels good.
 3. ~~**Evening is too long**~~ (playtest after M6, 2026-10-09). **Resolved in v0.10 (decision #33):** 5 s of twilight, then the day closes once the shop is empty. The user tried it and approved it.
 4. ~~**Order book shows only the cost**~~ (user, 2026-10-09). **Resolved in v0.19 (decision #54):** cards show the sell price per item and the profit per box.
@@ -544,3 +553,5 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
     - **Rebalance the upgrade and helper prices too** (user, 2026-10-10): too many of them are too close in price, so they all come at once. Spread them out when designing the Grow sheet half (`npm run balance` shows when each is bought).
     - ✅ **Order book half built (#82); Grow sheet half built as the ladder (#83).** Was to settle: exactly when each upgrade and helper shows up, and whether a "coming soon" teaser stays for the next one.
 18. ✅ **Resolved (#87).** **Collection reward styles should be fun and special** (user, 2026-10-10): rewards should be theme-specific and different from normal decorations, e.g. **Pet Corner → a cat-face wallpaper**, and the Bright and Dazzle rounds' rewards should match their round's colors. Today's rewards are mostly ordinary Ribbon-shop styles (gingham, stars, a cherry rug, grape curtains). Since #86 they can't be bought, which leaves the Ribbon shop small (28 looks, about 🎀 150 in all, one wallpaper pattern); the old reward styles could go back into the Ribbon shop once new prizes replace them. Not designed yet.
+19. **Christmas pack and outside decorations** (user, 2026-10-10, #89, #90): to design together before building. What's in the pack (outside pieces, room styles, an outfit?) and which pieces are free for everyone; where outside pieces go (by the street trees, along the sidewalk, lights on the house front, the roof?) and how you place them (fixed spots like the room styles, or tap a spot); whether free seasonal pieces switch on by the date or stay once added; price $1.99 or $2.99.
+20. **Business setup for the stores** (user, 2026-10-10, #89): LLC (which state; a registered agent), business address and phone for the store pages, EIN, D-U-N-S, a business bank account, Apple and Google company accounts, a business domain and email, and maybe moving the repo to a GitHub organization (that changes the web address, so web saves need the transfer code first). The user is handling this, starting now, for the December target.

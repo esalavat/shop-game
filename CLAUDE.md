@@ -209,6 +209,12 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
 - **Planned next:** feedback on the balancing pass (#80). Later: more items past 100 (#59), more stockers
   (#60), **Instant Delivery** (GDD §11, on the §17 roadmap, design to discuss), Heart/Sparkle milestone unlocks (§18 #6). 
+- **Store release and money, decided 2026-10-10** (GDD v0.51 #89, #90, §16): free download, no ads; decoration packs for
+  real money ($1.99-$2.99, always for sale, about one a month, Christmas first), just for looks; worldwide except mainland
+  China; published by an LLC (the user is setting up the business side, GDD §18 #20). **Target: in the iOS and Android
+  stores with the Christmas pack by early December 2026.** The web build stays free, unpromoted, the test build (never sells
+  packs). Outside decorations (street, trees, lights on the house; some free, some in packs) are part of the Christmas pack,
+  to design later (§18 #19). **Sharing comes first** (next, being discussed).
 
 **Next:** playtest feedback on v2026.10.10.2 (#80-#87). Waiting on feedback: the balancing pass (#80), Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71).
