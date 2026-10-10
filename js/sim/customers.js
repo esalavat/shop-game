@@ -21,6 +21,7 @@ import { recordWish, DAY_LENGTH } from './day.js';
 import { SPARKLE } from '../data/dollhouse.js';
 import { peekChance, peekWantChance, trafficBoost, windowX, dollhouseItems } from './collection.js';
 import { keeperGreeting } from './keeper.js';
+import { greeterOnDuty } from './helpers.js';
 
 /** Just inside the shop's open front, where customers step in and out (room-local). */
 export const ENTRY = { x: 0.4, z: 1.1 };
@@ -297,7 +298,7 @@ export function tickCustomers(state, navs, dt, rand = Math.random) {
         if (!walking) {
           c.state = 'entering';
           events.emit('customerEntered', { customerId: c.id });
-          if (c.roomId === shopRoomId(state) && keeperGreeting(state)) greet(state, c, rand);
+          if (c.roomId === shopRoomId(state) && (keeperGreeting(state) || greeterOnDuty(state))) greet(state, c, rand);
         }
         break;
       case 'toRoom':

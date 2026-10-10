@@ -61,7 +61,7 @@ js/
     marketing.js        # Morning picks, special days, Sparkle → foot traffic
     catalog.js          # Order book pages: which are open (by items found), canOrder, orderableItems (GDD #66)
     collection.js       # Dream Dollhouse placing, Sparkle, foot-traffic boost, window spot (unlocks happen in day.js)
-    helpers.js          # Hired helpers doing jobs: Mia the cashier (state.cashier, live-only)
+    helpers.js          # Hired helpers doing jobs: Mia the cashier (state.cashier, live-only); Ollie the greeter and Rosa the window dresser standing at the bonus spots (state.greeter / state.dresser, live-only, GDD #72)
     tutorial.js         # First-day guide steps (state.tutorial: box → shelf → open → register → done), advanced each tick
     stocker.js          # Bea the stocker: fetches doorstep boxes and unpacks them in any room; Sorting Smarts (state.stocker, saved)
     upgrades.js         # Buying upgrades / hiring helpers (one-time; state.upgrades, state.helpers)
@@ -423,6 +423,7 @@ Each milestone ends with a push so it's playable on your phone.
 | 24 items on four catalog pages that open as you collect (#66) | ✅ approved |
 | Collection bonus and theme rewards: coins, shopkeeper styles (#70, part of #59) | ✅ built (waiting for the user's feedback) |
 | Stock counts in the order book (#71) | ✅ built (waiting for the user's feedback); `stockCount` in `sim/stock.js` |
+| More helpers and upgrades (#72) | 🚧 step 1 built (greeter, window dresser, scanner, gift wrap) |
 | Color variants and more items (#59) | ⏭ later |
 
 ### 11.1 Plan: Stairwell and upstairs (#58 step 2) — ✅ built 2026-10-09

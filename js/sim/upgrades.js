@@ -16,9 +16,12 @@ export function buyUpgrade(state, id) {
   return true;
 }
 
+/** Some helpers need a room first (Rosa needs the Window Display). */
+export const canHire = (state, id) => HELPERS[id]?.needs !== 'display' || state.building.rooms.some((r) => r.type === 'display' && r.floor === 0);
+
 export function hireHelper(state, id) {
   const h = HELPERS[id];
-  if (!h || hasHelper(state, id) || state.coins < h.cost) return false;
+  if (!h || hasHelper(state, id) || !canHire(state, id) || state.coins < h.cost) return false;
   addCoins(state, -h.cost);
   state.helpers[id] = true;
   events.emit('helperHired', { id });

@@ -1,5 +1,6 @@
-// Draws helpers from state: Mia the cashier behind the counter (sim/helpers.js) and Bea the stocker
-// carrying boxes to the shelves (sim/stocker.js), once each is hired. They move smoothly between sim
+// Draws helpers from state: Mia the cashier behind the counter (sim/helpers.js), Bea the stocker
+// carrying boxes to the shelves (sim/stocker.js), Ollie the greeter at the door and Rosa the window
+// dresser by the Dream Dollhouse (GDD #72), once each is hired. They move smoothly between sim
 // ticks, bob while walking, and hop when they do something (Mia on each scan, Bea on each pickup).
 
 import * as THREE from 'three';
@@ -92,10 +93,14 @@ export function createHelpersView(state, roomOrigin) {
   const group = new THREE.Group();
   const mia = createHelper('cashier', () => state.cashier);
   const bea = createHelper('stocker', () => state.stocker);
-  const all = [mia, bea];
-  group.add(mia.root, bea.root);
+  const ollie = createHelper('greeter', () => state.greeter);
+  const rosa = createHelper('dresser', () => state.dresser);
+  const all = [mia, bea, ollie, rosa];
+  group.add(...all.map((h) => h.root));
 
   events.on('scanned', () => { if (state.cashier?.serving) mia.hop = 1; });
+  events.on('greeted', () => { if (state.greeter) ollie.hop = 1; });
+  events.on('peek', () => { if (state.dresser) rosa.hop = 1; });
   events.on('boxPicked', ({ by }) => { if (by === 'stocker') bea.hop = 1; });
 
   return {

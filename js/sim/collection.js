@@ -47,11 +47,14 @@ export function trafficBoost(state) {
 export function peekChance(state) {
   if (!state.sparkle || windowX(state) === null) return 0;
   const base = Math.min(SPARKLE.peekMax, SPARKLE.peekBase + state.sparkle * SPARKLE.peekPer);
-  return keeperShowingOff(state) ? Math.min(SPARKLE.keeperPeekMax, base + SPARKLE.keeperPeek) : base;
+  return showingOff(state) ? Math.min(SPARKLE.keeperPeekMax, base + SPARKLE.keeperPeek) : base;
 }
 
 /** Chance a window-peeker wants something from the dollhouse. */
-export const peekWantChance = (state) => (keeperShowingOff(state) ? SPARKLE.keeperPeekWant : SPARKLE.peekWant);
+export const peekWantChance = (state) => (showingOff(state) ? SPARKLE.keeperPeekWant : SPARKLE.peekWant);
+
+/** The shopkeeper or Rosa the window dresser (GDD #72) is showing off the Dream Dollhouse. */
+export const showingOff = (state) => keeperShowingOff(state) || !!state.dresser;
 
 /** The shopkeeper is in the Window Display room, showing off the Dream Dollhouse (GDD #41). */
 export const keeperShowingOff = (state) => {

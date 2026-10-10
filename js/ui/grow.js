@@ -7,7 +7,7 @@
 
 import { nextExpansion, buildExpansion, canBuildRooms, roomSpots, roomCost, canBuildStairwell, buildStairwell, hasStairwell, buildFloor, stairCost, stairRooms } from '../sim/building.js';
 import { displayRoom } from '../sim/collection.js';
-import { buyUpgrade, hireHelper, hasUpgrade, hasHelper } from '../sim/upgrades.js';
+import { buyUpgrade, hireHelper, hasUpgrade, hasHelper, canHire } from '../sim/upgrades.js';
 import { UPGRADES, HELPERS } from '../data/upgrades.js';
 import { events } from '../core/events.js';
 
@@ -54,8 +54,8 @@ export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
     return short > 0 ? `<button class="grow-build" disabled>🪙 ${cost} · ${short} more to go</button>` : null;
   }
 
-  function small({ art, name, desc, cost, owned, ownedText, buy, buyText }) {
-    const btn = price(cost, owned, ownedText) ?? `<button class="grow-build" data-buy="${buy}">${buyText} 🪙 ${cost}</button>`;
+  function small({ art, name, desc, cost, owned, ownedText, buy, buyText, locked = null }) {
+    const btn = (locked && !owned ? `<button class="grow-build" disabled>${locked}</button>` : null) ?? price(cost, owned, ownedText) ?? `<button class="grow-build" data-buy="${buy}">${buyText} 🪙 ${cost}</button>`;
     return `<div class="grow-card small${owned ? ' owned' : ''}"><div class="grow-art" aria-hidden="true">${art}</div>
       <div><h3>${name}</h3><p>${desc}</p></div>${btn}</div>`;
   }
@@ -94,7 +94,7 @@ export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
     }
     html += '<div class="grow-section">Helpers</div>';
     for (const [id, h] of Object.entries(HELPERS)) {
-      html += small({ art: h.icon, name: `${h.name} the ${h.job}`, desc: h.desc, cost: h.cost, owned: hasHelper(state, id), ownedText: 'Hired 💖', buy: `helper:${id}`, buyText: 'Hire' });
+      html += small({ art: h.icon, name: `${h.name} the ${h.job}`, desc: h.desc, cost: h.cost, owned: hasHelper(state, id), ownedText: 'Hired 💖', buy: `helper:${id}`, buyText: 'Hire', locked: canHire(state, id) ? null : 'Build the Window Display first' });
     }
     html += '<div class="grow-section">Upgrades</div>';
     for (const [id, u] of Object.entries(UPGRADES)) {
@@ -114,7 +114,7 @@ export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
       nextExpansion(state)?.cost,
       canBuildRooms(state) ? cheapestRoom() : null,
       canBuildStairwell(state) || hasStairwell(state) ? stairCost(state) : null,
-      ...Object.entries(HELPERS).filter(([id]) => !hasHelper(state, id)).map(([, h]) => h.cost),
+      ...Object.entries(HELPERS).filter(([id]) => !hasHelper(state, id) && canHire(state, id)).map(([, h]) => h.cost),
       ...Object.entries(UPGRADES).filter(([id]) => !hasUpgrade(state, id) && upgradeListed(id)).map(([, u]) => u.cost),
     ];
     return costs.some((c) => c != null && state.coins >= c);

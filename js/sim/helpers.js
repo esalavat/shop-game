@@ -1,12 +1,15 @@
 // Helpers (GDD §10, #36). Mia the cashier stands at the register and rings customers up at a steady
 // pace (no tips). When the shopkeeper comes to the counter, Mia steps aside and the player takes over.
 // Her position is live-only (state.cashier, in TRANSIENT): on load she's simply back at the register.
+// Ollie the greeter and Rosa the window dresser (GDD #72) just stand at the bonus spots (state.greeter,
+// state.dresser, also live-only), giving the bonus your shopkeeper gives there.
 
 import { useSpot } from '../data/fixtures.js';
-import { HELPERS } from '../data/upgrades.js';
+import { HELPERS, SCANNER } from '../data/upgrades.js';
+import { GREETER, SHOWOFF } from './route.js';
 import { stepAlong } from './walker.js';
 import { counterOf, keeperAtCounter, scanNext, completeSale } from './checkout.js';
-import { hasHelper } from './upgrades.js';
+import { hasHelper, hasUpgrade } from './upgrades.js';
 import { shopRoomId } from './stock.js';
 
 const MIA_SPEED = 1.0;
@@ -37,7 +40,30 @@ export function cashierReady(state) {
   return keeperAtCounter(state) || miaAtTill(state);
 }
 
+/** Ollie stands a little left of the shopkeeper's greeter spot, turned toward the door, so he doesn't hide the counter. */
+const OLLIE = { x: GREETER.x - 0.65, z: GREETER.z, face: 0.6 };
+
+/** Someone standing still at a spot (room-local), or null if not hired. */
+function stander(state, id, roomId, spot) {
+  if (!hasHelper(state, id) || !roomId) return null;
+  const a = state[id];
+  if (a?.roomId === roomId) return a;
+  return { roomId, x: spot.x, z: spot.z, facing: spot.face, path: [] };
+}
+
+/** Ollie is hired: everyone walking in gets greeted, as if the shopkeeper were at the door. */
+export const greeterOnDuty = (state) => !!state.greeter;
+/** Rosa is hired and in the Window Display, showing off the Dream Dollhouse. */
+export const dresserOnDuty = (state) => !!state.dresser;
+
 export function tickHelpers(state, dt, rand = Math.random) {
+  state.greeter = stander(state, 'greeter', shopRoomId(state), OLLIE);
+  const display = state.building.rooms.find((r) => r.type === 'display' && r.floor === 0);
+  state.dresser = stander(state, 'dresser', display?.id, SHOWOFF);
+  tickCashier(state, dt, rand);
+}
+
+function tickCashier(state, dt, rand) {
   if (!hasHelper(state, 'cashier')) {
     state.cashier = null;
     return;
@@ -50,6 +76,7 @@ export function tickHelpers(state, dt, rand = Math.random) {
   }
   const m = state.cashier;
   const H = HELPERS.cashier;
+  const scanTime = H.scanTime * (hasUpgrade(state, 'scanner') ? SCANNER.helperSpeed : 1);
 
   // Step aside for the shopkeeper, or back to the register once she leaves.
   const target = keeperWantsTill(state, s.counter) ? s.aside : s.till;
@@ -69,12 +96,12 @@ export function tickHelpers(state, dt, rand = Math.random) {
   }
   if (m.serving !== c.customerId) {
     m.serving = c.customerId;
-    m.timer = Math.max(m.timer, H.scanTime);
+    m.timer = Math.max(m.timer, scanTime);
   }
   if ((m.timer -= dt) > 0) return;
   if (c.items.some((i) => !i.scanned)) {
     scanNext(state);
-    m.timer = c.items.some((i) => !i.scanned) ? H.scanTime : H.ringTime;
+    m.timer = c.items.some((i) => !i.scanned) ? scanTime : H.ringTime;
   } else {
     completeSale(state, rand, { tip: false, by: 'mia' });
     m.serving = null;

@@ -8,6 +8,8 @@ import { CUSTOMER } from '../data/customers.js';
 import { addCoins } from './economy.js';
 import { recordSale } from './day.js';
 import { ribbonsForSale } from './decor.js';
+import { hasUpgrade } from './upgrades.js';
+import { SCANNER, GIFT_WRAP_TIPS } from '../data/upgrades.js';
 
 export function counterOf(state, roomId) {
   return state.building.rooms.find((r) => r.id === roomId)?.fixtures.find((f) => f.kind === 'counter') ?? null;
@@ -47,7 +49,7 @@ export function completeSale(state, rand = Math.random, { tip: tips = true, by =
   const customer = state.customers.find((x) => x.id === c.customerId);
   const amount = c.items.reduce((sum, i) => sum + ITEMS[i.itemId].price, 0);
   const [lo, hi] = CUSTOMER.tip;
-  const tip = tips ? lo + Math.floor(rand() * (hi - lo + 1)) : 0;
+  const tip = tips ? (lo + Math.floor(rand() * (hi - lo + 1))) * (hasUpgrade(state, 'giftwrap') ? GIFT_WRAP_TIPS : 1) : 0;
   addCoins(state, amount + tip);
   state.hearts += 1;
   recordSale(state, { amount, tip, items: c.items.map((i) => i.itemId) });
@@ -62,11 +64,12 @@ export function completeSale(state, rand = Math.random, { tip: tips = true, by =
   return { amount, tip };
 }
 
-/** One tap at the counter during checkout: scan the next item, or ring up when all are scanned. */
+/** One tap at the counter during checkout: scan the next item (two with the Speedy Scanner), or ring up when all are scanned. */
 export function checkoutTap(state, rand) {
   if (!state.checkout) return null;
   if (state.checkout.items.some((i) => !i.scanned)) {
-    scanNext(state);
+    const n = hasUpgrade(state, 'scanner') ? SCANNER.perTap : 1;
+    for (let i = 0; i < n; i++) scanNext(state);
     return 'scanned';
   }
   completeSale(state, rand);

@@ -8,6 +8,7 @@
 import * as THREE from 'three';
 import { GREETER, SHOWOFF, groundAt, shopRoom } from '../../sim/route.js';
 import { keeperGreeting } from '../../sim/keeper.js';
+import { hasHelper } from '../../sim/upgrades.js';
 import { displayRoom } from '../../sim/collection.js';
 
 const SPOTS = {
@@ -53,9 +54,10 @@ export function createSpotsView(state, roomOrigin) {
       for (const s of spots) for (const m of [s.ring, s.dot]) m.material.dispose();
       group.clear();
       spots = [];
-      add('greeter', shopRoom(state).id, GREETER, () => keeperGreeting(state));
+      // A hired greeter or window dresser stands there instead (GDD #72), so no ring.
+      if (!hasHelper(state, 'greeter')) add('greeter', shopRoom(state).id, GREETER, () => keeperGreeting(state));
       const display = displayRoom(state);
-      if (display?.floor === 0) {
+      if (display?.floor === 0 && !hasHelper(state, 'dresser')) {
         add('showoff', display.id, SHOWOFF, () => state.keeper.roomId === display.id && !state.keeper.path.length, () => state.sparkle > 0);
       }
     },

@@ -10,7 +10,7 @@ import { ribbonsForCollection } from './decor.js';
 export const STATE_VERSION = 18;
 
 /** Live-only fields: never saved, reset on every load (customers just walk in again). */
-export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer', 'cashier'];
+export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer', 'cashier', 'greeter', 'dresser'];
 
 export function resetTransient(state) {
   state.customers = [];
@@ -18,6 +18,8 @@ export function resetTransient(state) {
   state.checkout = null;
   state.spawnTimer = 2; // first visitor shortly after opening
   state.cashier = null; // Mia's spot behind the counter (sim/helpers.js), once she's hired
+  state.greeter = null; // Ollie at the door and Rosa in the Window Display (sim/helpers.js, GDD #72)
+  state.dresser = null;
   return state;
 }
 

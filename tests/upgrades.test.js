@@ -155,3 +155,38 @@ test('no Mia until she is hired', () => {
   assert.equal(s.cashier, null);
   assert.equal(miaAtTill(s), false);
 });
+
+test('Ollie the greeter greets everyone walking in; Rosa needs the Window Display (GDD #72)', async () => {
+  const { tickHelpers, greeterOnDuty, dresserOnDuty } = await import('../js/sim/helpers.js');
+  const { showingOff } = await import('../js/sim/collection.js');
+  const { hireHelper } = await import('../js/sim/upgrades.js');
+  const { buildExpansion } = await import('../js/sim/building.js');
+  const s = createState();
+  s.coins = 2000;
+  tickHelpers(s, 0.1);
+  assert.ok(!greeterOnDuty(s));
+  assert.ok(hireHelper(s, 'greeter'));
+  tickHelpers(s, 0.1);
+  assert.ok(greeterOnDuty(s));
+  assert.equal(hireHelper(s, 'dresser'), false, 'no Window Display yet');
+  assert.ok(buildExpansion(s));
+  assert.ok(hireHelper(s, 'dresser'));
+  tickHelpers(s, 0.1);
+  assert.ok(dresserOnDuty(s) && showingOff(s));
+});
+
+test('Speedy Scanner scans two per tap; Gift Wrap doubles tips', async () => {
+  const { startCheckout, checkoutTap } = await import('../js/sim/checkout.js');
+  const s = createState();
+  const customer = { id: 'c1', basket: ['teaset', 'teaset', 'chair'], state: 'waiting' };
+  s.customers.push(customer);
+  s.upgrades.scanner = true;
+  s.upgrades.giftwrap = true;
+  startCheckout(s, customer);
+  checkoutTap(s);
+  assert.equal(s.checkout.items.filter((i) => i.scanned).length, 2);
+  checkoutTap(s);
+  const coins = s.coins;
+  checkoutTap(s, () => 0); // the smallest tip, doubled
+  assert.equal(s.coins, coins + 10 + 10 + 14 + 2);
+});

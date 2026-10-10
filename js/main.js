@@ -53,6 +53,7 @@ import { createDecorate } from './ui/decorate.js';
 import { createStyler } from './ui/styler.js';
 import { SETS } from './data/items.js';
 import { giftCompleteThemes } from './sim/rewards.js';
+import { hasHelper } from './sim/upgrades.js';
 import { styleName } from './data/decor.js';
 import { createCreator } from './ui/creator.js';
 import { createJuice } from './ui/juice.js';
@@ -388,8 +389,14 @@ events.on('lunchDelivery', ({ delivered }) => {
   pageToasts(delivered);
 });
 events.on('upgradeBought', ({ id }) => toast(`${UPGRADES[id].icon} ${UPGRADES[id].name}: yours!`));
-const HELPER_JOBS = { cashier: "She'll mind the register.", stocker: "She'll keep the shelves stocked." };
-events.on('helperHired', ({ id }) => toast(`${HELPERS[id].name} joined your shop! 💖 ${HELPER_JOBS[id] ?? ''}`));
+const HELPER_JOBS = {
+  cashier: "She'll mind the register.", stocker: "She'll keep the shelves stocked.",
+  greeter: "He'll say hello at the door.", dresser: "She'll show off your Dream Dollhouse.",
+};
+events.on('helperHired', ({ id }) => {
+  toast(`${HELPERS[id].name} joined your shop! 💖 ${HELPER_JOBS[id] ?? ''}`);
+  spotsView.rebuild(); // Ollie and Rosa take over their bonus spots
+});
 events.on('dayStarted', ({ day, delivered, rescued }) => {
   const boxes = delivered.boxes ? ` Pip delivered ${delivered.boxes} box${delivered.boxes > 1 ? 'es' : ''} 📦` : '';
   toast(`Good morning! Day ${day}.${boxes}`);
@@ -510,7 +517,7 @@ function tapSpot(id) {
 function tapStreet(point) {
   const o = roomOrigin(shopRoom(state).id);
   const x = point.x - o.x;
-  const ok = Math.abs(x - GREETER.x) < 0.75
+  const ok = Math.abs(x - GREETER.x) < 0.75 && !hasHelper(state, 'greeter') // Ollie's spot once he's hired
     ? walkToGreeter(state, navs)
     : (() => {
         const b = streetBounds(state);

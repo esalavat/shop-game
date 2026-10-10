@@ -122,15 +122,20 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 - **Stock counts in the order book, built 2026-10-09, waiting for feedback (also from the tester who asked)** (GDD v0.34
   #71): chips on each found item's card, 🏪 on shelves / 📦 in boxes / 🚚 coming, or "None in the shop!"; legend under the
   tabs. `stockCount` in `js/sim/stock.js`. No save change.
+- **More helpers and upgrades (GDD v0.35 #72), in progress, built in four steps:**
+  1. ✅ **Ollie the Greeter** (🪙 250, stands left of the door and greets everyone) and **Rosa the Window Dresser** (🪙 300,
+     after the Window Display; shows off the Dream Dollhouse); their bonus rings go away once hired. Live-only
+     `state.greeter` / `state.dresser` (`js/sim/helpers.js`). **Speedy Scanner** (🪙 120: two items per tap, cashiers
+     faster) and **Gift Wrap** (🪙 150: tips ×2). No save change.
+  2. Tall Shelves (🪙 250, one more row on every shelf). 3. Up to three stockers (Bea, Theo 🪙 350, Juno 🪙 500).
+  4. A second register on the same counter, with Kai the cashier (🪙 400), two lines.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
 - **Planned next, in order:** (#59) **more items** (toward 100+, color variants). Later: more stockers
   (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issue: delivery boxes stack too
   high (delivery-bin idea, docs/ISSUES.md).
 
-**Next:** to discuss with the user: more helpers / upgrades (more registers, more stockers, a greeter; GDD §18 #12;
-proposal: a second register with its own cashier, a second stocker, a door greeter, all from Grow, priced up as you
-hire more). Then the rest of #59 (color variants, more items). Waiting on feedback: the Collection bonus and theme
+**Next:** the rest of #72 (Tall Shelves, more stockers, the second register; see above). Then the rest of #59 (color variants, more items). Waiting on feedback: the Collection bonus and theme
 rewards (#70), stock counts (#71).
 
 **Releases:** the latest is **v2026.10.9.8** (2026-10-09): the Collection bonus and theme rewards (#70) and stock counts in
