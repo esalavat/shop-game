@@ -403,6 +403,12 @@ they share `localStorage`, and the test build often has a newer save version tha
 - **Sim unit tests** (`node --test tests/`): economy math, day phases, order delivery, customer state transitions, save migrations.
 - **Manual phone testing** on the Pages URL each milestone (iPhone Safari + Android Chrome).
 - **Save safety** (`tests/saves.test.js`): every released save version's sample save still loads (§9.4).
+- **Balancing runs** (`npm run balance`, `scripts/balance.js`, GDD §18 #10, #15): plays the real sim headless with a bot
+  player for N days (about 4 s per 10 days) and prints a line per day (coins earned, customers, Collection, Sparkle,
+  traffic, shelf space, what it bought) and the day / minutes of play each milestone came. `--days N`, `--seed S`,
+  `--seeds K` (median over K seeds), `--json file`. The bot: unpacks then opens, rings up at 4 taps/s, closes early when
+  sold out; at closing fills the dollhouse, orders one box of every new item, stocks about two days of sales in the
+  best-paying colors, then buys growth in a fixed order (`PLAN`). It never uses Lunchtime Delivery, greets or shows off.
 - `?debug` URL flag: fps meter, speed-up time, add coins, skip to phase, reset save (and copy the main save, on dev).
 
 ## 11. Build Order (MVP milestones)

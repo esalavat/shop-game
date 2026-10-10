@@ -169,12 +169,17 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   rug, rose gold wallpaper, Cotton Candy / Sour Apple / Chocolate Truffle outfits, Kitty Ears ×3 (`character.js`). Order book
   (user): each page cheapest first (BASE in `js/data/items.js` is listed that way, tested), every card has a stock line ("Not
   ordered yet"), buy buttons line up.
+- **Balancing script, built 2026-10-09** (step 1 of the balancing pass): `npm run balance` plays the real sim headless
+  with a bot player and prints coins, customers, Collection, Sparkle and purchases per day, plus milestone days
+  (`scripts/balance.js`, `docs/TECH.md` §10). First numbers are in GDD §18 #10 and #15: both visitor caps hit on day 5,
+  the whole Collection is found by day 16 (~55 min), and from round 2 on coins (~600k a day by day 16) dwarf every
+  price, while customers stay at ~25-30 a day. **Next: pick fixes with the user**, then re-run the script to check them.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
 - **Planned next:** the balancing pass (Sparkle cap §18 #10, coins after round 1 §18 #15). Later: more items past 100 (#59), more stockers
   (#60), **Instant Delivery** (GDD §11, on the §17 roadmap, design to discuss), Heart/Sparkle milestone unlocks (§18 #6). 
 
-**Next:** the balancing pass (GDD §18 #10, #15). Waiting on feedback: Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
+**Next:** the balancing pass (GDD §18 #10, #15): measuring done, choosing the fixes with the user. Waiting on feedback: Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71).
 
 **Releases:** the latest is **v2026.10.9.12** (2026-10-09): color rounds (#77) and shopping by item (#78); before it
