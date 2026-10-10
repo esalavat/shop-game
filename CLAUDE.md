@@ -196,6 +196,9 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   (`PRIZES` / `PRIZE_TILES` / `PRIZE_PALETTES` in `js/render/patterns.js`; pattern options with `prize` and `round` from
   `PRIZE_PATTERNS()` in `js/data/decor.js`; `THEME_STYLES` maps each theme to its picture). Old prizes (`OLD_THEME_STYLES`) are on sale;
   **save version 23** keeps them for shops that had won them. The decorator shows prizes once their round opens.
+- **Smaller decorate panel, 2026-10-10** (user: hard to see the room): each row of choices is one line you swipe sideways
+  (with a fade at the right edge), slimmer tabs; 606 → about 300 px tall at phone size. Rows keep their scroll across taps
+  (`render` in `js/ui/styler.js`). Not released yet.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
 - **Planned next:** feedback on the balancing pass (#80). Later: more items past 100 (#59), more stockers

@@ -112,8 +112,17 @@ export function createStyler(state, { onRoom, onPreview, onClose, onBought }) {
     const ids = roomDecor(r), look = roomLook(r, preview && { [preview.kind]: preview.id });
     tabs.innerHTML = tabsFor(r).map((t) => `<button data-tab="${t.id}" class="${t.id === tab ? 'on' : ''}"><span aria-hidden="true">${t.icon}</span>${t.name}</button>`).join('');
     const kinds = DECOR_TABS.find((t) => t.id === tab).kinds;
+    // Rows scroll sideways: keep each where it was across redraws (same tab), and show the chosen one.
+    const scrolled = [...rows.querySelectorAll('.sty-opts')].map((o) => o.scrollLeft);
+    const sameTab = rows.dataset.tab === tab;
+    rows.dataset.tab = tab;
     rows.innerHTML = kinds.map((kind) => `<div class="sty-row">${kinds.length > 1 ? `<span>${ROW_NAMES[kind]}</span>` : ''}
       <div class="sty-opts">${DECOR[kind].filter((o) => shown(kind, o)).map((o) => optionButton(kind, o, ids[kind], look)).join('')}</div></div>`).join('');
+    rows.querySelectorAll('.sty-opts').forEach((o, i) => {
+      if (sameTab) o.scrollLeft = scrolled[i] ?? 0;
+      const on = o.querySelector('.on');
+      if (on && (on.offsetLeft < o.scrollLeft || on.offsetLeft + on.offsetWidth > o.scrollLeft + o.clientWidth)) o.scrollLeft = on.offsetLeft - o.clientWidth / 2 + on.offsetWidth / 2;
+    });
     if (preview) {
       const o = decorOption(preview.kind, preview.id), short = o.price - state.ribbons;
       const theme = rewardTheme(preview.kind, preview.id);

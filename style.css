@@ -651,8 +651,8 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
   bottom: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px 12px calc(env(safe-area-inset-bottom) + 12px);
+  gap: 6px;
+  padding: 10px 12px calc(env(safe-area-inset-bottom) + 8px);
   border-radius: 24px 24px 0 0;
   background: var(--cream);
   box-shadow: 0 -3px 0 rgba(90, 58, 85, 0.12), 0 40px 0 var(--cream);
@@ -680,7 +680,7 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 4px 0;
+  padding: 2px 0;
   border: 2px solid transparent;
   border-radius: 12px;
   background: #fff;
@@ -689,11 +689,16 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
   font-size: 11px;
   box-shadow: 0 2px 0 var(--shadow);
 }
-.sty-tabs button span { font-size: 18px; }
+.sty-tabs button span { font-size: 15px; line-height: 18px; }
 .sty-tabs button.on { border-color: var(--pink); background: #ffeef5; }
-.sty-rows { display: flex; flex-direction: column; gap: 6px; min-height: 182px; } /* the Walls tab's height, so the room stays framed */
+/* Each row of choices is one line you swipe sideways, so the panel stays short and the room in view. */
+.sty-rows { display: flex; flex-direction: column; gap: 2px; min-height: 140px; } /* the Walls tab's height, so the room stays framed */
+.sty-row { min-width: 0; }
 .sty-row > span { font-size: 12px; font-weight: 800; opacity: 0.65; }
-.sty-opts { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 2px; }
+.sty-opts { position: relative; display: flex; flex-wrap: nowrap; gap: 6px; padding: 2px 28px 9px 2px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); } /* the fade says: more this way */
+.sty-opts::-webkit-scrollbar { display: none; }
+.sty-opts button { flex-shrink: 0; }
 .sty-opts button {
   position: relative;
   width: 44px;
