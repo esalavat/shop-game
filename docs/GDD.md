@@ -344,7 +344,7 @@ Your very own dollhouse, displayed in the shop's front window.
 - You can't go broke. Unsold stock just waits on the shelf. If you ever spend everything with nothing left to sell, Pip brings a free box the next morning (#40).
 - Goals: gentle milestone lists, Collection pages, regulars' stories, and room unlocks.
 - **Upgrades (v0.12, #37)** are one-time buys in the Grow sheet: Lunchtime delivery (🪙 100), Stock cart (🪙 60, carry 2 boxes), Comfy shoes (🪙 80, walk faster). Costs to tune with feedback (`js/data/upgrades.js`).
-- 💡 **Future upgrade ideas (user, 2026-10-09):** **Instant Delivery**: orders arrive right away instead of next morning or at lunch (a pricier upgrade, or maybe a per-order option). **Sorting Smarts** and more stockers are planned (#60).
+- 💡 **Future upgrade ideas (user, 2026-10-09):** **Instant Delivery**: orders arrive right away instead of next morning or at lunch (a pricier upgrade, or maybe a per-order option). Not designed yet; on the roadmap (§17). (More stockers came in #72; Sorting Smarts was dropped in #65.)
 
 ## 12. Controls (Portrait, Touch)
 
@@ -428,6 +428,7 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - [x] **More helpers and upgrades** (#72): greeter, window dresser, Speedy Scanner, Gift Wrap; Tall Shelves; more stockers
 - [x] **Delivery bin** (#74)
 - [x] **Register rooms**, one per floor above the shop, each with a cashier (#73)
+- [ ] **Instant Delivery** upgrade: orders arrive right away (§11; design to discuss)
 - [ ] **Color variants and more items toward 100+** (#59)
 - [x] **Decoration shop with Ribbons 🎀:** style every room's walls, floor, rug, curtains and corner (#68)
 - Building grid expansion (X and Y), room types, pan/zoom

@@ -150,14 +150,14 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
 - **Planned next, in order:** (#59) **more items** (toward 100+, color variants). Later: more stockers
-  (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issue: pinch-zoom limit on big houses (docs/ISSUES.md).
+  (#60), **Instant Delivery** (GDD §11, on the §17 roadmap, design to discuss), Heart/Sparkle milestone unlocks (§18 #6). Open issue: pinch-zoom limit on big houses (docs/ISSUES.md).
 
 **Next:** room costs (§18 #13) and the zoom-out limit (§18 #14). Waiting on feedback: register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71). Then the rest of #59 (color variants, more items). Waiting on feedback: the Collection bonus and theme
 rewards (#70), stock counts (#71).
 
-**Releases:** the latest is **v2026.10.9.8** (2026-10-09): the Collection bonus and theme rewards (#70) and stock counts in
-the order book (#71); save version 17 → 18. Everything on `main` is public. The MVP list in GDD §17 is complete.
+**Releases:** the latest is **v2026.10.9.9** (2026-10-09): more helpers and upgrades (#72), the delivery bin (#74) and
+register rooms (#73); save version 18 → 19. Everything on `main` is public. The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).
