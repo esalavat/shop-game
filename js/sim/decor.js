@@ -4,7 +4,7 @@
 
 import { events } from '../core/events.js';
 import { DECOR, RIBBONS, THEME_STYLES, decorOption } from '../data/decor.js';
-import { ITEMS, SETS } from '../data/items.js';
+import { ITEMS, SETS, baseOf } from '../data/items.js';
 import { ROOM_TYPES } from '../data/rooms.js';
 
 export function addRibbons(state, amount, why, detail = {}) {
@@ -29,13 +29,13 @@ export const themeComplete = (collection, set) => Object.keys(ITEMS).filter((id)
  */
 export function ribbonsForSale(state, customer, itemIds) {
   for (const itemId of itemIds) {
-    const i = state.wishes.findIndex((w) => w.itemId === itemId);
+    const i = state.wishes.findIndex((w) => baseOf(w.itemId) === baseOf(itemId)); // any color grants it (GDD #78)
     if (i < 0) continue;
     state.wishes.splice(i, 1);
     events.emit('wishGranted', { itemId, customerId: customer?.id });
     addRibbons(state, RIBBONS.wish, 'wish');
   }
-  if (customer?.windowWant && itemIds.includes(customer.windowWant)) addRibbons(state, RIBBONS.window, 'window');
+  if (customer?.windowWant && itemIds.some((id) => baseOf(id) === baseOf(customer.windowWant))) addRibbons(state, RIBBONS.window, 'window');
 }
 
 /** New Collection items (+2 each) and any themes they complete (+5 each). */

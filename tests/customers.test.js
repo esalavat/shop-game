@@ -128,3 +128,30 @@ test('a customer who has shopped for far too long gives up and pays for what the
   assert.ok(['toQueue', 'queued'].includes(c.state));
   assert.ok(s.queue.includes(c.id));
 });
+
+test('customers want an item, not a color: any color on the shelf will do, at its price (GDD #78)', async () => {
+  const { s, navs, shelves } = setup();
+  const { ribbonsForSale } = await import('../js/sim/decor.js');
+  shelves[0].slots[4] = 'teaset2';
+  const rand = rng(3);
+  const c = customerWanting(s, 'teaset', rand);
+  run(s, navs, 12, rand);
+  assert.deepEqual(c.basket, ['teaset2']);
+  assert.equal(shelves[0].slots[4], null);
+  assert.equal(c.state, 'paying');
+  const coins = s.coins;
+  checkoutTap(s, rand);
+  checkoutTap(s, rand);
+  assert.ok(s.coins >= coins + ITEMS.teaset2.price);
+  // A wish note for the item is granted by any color.
+  s.wishes = [{ itemId: 'teaset', day: 1 }];
+  ribbonsForSale(s, null, ['teaset3']);
+  assert.equal(s.wishes.length, 0);
+});
+
+test('wishes and wants are always round-1 items', () => {
+  const { s } = setup();
+  for (const id of Object.keys(ITEMS)) s.collection[id] = true;
+  const rand = rng(4);
+  for (let i = 0; i < 100; i++) assert.ok(spawnCustomer(s, rand).wants.every((id) => ITEMS[id].round === 0));
+});

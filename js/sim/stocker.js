@@ -9,6 +9,7 @@
 
 import { HELPERS, SKATES_SPEED } from '../data/upgrades.js';
 import { useSpot } from '../data/fixtures.js';
+import { baseOf } from '../data/items.js';
 import { hasHelper, hasUpgrade } from './upgrades.js';
 import { sellingRooms } from './building.js';
 import { finishRoute, routeTo, walkRoute } from './route.js';
@@ -42,7 +43,8 @@ export function shelfFor(state, b) {
   return shelvesWithRoom(state).sort((x, y) => score(y) - score(x))[0] ?? null;
 }
 
-const onShelves = (state) => new Set(state.building.rooms.flatMap((r) => r.fixtures.flatMap((f) => f.slots ?? [])).filter(Boolean));
+/** Items on the shelves in any color (GDD #78). */
+const onShelves = (state) => new Set(state.building.rooms.flatMap((r) => r.fixtures.flatMap((f) => f.slots ?? [])).filter(Boolean).map(baseOf));
 
 /**
  * Which doorstep box to fetch next: wished-for items first, then items that aren't on the shelves at
@@ -52,9 +54,9 @@ export function chooseBox(state, me = null) {
   const k = state.keeper;
   const taken = new Set([k.task?.type === 'pickup' ? k.task.boxId : null]);
   for (const o of state.stockers) if (o !== me && o.job?.type === 'pickup') taken.add(o.job.boxId);
-  const wished = new Set(state.wishes.map((w) => w.itemId));
+  const wished = new Set(state.wishes.map((w) => baseOf(w.itemId)));
   const shelved = onShelves(state);
-  const score = (b) => (wished.has(b.itemId) ? 0 : shelved.has(b.itemId) ? 2 : 1) * 1000 + b.spot;
+  const score = (b) => (wished.has(baseOf(b.itemId)) ? 0 : shelved.has(baseOf(b.itemId)) ? 2 : 1) * 1000 + b.spot;
   return state.boxes
     .filter((b) => !taken.has(b.id) && b.roomId === shopRoomId(state))
     .sort((a, b) => score(a) - score(b))[0] ?? null;

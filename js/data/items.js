@@ -99,6 +99,9 @@ ROUNDS.forEach((r, round) => {
   }
 });
 
+/** Which item this is, whatever its color ('teaset2' -> 'teaset'): customers shop by item, not color (GDD #78). */
+export const baseOf = (id) => ITEMS[id]?.base ?? id;
+
 /** An item's colors, round by round: ['teaset', 'teaset2', 'teaset3']. */
 export const colorsOf = (id) => ROUNDS.map((r, round) => themeId(ITEMS[id].base, round));
 

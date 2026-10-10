@@ -159,6 +159,8 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   with 🎀, coin gifts ×16 a round, bolder room styles (new decor options) and shopkeeper styles (outfits, and tinted
   accessories like 'crown3'). The album shows a round's sections once it opens. Code: `ROUNDS` / `COLORS` / `STEPS` in
   `js/data/items.js`, `sim/catalog.js`, `js/ui/orderbook.js`. No save change. Economy past round 1 still to tune (GDD §18 #15).
+  **Customers shop by item, not color** (#78, user): wants and wishes are round-1 ids; any color on the shelf will do and
+  they pay that color's price (`baseOf` in `js/data/items.js`, used in `sim/customers.js`, `sim/decor.js`, `sim/stocker.js`).
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
 - **Planned next, in order:** (#59) **more items and themes** (toward 100+). Later: more stockers

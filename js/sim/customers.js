@@ -2,6 +2,8 @@
 // If something they want isn't on the shelves, they leave a wish note instead (never upset).
 // With more rooms (GDD #58) they head for the room that has what they want, walk over along the
 // sidewalk or up the Stairwell (sim/route.js), and come back to the shop's counter to pay.
+// They want an item, not a color (GDD #78): `wants` and wish notes hold round-1 ids ('teaset'), and
+// any color of it on the shelves will do; they pay for the color they took.
 //
 // States: [toWindow -> peeking (stop at the Window Display first)] -> arriving (walking in from the
 //         street) -> entering -> toShelf -> browsing -> (next want...; toRoom -> entering to try
@@ -11,6 +13,7 @@
 import { events } from '../core/events.js';
 import { orderableItems } from './catalog.js';
 import { CUSTOMER, LOOKS, ADULT_SCALE, KID_SCALE } from '../data/customers.js';
+import { baseOf } from '../data/items.js';
 import { findPath } from './nav.js';
 import { newId, shopRoomId, findFixture, freeSlots, dropBox } from './stock.js';
 import { sellingRooms, isShelfRoom } from './building.js';
@@ -57,13 +60,14 @@ export function stockedSlots(state, roomId) {
   return out;
 }
 
+/** A free slot in the room with this item in any color (the first one they come to). */
 function findSlot(state, roomId, itemId) {
   const reserved = reservedSlots(state);
-  return stockedSlots(state, roomId).find((s) => s.itemId === itemId && !reserved.has(`${s.fixture.id}:${s.slot}`)) ?? null;
+  return stockedSlots(state, roomId).find((s) => baseOf(s.itemId) === itemId && !reserved.has(`${s.fixture.id}:${s.slot}`)) ?? null;
 }
 
-/** Everything on the shelves, in every room customers shop in. */
-const stockedItems = (state) => [...new Set(sellingRooms(state).flatMap((r) => stockedSlots(state, r.id).map((s) => s.itemId)))];
+/** Every item on the shelves (whatever the color), in every room customers shop in. */
+const stockedItems = (state) => [...new Set(sellingRooms(state).flatMap((r) => stockedSlots(state, r.id).map((s) => baseOf(s.itemId))))];
 
 const roomById = (state, id) => state.building.rooms.find((r) => r.id === id);
 
@@ -95,7 +99,7 @@ function headInside(state, c) {
 
 function chooseWants(state, rand) {
   const stocked = stockedItems(state);
-  const all = orderableItems(state); // wishes point at things you can order now (GDD #66)
+  const all = [...new Set(orderableItems(state).map(baseOf))]; // wishes point at things you can order now (GDD #66)
   const first = stocked.length && rand() < CUSTOMER.wantsStocked ? pick(rand, stocked) : pick(rand, all);
   const wants = [first];
   if (stocked.length && rand() < CUSTOMER.secondItem) wants.push(pick(rand, stocked));
@@ -128,7 +132,7 @@ export function spawnCustomer(state, rand = Math.random) {
     c.arriveFacing = Math.PI;
     c.state = 'toWindow';
     const onShow = [...dollhouseItems(state)];
-    if (onShow.length && rand() < peekWantChance(state)) c.wants[0] = c.windowWant = pick(rand, onShow);
+    if (onShow.length && rand() < peekWantChance(state)) c.wants[0] = c.windowWant = baseOf(pick(rand, onShow));
   }
   state.customers.push(c);
   events.emit('customerArrived', { customer: c });
@@ -174,7 +178,7 @@ function nextWant(state, c, navs, rand) {
     const shelf = found?.fixture ?? pick(rand, shelves);
     if (shelf) {
       const col = found ? found.slot % 3 : Math.floor(rand() * 3);
-      c.target = { fixtureId: shelf.id, slot: found ? found.slot : null, itemId };
+      c.target = { fixtureId: shelf.id, slot: found ? found.slot : null, itemId }; // itemId: the item they want, any color
       walk(c, nav, shelf.x + (col - 1) * 0.3, shelf.z + BROWSE_DZ, Math.PI);
       c.state = 'toShelf';
       return;
@@ -192,12 +196,13 @@ function finishBrowsing(state, c, navs, rand) {
   const t = c.target;
   c.target = null;
   const shelf = t && findFixture(state, t.fixtureId)?.fixture;
-  if (t && shelf && t.slot != null && shelf.slots[t.slot] === t.itemId) {
+  const took = t && shelf && t.slot != null ? shelf.slots[t.slot] : null; // the color they found
+  if (took && baseOf(took) === t.itemId) {
     shelf.slots[t.slot] = null;
-    c.basket.push(t.itemId);
+    c.basket.push(took);
     c.takenFrom = [...(c.takenFrom ?? []), { fixtureId: shelf.id, slot: t.slot }]; // to put it back (sendEveryoneHome)
     c.wants.shift();
-    events.emit('itemTaken', { roomId: c.roomId, fixtureId: shelf.id, slot: t.slot, itemId: t.itemId, customerId: c.id });
+    events.emit('itemTaken', { roomId: c.roomId, fixtureId: shelf.id, slot: t.slot, itemId: took, customerId: c.id });
   } else if (t && roomWith(state, c.roomId, t.itemId)) {
     // Someone else took it, but there's another one (here or in another room): go look there.
   } else if (t) {
