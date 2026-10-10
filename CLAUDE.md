@@ -219,6 +219,8 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   a link (shop packed after the `#`, no server) to a public view-only 3D visit page (zoom into rooms, shopkeeper and a few
   browsing customers, whole house / Dream Dollhouse / day-night buttons, "Get the game" later). Typed shop names on the roof
   sign, frame and visit page (filter, §18 #21) — a save change.
+- **Planned: 9-room Dream Dollhouse** (GDD v0.53 #92): a 3 × 3 house, 🪙 4,000 on the ladder once Bright opens, as a
+  customer boost when numbers level off; room names to settle (§18 #22).
 
 **Next:** playtest feedback on v2026.10.10.2 (#80-#87). Waiting on feedback: the balancing pass (#80), Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71).
