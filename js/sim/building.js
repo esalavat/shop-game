@@ -1,7 +1,7 @@
 // Building grid actions. Rooms sit on a (col, floor) grid that grows sideways and upward.
 
 import { events } from '../core/events.js';
-import { ROOM_TYPES, ROOM_SIZE, ROOM_STYLES, ROOM_COSTS, ROOM_COST_STEP, ROOM_FLOOR_MARKUP, STAIR_COSTS, STAIR_COST_STEP } from '../data/rooms.js';
+import { ROOM_TYPES, ROOM_SIZE, ROOM_STYLES, ROOM_COSTS, ROOM_COST_STEP, ROOM_FLOOR_MARKUP, STAIR_COSTS, STAIR_COST_STEP, REGISTER_COST, REGISTER_COST_STEP } from '../data/rooms.js';
 import { FIXTURES } from '../data/fixtures.js';
 import { EXPANSIONS } from '../data/dollhouse.js';
 import { addCoins } from './economy.js';
@@ -141,7 +141,7 @@ function insertColumn(state, col) {
     if (w > gap) p.x += S;
     p.x -= (state.building.rooms.find((r) => r.id === frame).col - oldCol.get(frame)) * S;
   };
-  const people = [state.keeper, ...state.stockers, state.cashier, ...(state.customers ?? [])].filter(Boolean);
+  const people = [state.keeper, ...state.stockers, state.cashier, ...Object.values(state.registers ?? {}).map((r) => r.cashier), ...(state.customers ?? [])].filter(Boolean);
   for (const a of people) {
     if (!oldCol.has(a.roomId)) continue;
     if (a.arriveRoom || a.legs?.length) { // walking in another room's coordinates
@@ -208,6 +208,92 @@ export function buildFloor(state) {
   if (state.coins < cost) return null;
   const room = addFloor(state);
   if (!room) return null;
+  addCoins(state, -cost);
+  events.emit('expanded', { room });
+  return room;
+}
+
+// ---------------------------------------------------------------------------
+// Register rooms (GDD #73): a copy of the shop, one per floor, always straight above the shop (left of
+// the Stairwell), each one floor above the last. Rooms on that floor move over to make space.
+// ---------------------------------------------------------------------------
+
+export const registerRoomsBuilt = (state) => state.building.rooms.filter((r) => r.type === 'register');
+
+/** The floor the next register room goes on, or null if the stairs don't reach a floor without one. */
+export function nextRegisterFloor(state) {
+  const floor = registerRoomsBuilt(state).length + 1;
+  return hasStairwell(state) && stairRooms(state).length > floor ? floor : null;
+}
+
+export const registerCost = (state) => REGISTER_COST + REGISTER_COST_STEP * registerRoomsBuilt(state).length;
+
+/**
+ * Make space at (col, floor): the rooms in a row leftward from there move one place left. The last
+ * of them may end up over nothing; then it goes to the nearest free spot that has something under it
+ * instead (GDD #73), keeping its stock and decorations. Returns the rooms that moved.
+ */
+function clearSpot(state, col, floor) {
+  const run = [];
+  for (let c = col; hasRoom(state, c, floor); c--) run.push(state.building.rooms.find((r) => r.col === c && r.floor === floor));
+  for (const r of run) r.col -= 1;
+  const last = run.at(-1);
+  if (last && floor > 0 && !hasRoom(state, last.col, floor - 1)) {
+    const from = { col: last.col, floor };
+    last.col = NaN; // out of the way while we look for a spot
+    const spots = roomSpots(state).filter((p) => !Number.isNaN(p.col) && !(p.col === col && p.floor === floor));
+    const near = (p) => Math.abs(p.floor - from.floor) * 100 + Math.abs(p.col - from.col);
+    const spot = spots.sort((a, b) => near(a) - near(b))[0];
+    last.col = spot.col;
+    last.floor = spot.floor;
+  }
+  return run;
+}
+
+/** Anyone walking through rooms that just moved stops where they are (their walk was planned for the old layout). */
+function stopWalkers(state, moved, oldCol) {
+  if (!moved.length) return;
+  const S = ROOM_SIZE.W + ROOM_SIZE.T;
+  const ids = new Set(moved.map((r) => r.id));
+  const people = [state.keeper, ...state.stockers, ...(state.customers ?? [])];
+  for (const a of people) {
+    const frames = [a.roomId, a.arriveRoom?.roomId, ...(a.legs ?? []).map((l) => l.frame)];
+    if (!frames.some((id) => ids.has(id))) continue;
+    if (!a.arriveRoom && !a.legs?.length) continue; // standing or walking inside one room: it moved with them
+    // Back into the room they're standing in, in its own coordinates.
+    const frame = state.building.rooms.find((r) => r.id === a.roomId);
+    const wx = a.x + (oldCol.get(frame.id) ?? frame.col) * S;
+    const here = state.building.rooms.find((r) => r.floor === frame.floor && Math.abs(wx - r.col * S) <= S / 2) ?? frame;
+    a.roomId = here.id;
+    a.x = Math.max(-ROOM_SIZE.W / 2 + 0.3, Math.min(ROOM_SIZE.W / 2 - 0.3, wx - here.col * S));
+    a.z = Math.min(a.z, ROOM_SIZE.D / 2 - 0.2);
+    a.path = []; a.legs = []; a.arriveRoom = null; a.y = 0;
+    if ('task' in a) a.task = null;
+    if ('job' in a) a.job = null;
+  }
+}
+
+/** Put the next register room straight above the shop's column (no cost; buildRegister charges). */
+export function addRegisterRoom(state) {
+  const floor = nextRegisterFloor(state);
+  if (floor === null) return null;
+  const col = shopOf(state).col;
+  const oldCol = new Map(state.building.rooms.map((r) => [r.id, r.col]));
+  const moved = clearSpot(state, col, floor);
+  stopWalkers(state, moved, oldCol);
+  const room = makeRoom(newId(state, 'r'), 'register', col, floor);
+  state.building.rooms.push(room);
+  fitShelves(state);
+  events.emit('buildingChanged', { room });
+  return room;
+}
+
+/** Buy the next register room (GDD #73). Returns it, or null. */
+export function buildRegister(state) {
+  if (nextRegisterFloor(state) === null) return null;
+  const cost = registerCost(state);
+  if (state.coins < cost) return null;
+  const room = addRegisterRoom(state);
   addCoins(state, -cost);
   events.emit('expanded', { room });
   return room;

@@ -15,7 +15,7 @@ import { findPath } from './nav.js';
 import { newId, shopRoomId, findFixture, freeSlots, dropBox } from './stock.js';
 import { sellingRooms, isShelfRoom } from './building.js';
 import { doorOf, finishRoute, roomOffset, routeTo, streetBounds, stairRoom, walkRoute, routeEndPath } from './route.js';
-import { startCheckout } from './checkout.js';
+import { startCheckout, registerOf, registerFor, registerRooms } from './checkout.js';
 import { cashierReady } from './helpers.js';
 import { recordWish, DAY_LENGTH } from './day.js';
 import { SPARKLE } from '../data/dollhouse.js';
@@ -213,31 +213,44 @@ function queueFace(i) {
   return Math.atan2(ahead.x - me.x, ahead.z - me.z);
 }
 
+/** Where they'll pay: the register on the floor they're on, else the nearest one below (GDD #73). */
+function payingAt(state, c) {
+  const roomId = c.arriveRoom?.roomId ?? c.roomId;
+  const floor = state.building.rooms.find((r) => r.id === roomId)?.floor ?? 0;
+  return registerFor(state, floor).id;
+}
+
+/** The register they're lined up at (the shop's if they never picked one). */
+const regIdOf = (state, c) => c.registerId ?? shopRoomId(state);
+
 function joinQueue(state, c, navs) {
-  if (state.queue.length >= QUEUE_SPOTS.length) {
+  c.registerId = payingAt(state, c);
+  const queue = registerOf(state, c.registerId).queue;
+  if (queue.length >= QUEUE_SPOTS.length) {
     c.state = 'waitingQueue';
     return;
   }
-  state.queue.push(c.id);
-  goToQueueSpot(state, c, state.queue.length - 1, navs);
+  queue.push(c.id);
+  goToQueueSpot(state, c, queue.length - 1, navs);
 }
 
-/** To their place in line at the shop's counter (from another room: along the sidewalk). */
+/** To their place in line at their register's counter (from another room: along the sidewalk or the stairs). */
 function goToQueueSpot(state, c, i, navs) {
   const s = QUEUE_SPOTS[i];
   c.state = 'toQueue';
   if (c.arriveRoom) return; // still walking over from another room: they find their place on arrival
-  const shopId = shopRoomId(state);
-  if (c.roomId === shopId) walk(c, navs.get(shopId), s.x, s.z, queueFace(i));
-  else if (routeTo(state, navs, c, { roomId: shopId, x: s.x, z: s.z })) c.arriveFacing = queueFace(i);
+  const regId = regIdOf(state, c);
+  if (c.roomId === regId) walk(c, navs.get(regId), s.x, s.z, queueFace(i));
+  else if (routeTo(state, navs, c, { roomId: regId, x: s.x, z: s.z })) c.arriveFacing = queueFace(i);
 }
 
 function leave(state, c, navs) {
-  const i = state.queue.indexOf(c.id);
+  const queue = registerOf(state, regIdOf(state, c))?.queue ?? [];
+  const i = queue.indexOf(c.id);
   if (i >= 0) {
-    state.queue.splice(i, 1);
+    queue.splice(i, 1);
     // Everyone behind steps up.
-    state.queue.forEach((id, j) => {
+    queue.forEach((id, j) => {
       const other = state.customers.find((x) => x.id === id);
       if (j >= i && other && (other.state === 'toQueue' || other.state === 'queued')) goToQueueSpot(state, other, j, navs);
     });
@@ -314,12 +327,12 @@ export function tickCustomers(state, navs, dt, rand = Math.random) {
         if ((c.timer -= dt) <= 0) finishBrowsing(state, c, navs, rand);
         break;
       case 'waitingQueue':
-        if (state.queue.length < QUEUE_SPOTS.length) joinQueue(state, c, navs);
+        if (registerOf(state, c.registerId ?? payingAt(state, c)).queue.length < QUEUE_SPOTS.length) joinQueue(state, c, navs);
         break;
       case 'toQueue':
         if (!walking) {
           // Walked over from another room: the line may have moved up while they were on the way.
-          const i = state.queue.indexOf(c.id), s = QUEUE_SPOTS[i];
+          const i = registerOf(state, regIdOf(state, c)).queue.indexOf(c.id), s = QUEUE_SPOTS[i];
           if (s && !c.requeued && Math.hypot(c.x - s.x, c.z - s.z) > 0.05) {
             c.requeued = true;
             goToQueueSpot(state, c, i, navs);
@@ -330,7 +343,10 @@ export function tickCustomers(state, navs, dt, rand = Math.random) {
         }
         break;
       case 'queued':
-        if (state.queue[0] === c.id && !state.checkout && cashierReady(state)) startCheckout(state, c);
+        {
+          const regId = regIdOf(state, c), reg = registerOf(state, regId);
+          if (reg.queue[0] === c.id && !reg.checkout && cashierReady(state, regId)) startCheckout(state, c);
+        }
         break;
       case 'paid':
         leave(state, c, navs);
@@ -363,12 +379,15 @@ export function sendEveryoneHome(state) {
     if (c.state === 'leaving') continue;
     c.basket.forEach((itemId, i) => putBack(state, itemId, c.takenFrom?.[i]));
   }
-  if (state.checkout) {
-    state.checkout = null;
-    events.emit('checkoutCancelled');
+  for (const room of registerRooms(state)) {
+    const reg = registerOf(state, room.id);
+    if (reg.checkout) {
+      reg.checkout = null;
+      events.emit('checkoutCancelled', { roomId: room.id });
+    }
+    if (reg.cashier) reg.cashier.serving = null;
+    reg.queue = [];
   }
-  if (state.cashier) state.cashier.serving = null;
-  state.queue = [];
   state.customers = [];
   events.emit('shelvesChanged');
 }

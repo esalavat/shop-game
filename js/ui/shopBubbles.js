@@ -4,7 +4,7 @@
 
 import * as THREE from 'three';
 import { events } from '../core/events.js';
-import { keeperAtCounter } from '../sim/checkout.js';
+import { keeperAtCounter, registerOf, registerRooms } from '../sim/checkout.js';
 import { cashierReady } from '../sim/helpers.js';
 
 const WISH_SECONDS = 3;
@@ -14,7 +14,7 @@ const ABOVE_COUNTER = new THREE.Vector3(0, 0.75, 0);
 export function createShopBubbles({ state, overlay, customersView, checkoutView, thumbs }) {
   const wishes = new Map(); // customerId -> { itemId, t }
   const peeks = new Map();  // customerId -> { html }
-  const counterAbove = () => checkoutView.counterTop()?.add(ABOVE_COUNTER) ?? null;
+  const counterAbove = (roomId) => () => checkoutView.counterTop(roomId)?.add(ABOVE_COUNTER) ?? null;
 
   events.on('wish', ({ customerId, itemId }) => wishes.set(customerId, { itemId, t: WISH_SECONDS }));
   events.on('peek', ({ customerId, itemId }) => {
@@ -25,9 +25,9 @@ export function createShopBubbles({ state, overlay, customersView, checkoutView,
     const p = customersView.headPosition(customerId);
     if (p) overlay.float(p, 'Hi! 👋', 'tip');
   });
-  events.on('scanned', () => { const p = checkoutView.counterTop(); if (p) overlay.float(p, 'beep!', 'beep'); });
-  events.on('sale', ({ amount, tip }) => {
-    const p = checkoutView.counterTop();
+  events.on('scanned', ({ roomId }) => { const p = checkoutView.counterTop(roomId); if (p) overlay.float(p, 'beep!', 'beep'); });
+  events.on('sale', ({ amount, tip, roomId }) => {
+    const p = checkoutView.counterTop(roomId);
     if (!p) return;
     overlay.float(p.clone().add(new THREE.Vector3(0, 0.75, 0)), `+${amount} 🪙`, 'coins');
     if (tip) overlay.float(p.clone().add(new THREE.Vector3(0.55, 0.35, 0)), `+${tip} tip!`, 'tip');
@@ -58,18 +58,22 @@ export function createShopBubbles({ state, overlay, customersView, checkoutView,
         }
       }
 
-      const front = state.customers.find((c) => c.id === state.queue[0]);
-      if (front?.state === 'queued' && !cashierReady(state)) {
-        overlay.bubble('waiting', () => customersView.headPosition(front.id), '🛎️', 'waiting');
-      } else {
-        overlay.removeBubble('waiting');
-      }
-
-      if (state.checkout && keeperAtCounter(state)) { // Mia needs no prompt
-        const left = state.checkout.items.filter((i) => !i.scanned).length;
-        overlay.bubble('checkout', counterAbove, left ? `Tap to scan · ${left} left` : 'Tap to ring up! 🛎️', 'prompt');
-      } else {
-        overlay.removeBubble('checkout');
+      // Every register (GDD #73): a bell over someone waiting with nobody at the till, and the scan
+      // prompt where the shopkeeper is behind the counter (cashiers need no prompt).
+      for (const room of registerRooms(state)) {
+        const reg = registerOf(state, room.id);
+        const front = state.customers.find((c) => c.id === reg.queue[0]);
+        if (front?.state === 'queued' && !cashierReady(state, room.id)) {
+          overlay.bubble(`waiting-${room.id}`, () => customersView.headPosition(front.id), '🛎️', 'waiting');
+        } else {
+          overlay.removeBubble(`waiting-${room.id}`);
+        }
+        if (reg.checkout && keeperAtCounter(state) && state.keeper.roomId === room.id) {
+          const left = reg.checkout.items.filter((i) => !i.scanned).length;
+          overlay.bubble(`checkout-${room.id}`, counterAbove(room.id), left ? `Tap to scan · ${left} left` : 'Tap to ring up! 🛎️', 'prompt');
+        } else {
+          overlay.removeBubble(`checkout-${room.id}`);
+        }
       }
     },
   };

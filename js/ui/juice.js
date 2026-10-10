@@ -17,14 +17,14 @@ export function createJuice({ audio, fx, overlay, keeperView, helpersView, custo
 
   // Ringing up
   events.on('scanned', () => audio.play('beep'));
-  events.on('sale', ({ customerId }) => {
+  events.on('sale', ({ customerId, roomId }) => {
     audio.play('chaching');
     audio.buzz([12, 40, 24]);
     const head = customersView.headPosition(customerId);
     if (head) {
       HEARTS.forEach((h, i) => overlay.float(head.clone().add(UP), h, 'heart-rise', { drift: (i - 1) * 22, delay: 0.15 + i * 0.12 }));
     }
-    const counter = checkoutView.counterTop();
+    const counter = checkoutView.counterTop(roomId);
     if (counter) fx.sparkle(counter.add(new THREE.Vector3(0, 0.2, 0.3)), { count: 6, spread: 0.8 });
   });
 

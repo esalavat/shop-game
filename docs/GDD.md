@@ -427,7 +427,7 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - [x] **Collection bonus and theme rewards: coins, shopkeeper styles** (#70, part of #59)
 - [x] **More helpers and upgrades** (#72): greeter, window dresser, Speedy Scanner, Gift Wrap; Tall Shelves; more stockers
 - [x] **Delivery bin** (#74)
-- [ ] **Register rooms**, one per floor above the shop, each with a cashier (#73)
+- [x] **Register rooms**, one per floor above the shop, each with a cashier (#73)
 - [ ] **Color variants and more items toward 100+** (#59)
 - [x] **Decoration shop with Ribbons 🎀:** style every room's walls, floor, rug, curtains and corner (#68)
 - Building grid expansion (X and Y), room types, pan/zoom

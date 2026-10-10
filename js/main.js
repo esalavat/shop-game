@@ -32,9 +32,9 @@ import { tickCustomers } from './sim/customers.js';
 import { tickHelpers } from './sim/helpers.js';
 import { tickStockers } from './sim/stocker.js';
 import { canCarryMore } from './sim/stock.js';
-import { UPGRADES, HELPERS } from './data/upgrades.js';
+import { UPGRADES, HELPERS, REGISTER_CASHIERS } from './data/upgrades.js';
 import { separate } from './sim/crowd.js';
-import { checkoutTap, keeperAtCounter } from './sim/checkout.js';
+import { checkoutTap, keeperAtCounter, registerOf } from './sim/checkout.js';
 import { displayRoom } from './sim/collection.js';
 import { ITEMS, PAGES } from './data/items.js';
 import { buildRoom, roomSpots, roomCost } from './sim/building.js';
@@ -347,8 +347,9 @@ attachGestures(canvas, {
     if (roomId !== focusedRoomId) return focusRoom(room);
     const o = roomOrigin(roomId);
     const counter = room.fixtures.find((f) => f.kind === 'counter');
-    const tappedCounter = fixtureId === counter?.id || (customerId && customerId === state.queue[0]);
-    if (tappedCounter && state.checkout && keeperAtCounter(state)) {
+    const reg = registerOf(state, roomId); // the shop or a register room (GDD #73)
+    const tappedCounter = fixtureId === counter?.id || (customerId && customerId === reg?.queue[0]);
+    if (tappedCounter && reg?.checkout && keeperAtCounter(state) && state.keeper.roomId === roomId) {
       checkoutTap(state);
     } else if (tappedCounter && counter) {
       if (walkToFixture(state, navs, counter)) tapFeedback();
@@ -428,6 +429,10 @@ events.on('expanded', ({ room }) => {
   } else if (room.type === 'stairs') {
     toast('Your 🪜 Stairwell is open! 🎉');
     setTimeout(() => toast('Now you can build rooms upstairs ✨'), 1200);
+  } else if (room.type === 'register') {
+    const { name } = REGISTER_CASHIERS[(room.floor - 1) % REGISTER_CASHIERS.length];
+    toast(`Your register room is open! 🛎️🎉`);
+    setTimeout(() => toast(`${name} rings up everyone who shops on this floor ✨`), 1200);
   } else if (room.type === 'landing') {
     toast(`Floor ${room.floor + 1} is open! 🪜🎉`);
     setTimeout(() => toast('Build rooms up here next to the stairs ✨'), 1200);

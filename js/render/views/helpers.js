@@ -6,19 +6,20 @@
 import * as THREE from 'three';
 import { createCharacter } from '../models/character.js';
 import { buildBox } from '../models/items.js';
-import { HELPERS } from '../../data/upgrades.js';
+import { HELPERS, REGISTER_CASHIERS } from '../../data/upgrades.js';
 import { BOX_SIZE } from '../../sim/stock.js';
 import { events } from '../../core/events.js';
 import { groundAt } from '../../sim/route.js';
 import { STOCKERS } from '../../sim/stocker.js';
+import { registerRoomsBuilt } from '../../sim/building.js';
 
 const lerp = (a, b, t) => a + (b - a) * t;
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
 const CARRY_SCALE = 0.75;
 const HAND = new THREE.Vector3(0, 0.5, 0.32); // in front of the chest, character-local (as the shopkeeper's)
 
-function createHelper(id, agent) {
-  const { root, inner } = createCharacter({ ...HELPERS[id].look, apron: true });
+function createHelper(look, agent) {
+  const { root, inner } = createCharacter({ ...look, apron: true });
   root.visible = false;
   const prev = { x: 0, z: 0, y: 0 };
   let prevRoom = null;
@@ -92,22 +93,38 @@ function createHelper(id, agent) {
 
 export function createHelpersView(state, roomOrigin) {
   const group = new THREE.Group();
-  const mia = createHelper('cashier', () => state.cashier);
+  const mia = createHelper(HELPERS.cashier.look, () => state.cashier);
   // Stockers by HELPERS id (Bea, Theo, Juno; GDD #72).
-  const stockers = Object.fromEntries(STOCKERS.map((who) => [who, createHelper(who, () => state.stockers.find((b) => b.who === who))]));
-  const ollie = createHelper('greeter', () => state.greeter);
-  const rosa = createHelper('dresser', () => state.dresser);
+  const stockers = Object.fromEntries(STOCKERS.map((who) => [who, createHelper(HELPERS[who].look, () => state.stockers.find((b) => b.who === who))]));
+  const ollie = createHelper(HELPERS.greeter.look, () => state.greeter);
+  const rosa = createHelper(HELPERS.dresser.look, () => state.dresser);
   const all = [mia, ...Object.values(stockers), ollie, rosa];
   group.add(...all.map((h) => h.root));
 
-  events.on('scanned', () => { if (state.cashier?.serving) mia.hop = 1; });
+  // Register rooms' cashiers (GDD #73): Kai, Nell, ... by floor, added as the rooms are built.
+  const tillCashiers = new Map(); // roomId -> helper
+  function syncTills() {
+    for (const room of registerRoomsBuilt(state)) {
+      if (tillCashiers.has(room.id)) continue;
+      const { look } = REGISTER_CASHIERS[(room.floor - 1) % REGISTER_CASHIERS.length];
+      const h = createHelper(look, () => state.registers?.[room.id]?.cashier);
+      tillCashiers.set(room.id, h);
+      all.push(h);
+      group.add(h.root);
+    }
+  }
+
+  events.on('scanned', ({ roomId }) => {
+    if (tillCashiers.has(roomId)) { if (state.registers[roomId]?.cashier?.serving) tillCashiers.get(roomId).hop = 1; }
+    else if (state.cashier?.serving) mia.hop = 1;
+  });
   events.on('greeted', () => { if (state.greeter) ollie.hop = 1; });
   events.on('peek', () => { if (state.dresser) rosa.hop = 1; });
   events.on('boxPicked', ({ by }) => { if (stockers[by]) stockers[by].hop = 1; });
 
   return {
     group,
-    beforeTick() { for (const h of all) h.beforeTick(); },
+    beforeTick() { syncTills(); for (const h of all) h.beforeTick(); },
     /** World position of a stocker's hands (where stocked items hop from). */
     stockerHand: (who) => (stockers[who] ?? stockers.stocker).handPosition(),
     frame(dt, alpha) { for (const h of all) h.frame(dt, alpha, roomOrigin); },

@@ -53,3 +53,11 @@ export const HELPERS = {
     look: { hair: 'bob', hairColor: '#2e2430', skin: '#ffd9c2', outfit: '#f7a8d8', accessory: 'hat' },
   },
 };
+
+/** The cashiers who come with register rooms (GDD #73), floor by floor; the list repeats if you build more. */
+export const REGISTER_CASHIERS = [
+  { name: 'Kai', look: { hair: 'short', hairColor: '#2e2430', skin: '#e0a37c', outfit: '#a8d8ff', accessory: 'bowtie' } },
+  { name: 'Nell', look: { hair: 'ponytail', hairColor: '#f2c46b', skin: '#ffd9c2', outfit: '#ffb8a0', accessory: 'none' } },
+  { name: 'Remy', look: { hair: 'curly', hairColor: '#6b3e2e', skin: '#8d5a3c', outfit: '#b8e6a0', accessory: 'glasses' } },
+  { name: 'Ivy', look: { hair: 'bun', hairColor: '#b07ad8', skin: '#f5c4a0', outfit: '#c8b6ff', accessory: 'bow' } },
+];

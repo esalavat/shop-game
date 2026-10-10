@@ -133,8 +133,16 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   3. ✅ **Up to three stockers**: Bea, then Theo (🪙 350), then Juno (🪙 500); each waits a little further from the right
      wall and they never head for the same box. **Save version 19:** `state.stocker` became `state.stockers` (each with
      `who`, its HELPERS id: 'stocker' | 'stocker2' | 'stocker3'); stock events say `by: 'keeper'` or that id.
-  4. The second register became **register rooms** (GDD v0.36 #73, designed with the user, not built yet).
-- **Delivery bin, built 2026-10-09, waiting for feedback** (GDD v0.36 #74): two loose doorstep boxes, the rest in a
+  4. The second register became **register rooms** (#73, below).
+- **Register rooms, built 2026-10-09, waiting for feedback** (GDD v0.36 #73): Grow → Upgrades → "Register room · floor N"
+  (🪙 400, +200 each), once the stairs reach a floor without one. A copy of the shop, always straight above the
+  highest register, in the shop's column; rooms in the way move left, and one that would float goes to the nearest
+  safe spot (`addRegisterRoom` / `clearSpot` in `js/sim/building.js`; walkers in moved rooms stop where they are).
+  Each comes with a cashier (Kai, Nell, Remy, Ivy: `REGISTER_CASHIERS`); customers pay on their floor (`registerFor`).
+  Every register has { queue, checkout, cashier }, live-only: the shop's on `state` itself as before, register rooms'
+  in `state.registers[roomId]` (`registerOf` in `js/sim/checkout.js`). Events `scanned` / `sale` / `checkoutCancelled`
+  carry `roomId`. No save change (a new room type only). `tests/registers.test.js`.
+- **Delivery bin, built 2026-10-09, works on the user's phone** (GDD v0.36 #74): two loose doorstep boxes, the rest in a
   crate at the right end of the doorstep with a count badge; tap it for a list by item, tap one to fetch it
   (`js/ui/bin.js`, `BIN` / `inBin` / `settleBoxes` in `js/sim/stock.js`, drawn in `js/render/views/boxes.js`). No save change.
 - **Pinch out further on a big house** (GDD §18 #14, docs/ISSUES.md): to do.
@@ -144,8 +152,8 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 - **Planned next, in order:** (#59) **more items** (toward 100+, color variants). Later: more stockers
   (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issue: pinch-zoom limit on big houses (docs/ISSUES.md).
 
-**Next:** register rooms (#73, designed: cashier included, customers pay on their floor, rooms in the way move to the
-nearest safe spot). Then room costs (§18 #13) and the zoom-out limit (§18 #14). Then the rest of #59 (color variants, more items). Waiting on feedback: the Collection bonus and theme
+**Next:** room costs (§18 #13) and the zoom-out limit (§18 #14). Waiting on feedback: register rooms (#73), the
+#72 helpers and upgrades, Collection rewards (#70), stock counts (#71). Then the rest of #59 (color variants, more items). Waiting on feedback: the Collection bonus and theme
 rewards (#70), stock counts (#71).
 
 **Releases:** the latest is **v2026.10.9.8** (2026-10-09): the Collection bonus and theme rewards (#70) and stock counts in

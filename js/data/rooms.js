@@ -37,6 +37,19 @@ export const ROOM_TYPES = {
   },
   // The Stairwell (GDD #58): two rooms, one above the other, built together. A spiral staircase in the
   // back-left corner (STAIRS in sim/route.js) and one shelf beside it, downstairs and up.
+  // Register rooms (GDD #73): a copy of the shop, one per floor, stacked above it. Each has its own cashier.
+  register: {
+    name: 'Register Room', icon: '🛎️',
+    decor: { paper: 'pink', curtain: 'pink' },
+    window: { x: -1.0, w: 0.8, h: 0.7 },
+    fixtures: [
+      { kind: 'rug', x: 0.3, z: 0.15 },
+      { kind: 'shelf', x: -0.05, z: -1.06 },
+      { kind: 'shelf', x: 1.1, z: -1.06 },
+      { kind: 'counter', x: -1.05, z: 0.1 },
+      { kind: 'plant', x: -1.45, z: -1.05 },
+    ],
+  },
   stairs: {
     name: 'Stairwell', icon: '🪜',
     decor: { paper: 'butter', curtain: 'butter' },
@@ -95,3 +108,6 @@ export const ROOM_FLOOR_MARKUP = 0.15;
 /** The Stairwell (both of its first two floors), then each staircase up to a new floor: each costs more. */
 export const STAIR_COSTS = [350, 700, 1200, 1900, 2800];
 export const STAIR_COST_STEP = 1200;
+/** Register rooms (GDD #73): the first costs this, and each one higher up costs REGISTER_COST_STEP more. */
+export const REGISTER_COST = 400;
+export const REGISTER_COST_STEP = 200;

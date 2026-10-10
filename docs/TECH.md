@@ -132,7 +132,8 @@ docs/                   # GDD, tech plan
   building: { rooms: [{ id, type, col, floor, style?, decor?, fixtures: [{ id, kind, x, z, slots? }] }] }, // type: shop | display | room | stairs | landing; style: shelf rooms (v16); decor: { kind: optionId } chosen styles (v17)
   stock: { boxes: [...], back: { itemId: count } },
   orders: [{ itemId, qty, arrivesDay }],
-  customers: [{ id, type, state, pos, wants, cart, ... }],   // transient, not saved
+  customers: [{ id, type, state, pos, wants, cart, registerId, ... }],   // transient, not saved; registerId = where they pay (#73)
+  queue, checkout, cashier,            // the shop register (transient); register rooms' are in registers[roomId] (#73)
   collection: { itemId: true },
   dollhouse: { slots: { slotId: itemId } },   // v0: 4 fixed rooms (data/dollhouse.js); later rooms/wallpaper
   helpers: { cashier: true },          // one-time hires (v8); Mia's position is live-only in `cashier`
@@ -423,9 +424,9 @@ Each milestone ends with a push so it's playable on your phone.
 | 24 items on four catalog pages that open as you collect (#66) | ✅ approved |
 | Collection bonus and theme rewards: coins, shopkeeper styles (#70, part of #59) | ✅ built (waiting for the user's feedback) |
 | Stock counts in the order book (#71) | ✅ built (waiting for the user's feedback); `stockCount` in `sim/stock.js` |
-| More helpers and upgrades (#72) | 🚧 steps 1-3 built (greeter, window dresser, scanner, gift wrap; tall shelves; up to three stockers, save v19) |
+| More helpers and upgrades (#72) | ✅ built (greeter, window dresser, scanner, gift wrap; tall shelves; up to three stockers, save v19); the second register became #73 |
 | Delivery bin (#74) | ✅ built (waiting for the user's feedback); `js/ui/bin.js`, `BIN` in `sim/stock.js` |
-| Register rooms (#73) | ⏭ next |
+| Register rooms (#73) | ✅ built (waiting for the user's feedback); `registerOf` in `sim/checkout.js`, `addRegisterRoom` in `sim/building.js` |
 | Color variants and more items (#59) | ⏭ later |
 
 ### 11.1 Plan: Stairwell and upstairs (#58 step 2) — ✅ built 2026-10-09

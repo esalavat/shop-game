@@ -5,7 +5,8 @@
 // Display is built, a separate Dollhouse button appears next to it and opens decorate mode. At the top,
 // Decorate rooms opens the room styler (ui/styler.js, GDD #68).
 
-import { nextExpansion, buildExpansion, canBuildRooms, roomSpots, roomCost, canBuildStairwell, buildStairwell, hasStairwell, buildFloor, stairCost, stairRooms } from '../sim/building.js';
+import { nextExpansion, buildExpansion, canBuildRooms, roomSpots, roomCost, canBuildStairwell, buildStairwell, hasStairwell, buildFloor, stairCost, stairRooms, nextRegisterFloor, registerCost, buildRegister, registerRoomsBuilt } from '../sim/building.js';
+import { REGISTER_CASHIERS } from '../data/upgrades.js';
 import { displayRoom } from '../sim/collection.js';
 import { buyUpgrade, hireHelper, hasUpgrade, hasHelper, canHire } from '../sim/upgrades.js';
 import { UPGRADES, HELPERS } from '../data/upgrades.js';
@@ -42,6 +43,7 @@ export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
     else if (kind === 'floor' && buildFloor(state)) sheet.hidden = true;
     else if (kind === 'place') { sheet.hidden = true; return onPlaceRoom(); }
     else if (kind === 'style') { sheet.hidden = true; return onStyle(); }
+    else if (kind === 'register') { if (buildRegister(state)) sheet.hidden = true; }
     else if (kind === 'helper') hireHelper(state, id);
     else if (kind === 'upgrade') buyUpgrade(state, id);
     render();
@@ -97,6 +99,16 @@ export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
       html += small({ art: h.icon, name: `${h.name} the ${h.job}`, desc: h.desc, cost: h.cost, owned: hasHelper(state, id), ownedText: 'Hired 💖', buy: `helper:${id}`, buyText: 'Hire', locked: canHire(state, id) ? null : h.needs === 'display' ? 'Build the Window Display first' : `Hire ${HELPERS[h.needs].name} first` });
     }
     html += '<div class="grow-section">Upgrades</div>';
+    // Register rooms (GDD #73): one per floor, straight above the shop, each with its own cashier.
+    const regFloor = nextRegisterFloor(state);
+    if (regFloor !== null) {
+      const cost = registerCost(state), who = REGISTER_CASHIERS[registerRoomsBuilt(state).length % REGISTER_CASHIERS.length].name;
+      html += small({ art: '🛎️', name: `Register room · floor ${regFloor + 1}`, cost, buy: 'register', buyText: 'Build it!',
+        desc: `A second shop counter, upstairs right above your shop, with ${who} the cashier. Customers on that floor pay there instead of coming down. Rooms in the way move over.` });
+    } else if (hasStairwell(state) && !registerRoomsBuilt(state).length) {
+      html += small({ art: '🛎️', name: 'Register room', cost: 0, owned: true, ownedText: 'Build another floor first',
+        desc: 'A second shop counter upstairs, with its own cashier. One per floor.' });
+    }
     for (const [id, u] of Object.entries(UPGRADES)) {
       if (!upgradeListed(id)) continue;
       html += small({ art: u.icon, name: u.name, desc: u.desc, cost: u.cost, owned: hasUpgrade(state, id), ownedText: 'Yours ✓', buy: `upgrade:${id}`, buyText: 'Buy' });
@@ -114,6 +126,7 @@ export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
       nextExpansion(state)?.cost,
       canBuildRooms(state) ? cheapestRoom() : null,
       canBuildStairwell(state) || hasStairwell(state) ? stairCost(state) : null,
+      nextRegisterFloor(state) !== null ? registerCost(state) : null,
       ...Object.entries(HELPERS).filter(([id]) => !hasHelper(state, id) && canHire(state, id)).map(([, h]) => h.cost),
       ...Object.entries(UPGRADES).filter(([id]) => !hasUpgrade(state, id) && upgradeListed(id)).map(([, u]) => u.cost),
     ];
