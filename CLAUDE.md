@@ -187,9 +187,9 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 **Next:** feedback on the balancing pass (#80). Waiting on feedback: the balancing pass (#80), Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71).
 
-**Releases:** the latest is **v2026.10.9.12** (2026-10-09): color rounds (#77) and shopping by item (#78); before it
-v2026.10.9.11, Roller Skates (#76); v2026.10.9.10, room prices (#75)
-and pinching out to the whole house (§18 #14); no save changes. Everything on `main` is public. The MVP list in GDD §17 is complete.
+**Releases:** the latest is **v2026.10.10** (2026-10-10): Sweet Shop and Pet Corner (#79), **save version 20**
+(`state.pagesOpen`); before it v2026.10.9.12, color rounds (#77) and shopping by item (#78); v2026.10.9.11, Roller Skates (#76).
+Not released yet: the balancing script and the balancing pass (#80). The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).
