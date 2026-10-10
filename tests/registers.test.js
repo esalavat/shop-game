@@ -6,7 +6,7 @@ import { buildExpansion, buildRoom, buildStairwell, buildFloor, buildRegister, n
 import { registerOf, registerFor, registerRooms, checkoutTap } from '../js/sim/checkout.js';
 import { tickHelpers, cashierReady } from '../js/sim/helpers.js';
 import { spawnCustomer, tickCustomers } from '../js/sim/customers.js';
-import { REGISTER_COST, REGISTER_COST_STEP } from '../js/data/rooms.js';
+import { REGISTER_COST, REGISTER_GROWTH } from '../js/data/rooms.js';
 
 const at = (s, col, floor) => s.building.rooms.find((r) => r.col === col && r.floor === floor);
 const supported = (s) => s.building.rooms.every((r) => r.floor === 0 || hasRoom(s, r.col, r.floor - 1));
@@ -32,7 +32,7 @@ test('register rooms need the stairs, go straight above the shop, one per floor,
   assert.equal(registerCost(big), REGISTER_COST);
   const first = buildRegister(big);
   assert.deepEqual([first.col, first.floor, first.type], [shop.col, 1, 'register']);
-  assert.equal(registerCost(big), REGISTER_COST + REGISTER_COST_STEP);
+  assert.equal(registerCost(big), REGISTER_COST * REGISTER_GROWTH);
   const second = buildRegister(big);
   assert.deepEqual([second.col, second.floor], [shop.col, 2]);
   assert.equal(nextRegisterFloor(big), null, 'no floor 4 yet');

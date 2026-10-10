@@ -45,7 +45,7 @@ js/
   data/                 # Content as plain data (no logic)
     items.js            # Products (BASE round 1, then each item's Bright / Dazzle colors, GDD #77), SETS, PAGES, ROUNDS, STEPS
     shelves.js          # Shelf types and capacities
-    rooms.js            # Room types and sizes; shelf room styles and prices (ROOM_STYLES, ROOM_COSTS, ROOM_EACH, STAIR_COSTS)
+    rooms.js            # Room types and sizes; shelf room styles and prices (ROOM_STYLES, ROOM_COSTS, ROOM_GROWTH, STAIR_COSTS, niceCost)
     dollhouse.js        # Dream Dollhouse slots, Sparkle tuning, shop expansions (costs)
     customers.js        # Customer types: wants, budgets, looks
     story.js            # Regulars, story beats, triggers
@@ -59,7 +59,7 @@ js/
     customers.js        # Spawning, browsing, buying, wish notes (state machines); walk to the room that has their item
     checkout.js         # Queue, scanning, tips
     marketing.js        # Morning picks, special days, Sparkle → foot traffic
-    catalog.js          # Order book steps (every page of every color round): which are open (by items found, and never closing: state.pagesOpen / notePagesOpen), canOrder, orderableItems (GDD #66, #77, #79)
+    catalog.js          # Order book steps (every page of every color round): which are open (by items found and Hearts, GDD #80, and never closing: state.pagesOpen / notePagesOpen, also run after every sale), needFor / needText, canOrder, orderableItems (GDD #66, #77, #79)
     collection.js       # Dream Dollhouse placing, Sparkle, foot-traffic boost, window spot (unlocks happen in day.js)
     helpers.js          # Hired helpers doing jobs: Mia the cashier (state.cashier, live-only); Ollie the greeter and Rosa the window dresser standing at the bonus spots (state.greeter / state.dresser, live-only, GDD #72)
     tutorial.js         # First-day guide steps (state.tutorial: box → shelf → open → register → done), advanced each tick
@@ -220,7 +220,7 @@ docs/                   # GDD, tech plan
   anyone mid-walk (their path points past the gap) so they still arrive. `buildFloor` adds a `landing` on top and a
   `stairs` fixture to the landing below. `stairRooms` lists the column bottom up; `stairCost` (STAIR_COSTS) rises per
   staircase. Shelf rooms are type `room` with `room.style` (ROOM_STYLES, drawn in `render/building.js`);
-  `roomCost(state, col, floor)` = ROOM_COSTS by ring (`max(distanceOut, floor)`) + ROOM_EACH × shelf rooms built
+  `roomCost(state, col, floor)` = ROOM_COSTS by ring (`max(distanceOut, floor)`) × ROOM_GROWTH ^ shelf rooms built (GDD #80; was + ROOM_EACH × shelf rooms built)
   (#75; register rooms and the Stairwell don't count);
   `roomSpots` lists ends of the ground floor plus any spot on top of a room next to a room on that floor.
   Routes climb floor by floor (`planRoute`, a climb leg per floor; `stairRoom(state, floor)` in `sim/route.js`).

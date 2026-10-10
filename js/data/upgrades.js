@@ -6,9 +6,9 @@ export const UPGRADES = {
   shoes: { name: 'Comfy Shoes', icon: '👟', cost: 80, desc: 'Bouncy new shoes: your shopkeeper walks faster.' },
   lunch: { name: 'Lunchtime Delivery', icon: '🥪', cost: 100, desc: 'Pip comes at midday too. Order before lunch and it arrives halfway through the day.' },
   scanner: { name: 'Speedy Scanner', icon: '⚡', cost: 120, desc: 'Each tap at the register scans two items, and cashiers scan faster too.' },
-  tall: { name: 'Tall Shelves', icon: '📚', cost: 250, desc: 'Every shelf gets a row on top: room for 12 things instead of 9, so you restock less often.' },
-  skates: { name: 'Roller Skates', icon: '🛼', cost: 180, needs: 'stocker', desc: 'Roller skates for your stockers: they zip boxes from the doorstep to the shelves much faster.' },
-  giftwrap: { name: 'Gift Wrap', icon: '🎁', cost: 150, desc: 'Pretty wrapping paper: tips are twice as big when you ring people up yourself.' },
+  tall: { name: 'Tall Shelves', icon: '📚', cost: 600, desc: 'Every shelf gets a row on top: room for 12 things instead of 9, so you restock less often.' },
+  skates: { name: 'Roller Skates', icon: '🛼', cost: 450, needs: 'stocker', desc: 'Roller skates for your stockers: they zip boxes from the doorstep to the shelves much faster.' },
+  giftwrap: { name: 'Gift Wrap', icon: '🎁', cost: 350, desc: 'Pretty wrapping paper: tips are twice as big when you ring people up yourself.' },
 };
 
 export const SCANNER = { perTap: 2, helperSpeed: 0.6 }; // Speedy Scanner: items per tap; cashiers' scan time × this
@@ -34,12 +34,12 @@ export const HELPERS = {
   },
   // More stockers (GDD #72), each after the one before; they work just like Bea.
   stocker2: {
-    name: 'Theo', job: 'Stocker', icon: '📦', cost: 350, needs: 'stocker',
+    name: 'Theo', job: 'Stocker', icon: '📦', cost: 1200, needs: 'stocker',
     desc: 'Another pair of hands for the boxes. Theo and Bea never grab the same one.',
     look: { hair: 'swoop', hairColor: '#6b3e2e', skin: '#8d5a3c', outfit: '#a8d8ff', accessory: 'bowtie' },
   },
   stocker3: {
-    name: 'Juno', job: 'Stocker', icon: '📦', cost: 500, needs: 'stocker2',
+    name: 'Juno', job: 'Stocker', icon: '📦', cost: 5000, needs: 'stocker2',
     desc: 'For a really big shop: Juno joins Bea and Theo filling shelves on every floor.',
     look: { hair: 'bun', hairColor: '#c2563a', skin: '#ffd9c2', outfit: '#b8e6a0', accessory: 'bow' },
   },
@@ -50,7 +50,7 @@ export const HELPERS = {
     look: { hair: 'curly', hairColor: '#8a5a3c', skin: '#e0a37c', outfit: '#9fe0c8', accessory: 'cap' },
   },
   dresser: {
-    name: 'Rosa', job: 'Window Dresser', icon: '🪟', cost: 300, needs: 'display',
+    name: 'Rosa', job: 'Window Dresser', icon: '🪟', cost: 800, needs: 'display',
     desc: 'Rosa shows off your Dream Dollhouse in the Window Display, so more people stop to look and want what they see.',
     look: { hair: 'bob', hairColor: '#2e2430', skin: '#ffd9c2', outfit: '#f7a8d8', accessory: 'hat' },
   },

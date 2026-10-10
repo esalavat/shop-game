@@ -11,8 +11,10 @@ export const DOLLHOUSE_SLOTS = [
 
 export const SPARKLE = {
   fullHouse: 5,       // bonus when every room has something in it
-  trafficFull: 60,    // Sparkle that would double how often visitors arrive...
-  trafficMax: 1.5,    // ...capped at this many times as often
+  // Visitors arrive (1 + trafficMore × Sparkle / (Sparkle + trafficHalf)) times as often: more Sparkle always
+  // helps, a little less each time, never past ×(1 + trafficMore) (§18 #10).
+  trafficMore: 1.2,
+  trafficHalf: 150,   // the Sparkle that gives half of trafficMore
   peekBase: 0.25,     // chance a visitor stops at the window first, once anything is on show...
   peekPer: 1 / 60,    // ...plus this much per Sparkle...
   peekMax: 0.7,       // ...up to this

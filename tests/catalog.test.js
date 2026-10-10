@@ -24,18 +24,20 @@ test('32 items in three colors: one per theme on every page of every round, and 
   }
 });
 
-test('color rounds: ×16 prices, a new color for each, and Bright opens once all 32 are found (GDD #77)', () => {
-  assert.equal(ITEMS.teaset2.price, ITEMS.teaset.price * 16);
-  assert.equal(ITEMS.castle3.cost, ITEMS.castle.cost * 256);
+test('color rounds: ×12 prices, a new color for each, and Bright opens once all 32 are found (GDD #77, #80)', () => {
+  assert.equal(ITEMS.teaset2.price, ITEMS.teaset.price * 12);
+  assert.equal(ITEMS.castle3.cost, ITEMS.castle.cost * 144);
+  assert.ok(ITEMS.castle3.sparkle > ITEMS.castle2.sparkle && ITEMS.castle2.sparkle > ITEMS.castle.sparkle, 'bolder colors sparkle more');
   assert.deepEqual(colorsOf('cottage2'), ['cottage', 'cottage2', 'cottage3']);
   assert.equal(ITEMS.chair2.set, 'parlor2');
   assert.notEqual(ITEMS.chair2.color, ITEMS.chair.color);
-  // Each round's cheapest item sells for more than the last round's dearest.
+  // Each round's cheapest box earns more than the last round's best (GDD #79; single items may not, since #80).
   for (let round = 1; round < ROUNDS.length; round++) {
-    const price = (r) => Object.values(ITEMS).filter((i) => i.round === r).map((i) => i.price);
-    assert.ok(Math.min(...price(round)) > Math.max(...price(round - 1)));
+    const profit = (r) => Object.keys(ITEMS).filter((id) => ITEMS[id].round === r).map(boxProfit);
+    assert.ok(Math.min(...profit(round)) > Math.max(...profit(round - 1)));
   }
   const s = createState();
+  s.hearts = STEPS[PAGES.length].hearts; // enough happy customers for Bright (GDD #80)
   for (const id of Object.keys(ITEMS)) if (ITEMS[id].round === 0 && id !== 'castle') s.collection[id] = true;
   notePagesOpen(s); // as if found one delivery at a time
   assert.ok(!roundOpen(s, 1));
@@ -61,12 +63,13 @@ test('a new shop can only order from the first page', () => {
   assert.equal(placeOrder(s, 'castle'), null);
   assert.ok(placeOrder(s, 'teddy'));
   assert.ok(orderableItems(s).every((id) => ITEMS[id].page === 0));
-  assert.deepEqual(toNextPage(s), { page: 1, need: PAGES[1].opensAt - 2 });
+  assert.deepEqual(toNextPage(s), { page: 1, need: PAGES[1].opensAt - 2, hearts: STEPS[1].hearts });
 });
 
 test('finding enough items opens the next page, with an event', () => {
   const s = createState();
   s.coins = 10000;
+  s.hearts = STEPS[1].hearts;
   const opened = [];
   let delivered;
   const offs = [events.on('pageOpened', ({ page }) => opened.push(page)), events.on('dayStarted', (e) => (delivered = e.delivered))];
@@ -112,4 +115,27 @@ test('the order book lists each page cheapest first', () => {
     const prices = Object.values(ITEMS).filter((i) => i.round === 0 && i.page === page).map((i) => i.price);
     assert.deepEqual(prices, [...prices].sort((a, b) => a - b), `page ${page}`);
   }
+});
+
+test('each page also needs happy customers, and opens on the sale that makes enough (GDD #80)', async () => {
+  const { startCheckout, scanNext, completeSale } = await import('../js/sim/checkout.js');
+  const { needText } = await import('../js/sim/catalog.js');
+  for (let step = 1; step < STEPS.length; step++) assert.ok(STEPS[step].hearts > STEPS[step - 1].hearts, `step ${step} needs more Hearts`);
+  const s = createState();
+  for (const id of ['teddy', 'lamp', 'kitten']) s.collection[id] = true; // enough finds for page 2...
+  assert.equal(openPageCount(s), 1, '...but not enough Hearts');
+  assert.deepEqual(toNextPage(s), { page: 1, need: 0, hearts: STEPS[1].hearts });
+  assert.equal(needText(s, 1), `Make ${STEPS[1].hearts} more customers happy ❤️`);
+  s.hearts = STEPS[1].hearts - 1;
+  const c = { id: 'c1', basket: ['teaset'], state: 'queued' };
+  s.customers.push(c);
+  startCheckout(s, c);
+  scanNext(s);
+  const opened = [];
+  const off = events.on('pageOpened', ({ page }) => opened.push(page));
+  completeSale(s, () => 0);
+  off();
+  assert.deepEqual(opened, [1]);
+  assert.ok(canOrder(s, 'cottage'));
+  assert.equal(needText(createState(), 1), `Find 3 more treasures and make ${STEPS[1].hearts} more customers happy ❤️`);
 });

@@ -67,14 +67,19 @@ test('a fully decorated house gets bonus Sparkle', () => {
   assert.equal(sparkleFor({ slots }), sum - ITEMS.bed.sparkle);
 });
 
-test('Sparkle brings visitors more often, up to a cap', () => {
+test('Sparkle always brings visitors more often, a little less each time (§18 #10)', () => {
   const s = withDisplay();
   s.collection = {}; // no Collection bonus (GDD #70)
   assert.equal(trafficBoost(s), 1);
-  s.sparkle = 30;
-  assert.ok(trafficBoost(s) > 1 && trafficBoost(s) <= SPARKLE.trafficMax);
-  s.sparkle = 1000;
-  assert.equal(trafficBoost(s), SPARKLE.trafficMax);
+  let last = 1, lastGain = Infinity;
+  for (const sparkle of [30, 60, 90, 120, 150, 180]) {
+    s.sparkle = sparkle;
+    const gain = trafficBoost(s) - last;
+    assert.ok(gain > 0 && gain < lastGain, `Sparkle ${sparkle}`);
+    last = trafficBoost(s); lastGain = gain;
+  }
+  s.sparkle = 1e6;
+  assert.ok(trafficBoost(s) < 1 + SPARKLE.trafficMore);
 });
 
 test('nobody stops at the window until something is on show', () => {

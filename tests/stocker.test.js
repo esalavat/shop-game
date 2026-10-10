@@ -113,7 +113,7 @@ test('old saves with stacked boxes put the stacked ones in the bin', () => {
 
 test('Theo comes after Bea and Juno after Theo; they never head for the same box (GDD #72)', () => {
   const s = createState();
-  s.coins = 5000;
+  s.coins = 10000;
   assert.equal(hireHelper(s, 'stocker2'), false, 'Bea first');
   assert.ok(hireHelper(s, 'stocker'));
   assert.equal(hireHelper(s, 'stocker3'), false, 'Theo first');

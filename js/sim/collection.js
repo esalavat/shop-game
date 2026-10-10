@@ -40,7 +40,12 @@ export const dollhouseItems = (state) => new Set(Object.values(state.dollhouse.s
 
 /** How many times as often visitors arrive, thanks to Sparkle and the Collection bonus (GDD #70). */
 export function trafficBoost(state) {
-  return Math.min(SPARKLE.trafficMax, 1 + state.sparkle / SPARKLE.trafficFull) + collectionBonus(state);
+  return 1 + sparkleBoost(state.sparkle) + collectionBonus(state);
+}
+
+/** Extra visitors from Sparkle, e.g. 0.4 for +40%: always more with more Sparkle, a little less each time. */
+export function sparkleBoost(sparkle) {
+  return (SPARKLE.trafficMore * sparkle) / (sparkle + SPARKLE.trafficHalf);
 }
 
 /** Chance a new visitor stops at the window first (0 with nothing on show or no window). */

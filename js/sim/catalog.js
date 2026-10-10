@@ -4,15 +4,19 @@
 // every round, in the order they open (STEPS). Anything you've already found can always be ordered
 // again, whatever page it's on.
 // A step that has opened stays open (state.pagesOpen, GDD #79), so adding items or moving the
-// thresholds never closes a page someone already has.
+// thresholds never closes a page someone already has. Each step also needs a number of happy
+// customers (state.hearts, GDD #80), so a page can open in the middle of the day, on a sale.
 
 import { ITEMS, STEPS, stepOf } from '../data/items.js';
 
 export const foundCount = (state) => Object.keys(ITEMS).filter((id) => state.collection[id]).length;
 
+/** Has this shop found enough items and made enough customers happy for a step? */
+const ready = (state, p, found) => found >= p.opensAt && (state.hearts ?? 0) >= p.hearts;
+
 /** How many catalog steps (pages of every round) are open (at least 1). */
 export const openPageCount = (state, found = foundCount(state)) =>
-  Math.max(state.pagesOpen ?? 1, STEPS.filter((p) => found >= p.opensAt).length);
+  Math.max(state.pagesOpen ?? 1, STEPS.filter((p) => ready(state, p, found)).length);
 
 /** Remember how many steps are open, so they stay open. Returns the steps that just opened. */
 export function notePagesOpen(state) {
@@ -29,14 +33,26 @@ export const canOrder = (state, itemId) => Boolean(ITEMS[itemId]) && (pageOpen(s
 /** Every item that can be ordered now: what customers may wish for when it isn't on the shelves. */
 export const orderableItems = (state) => Object.keys(ITEMS).filter((id) => canOrder(state, id));
 
-/** Items still to find before the next step opens, or null when every page is open. */
+/** The next step to open, with the items still to find and the Hearts still to earn, or null when every page is open. */
 export function toNextPage(state) {
-  const next = STEPS[openPageCount(state)];
-  return next ? { page: openPageCount(state), need: Math.max(1, next.opensAt - foundCount(state)) } : null;
+  const page = openPageCount(state);
+  return STEPS[page] ? { page, ...needFor(state, page) } : null;
 }
 
-/** Items still to find before this step opens (0 if it's open). */
-export const needFor = (state, step) => (pageOpen(state, step) ? 0 : Math.max(1, STEPS[step].opensAt - foundCount(state)));
+/** Items still to find (`need`) and happy customers still to make (`hearts`) before a step opens; both 0 if it's open. */
+export function needFor(state, step) {
+  if (pageOpen(state, step)) return { need: 0, hearts: 0 };
+  return { need: Math.max(0, STEPS[step].opensAt - foundCount(state)), hearts: Math.max(0, STEPS[step].hearts - (state.hearts ?? 0)) };
+}
+
+/** "Find 3 more treasures and make 40 more customers happy ❤️" (what a locked step still needs). */
+export function needText(state, step) {
+  const { need, hearts } = needFor(state, step);
+  const find = need ? `find ${need} more treasure${need > 1 ? 's' : ''}` : '';
+  const happy = hearts ? `make ${hearts} more customer${hearts > 1 ? 's' : ''} happy ❤️` : '';
+  const text = [find, happy].filter(Boolean).join(' and ');
+  return text[0].toUpperCase() + text.slice(1);
+}
 
 /** Is any part of this round open? */
 export const roundOpen = (state, round) => pageOpen(state, STEPS.findIndex((p) => p.round === round));

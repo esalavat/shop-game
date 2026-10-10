@@ -9,7 +9,7 @@
 
 import { ITEMS, PAGES, STEPS, boxCost, boxProfit, colorsOf, stepOf } from '../data/items.js';
 import { placeOrder, canAfford, lunchDeliveryOpen } from '../sim/orders.js';
-import { canOrder, needFor, openPageCount, toNextPage } from '../sim/catalog.js';
+import { canOrder, needText, openPageCount, toNextPage } from '../sim/catalog.js';
 import { stockCount } from '../sim/stock.js';
 import { events } from '../core/events.js';
 
@@ -79,9 +79,8 @@ export function createOrderBook(state, thumbs) {
     lockNote.hidden = shown < open;
     legend.hidden = shown >= open;
     if (shown >= open) {
-      const need = needFor(state, shown);
       lockNote.textContent = shown === next?.page
-        ? `Find ${need} more treasure${need > 1 ? 's' : ''} for your Collection to open this page ✨`
+        ? `${needText(state, shown)} to open this page ✨`
         : `Opens after ${PAGES[shown - 1].name}. Keep collecting! ✨`;
     }
     for (const [base, card] of cards) {
@@ -99,8 +98,7 @@ export function createOrderBook(state, thumbs) {
       const lock = card.querySelector('.card-lock');
       lock.hidden = orderable || shown >= open;
       if (!lock.hidden) {
-        const need = needFor(state, stepOf(id));
-        lock.textContent = `🔒 Find ${need} more treasure${need > 1 ? 's' : ''} to open this color`;
+        lock.textContent = `🔒 ${needText(state, stepOf(id))} to open this color`;
       }
       for (const dot of card.querySelectorAll('.dot')) {
         const can = canOrder(state, dot.dataset.id);

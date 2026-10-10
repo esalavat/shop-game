@@ -100,14 +100,21 @@ export const ROOM_STYLES = [
  * Stairwell, on the ground), so a compact, squarish house is the cheapest way to grow (user, GDD #65, #75).
  * A spot's ring is how far out it is, sideways or up, whichever is more: ROOM_COSTS[ring - 1], then
  * ROOM_COST_STEP more for each ring past the end of the list. Going up costs the same as going out, and
- * every spot costs ROOM_EACH more for each shelf room you already have, so prices always climb (#75).
+ * every spot costs ROOM_GROWTH times as much for each shelf room you already have, so prices keep up with
+ * a richer shop (#75, GDD #80).
  */
 export const ROOM_COSTS = [250, 400, 600, 850, 1150, 1500];
 export const ROOM_COST_STEP = 450;
-export const ROOM_EACH = 50;
-/** The Stairwell (both of its first two floors), then each staircase up to a new floor: each costs a bit more. */
+export const ROOM_GROWTH = 1.35;
+/** The Stairwell (both of its first two floors), then each staircase up to a new floor; past the list, STAIR_GROWTH times the one before. */
 export const STAIR_COSTS = [350, 500, 700, 950, 1250];
-export const STAIR_COST_STEP = 350;
-/** Register rooms (GDD #73): the first costs this, and each one higher up costs REGISTER_COST_STEP more. */
+export const STAIR_GROWTH = 1.6;
+/** Register rooms (GDD #73): the first costs this, and each one higher up REGISTER_GROWTH times the one before. */
 export const REGISTER_COST = 400;
-export const REGISTER_COST_STEP = 200;
+export const REGISTER_GROWTH = 2;
+
+/** Big prices rounded to friendly numbers: 2 significant figures (1234 -> 1200, 56789 -> 57000). */
+export function niceCost(n) {
+  const step = 10 ** Math.max(1, Math.floor(Math.log10(n)) - 1);
+  return Math.round(n / step) * step;
+}

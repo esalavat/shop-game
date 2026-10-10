@@ -13,6 +13,7 @@ import { addCoins } from './economy.js';
 import { recordSale } from './day.js';
 import { ribbonsForSale } from './decor.js';
 import { hasUpgrade } from './upgrades.js';
+import { notePagesOpen } from './catalog.js';
 import { SCANNER, GIFT_WRAP_TIPS } from '../data/upgrades.js';
 
 const isRegisterRoom = (room) => room?.type === 'shop' || room?.type === 'register';
@@ -85,6 +86,7 @@ export function completeSale(state, rand = Math.random, { tip: tips = true, by =
   reg.checkout = null;
   events.emit('sale', { amount, tip, by, customerId: c.customerId, roomId });
   ribbonsForSale(state, customer, c.items.map((i) => i.itemId));
+  for (const page of notePagesOpen(state)) events.emit('pageOpened', { page }); // enough Hearts for the next page (GDD #80)
   if (customer) {
     customer.basket = [];
     customer.takenFrom = [];

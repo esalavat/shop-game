@@ -32,7 +32,7 @@ import {
 } from '../js/sim/building.js';
 import { placeInDollhouse, displayRoom, trafficBoost, fitsSlot } from '../js/sim/collection.js';
 import { collectionBonus, completeThemes } from '../js/sim/rewards.js';
-import { ITEMS, STEPS, ROUNDS, boxCost, baseOf } from '../js/data/items.js';
+import { ITEMS, STEPS, ROUNDS, COLLECTION, boxCost, baseOf } from '../js/data/items.js';
 import { UPGRADES, HELPERS } from '../js/data/upgrades.js';
 import { DOLLHOUSE_SLOTS } from '../js/data/dollhouse.js';
 import { rng } from '../js/core/rng.js';
@@ -88,7 +88,7 @@ function offer(state, what) {
 }
 
 /** Spend leftover coins on growth. Returns what was bought ([{ what, cost }]). */
-function buyGrowth(state, bot, soldToday) {
+function buyGrowth(state, bot) {
   const bought = [];
   for (;;) {
     let what, o;
@@ -102,13 +102,13 @@ function buyGrowth(state, bot, soldToday) {
         break;
       }
     } else {
-      // After the plan, more space only when the shelves are nearly selling out.
-      if (soldToday < 0.6 * shelfCapacity(state)) break;
       const opts = ['room', 'floor', 'register'].map((w) => ({ w, o: offer(state, w) })).filter((x) => x.o);
       if (!opts.length) break;
       ({ w: what, o } = opts.sort((a, b) => a.o.cost - b.o.cost)[0]);
     }
-    if (state.coins < o.cost || !o.buy()) break;
+    // After the plan, it keeps half a room's price in hand (rooms bring more customers: CUSTOMER.perRoom).
+    const keep = bot.plan < PLAN.length ? 1 : 1.5;
+    if (state.coins < o.cost * keep || !o.buy()) break;
     bought.push({ what, cost: o.cost });
     if (bot.plan < PLAN.length) bot.plan++;
   }
@@ -266,7 +266,7 @@ function run(seed, days, { log = false } = {}) {
     fillDollhouse(state);
     const sold = Object.values(stats.sold).reduce((a, b) => a + b, 0);
     const ordered = orderStock(state, sold);
-    const bought = buyGrowth(state, bot, sold);
+    const bought = buyGrowth(state, bot);
     if (bought.length) rebuildNavs();
     fillDollhouse(state);
     for (const b of bought) mark(b.what === 'room' || b.what === 'floor' || b.what === 'register' ? `${b.what} #${countOf(state, b.what)}` : b.what, day, clock);
@@ -274,7 +274,7 @@ function run(seed, days, { log = false } = {}) {
     const row = {
       day, minutes: +((clock - start.clock) / 60).toFixed(1), earned, sales: stats.coins, tips: stats.tips, served: stats.served,
       wishes: stats.wishes.length, coins: state.coins, stockSpend: ordered.spent, newItems: ordered.newItems,
-      found: foundCount(state), themes: completeThemes(state).length, sparkle: state.sparkle,
+      hearts: state.hearts, found: foundCount(state), themes: completeThemes(state).length, sparkle: state.sparkle,
       traffic: +trafficBoost(state).toFixed(2), collBonus: +collectionBonus(state).toFixed(2),
       capacity: shelfCapacity(state), shelfRooms: state.building.rooms.filter(isShelfRoom).length,
       bought: bought.map((b) => `${b.what}(${b.cost})`).join(' '),
@@ -283,8 +283,8 @@ function run(seed, days, { log = false } = {}) {
     const pages = openPageCount(state);
     for (let p = lastPages; p < pages; p++) mark(`step ${p} (${ROUNDS[STEPS[p].round].name || 'round 1'} page ${STEPS[p].page + 1})`, day, clock);
     lastPages = pages;
-    if (state.sparkle >= 30) mark('Sparkle traffic cap (30)', day, clock);
-    if (collectionBonus(state) >= 0.5) mark('Collection bonus cap (+50%)', day, clock);
+    if (foundCount(state) === Object.keys(ITEMS).length) mark('whole Collection found', day, clock);
+    if (collectionBonus(state) >= COLLECTION.maxBonus) mark('Collection bonus maxed', day, clock);
     if (log) printRow(row);
     startNextDay(state);
   }
@@ -312,7 +312,7 @@ function tick(state, navs, rand) {
 
 const COLS = [
   ['day', 4], ['minutes', 5, 'min'], ['earned', 8], ['served', 4, 'cust'], ['tips', 5], ['wishes', 4, 'wish'], ['coins', 9],
-  ['stockSpend', 8, 'stock$'], ['found', 5], ['themes', 4, 'thm'], ['sparkle', 4, 'spk'], ['traffic', 5, 'trfc'],
+  ['stockSpend', 8, 'stock$'], ['hearts', 6], ['found', 5], ['themes', 4, 'thm'], ['sparkle', 4, 'spk'], ['traffic', 5, 'trfc'],
   ['collBonus', 5, 'coll'], ['capacity', 4, 'cap'], ['bought', 0],
 ];
 const fmt = (v) => (typeof v === 'number' && Math.abs(v) >= 1e6 ? `${(v / 1e6).toFixed(1)}M` : typeof v === 'number' && Math.abs(v) >= 1e4 ? `${Math.round(v / 1e3)}k` : String(v));

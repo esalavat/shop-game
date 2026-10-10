@@ -147,7 +147,7 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   (`js/ui/bin.js`, `BIN` / `inBin` / `settleBoxes` in `js/sim/stock.js`, drawn in `js/render/views/boxes.js`). No save change.
 - **Fixed 2026-10-09: pinch out further on a big house** (GDD §18 #14): pinching out can always show the whole house.
 - **Room prices, built 2026-10-09, waiting for feedback** (GDD v0.37 #75, resolves §18 #13): by ring only (the same on every
-  floor), +🪙 50 on every spot per shelf room built (`ROOM_EACH`), so the cheapest spot always climbs; register rooms
+  floor), +🪙 50 on every spot per shelf room built (×1.35 since #80, `ROOM_GROWTH`), so the cheapest spot always climbs; register rooms
   don't count. Staircases cheaper (500, 700, 950, 1250, +350). `roomCost` in `js/sim/building.js`. No save change.
 - **Roller Skates 🛼, built 2026-10-09, waiting for feedback** (GDD v0.38 #76): 🪙 180 upgrade, locked until Bea is hired;
   every stocker walks ×1.4 (`SKATES_SPEED`; Comfy Shoes is the shopkeeper's only). No skates drawn on them (user). Upgrades can have `needs` (a helper id,
@@ -169,17 +169,22 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   rug, rose gold wallpaper, Cotton Candy / Sour Apple / Chocolate Truffle outfits, Kitty Ears ×3 (`character.js`). Order book
   (user): each page cheapest first (BASE in `js/data/items.js` is listed that way, tested), every card has a stock line ("Not
   ordered yet"), buy buttons line up.
-- **Balancing script, built 2026-10-09** (step 1 of the balancing pass): `npm run balance` plays the real sim headless
-  with a bot player and prints coins, customers, Collection, Sparkle and purchases per day, plus milestone days
-  (`scripts/balance.js`, `docs/TECH.md` §10). First numbers are in GDD §18 #10 and #15: both visitor caps hit on day 5,
-  the whole Collection is found by day 16 (~55 min), and from round 2 on coins (~600k a day by day 16) dwarf every
-  price, while customers stay at ~25-30 a day. **Next: pick fixes with the user**, then re-run the script to check them.
+- **Balancing script** (`npm run balance`, `scripts/balance.js`, `docs/TECH.md` §10): plays the real sim headless with a
+  bot player and prints coins, customers, Hearts, Collection, Sparkle and purchases per day, plus milestone days and minutes.
+  Keep it; re-run it after any economy change.
+- **Balancing pass, built 2026-10-10, waiting for feedback** (GDD v0.42 #80, resolves §18 #10, #15): no early visitor cap
+  (Sparkle curve `sparkleBoost` in `js/sim/collection.js`, bolder colors sparkle more, Collection bonus up to +100%); rounds
+  ×12 / ×144 (was ×16 / ×256); room prices ×1.35 per shelf room (`ROOM_GROWTH`), staircases ×1.6 past the list, register
+  rooms ×2, `niceCost` rounding; pricier later helpers and upgrades (Theo 1,200, Juno 5,000, ...); **each catalog page also
+  needs Hearts** (`ROUNDS[].hearts` in `js/data/items.js`; pages can open on a sale), so the bot finds all 96 in ~3.8 h.
+  No save change (opened pages stay open). Not yet checked in the browser (no free preview server that session): look at
+  the order book lock notes and the album teaser at phone size.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
-- **Planned next:** the balancing pass (Sparkle cap §18 #10, coins after round 1 §18 #15). Later: more items past 100 (#59), more stockers
+- **Planned next:** feedback on the balancing pass (#80). Later: more items past 100 (#59), more stockers
   (#60), **Instant Delivery** (GDD §11, on the §17 roadmap, design to discuss), Heart/Sparkle milestone unlocks (§18 #6). 
 
-**Next:** the balancing pass (GDD §18 #10, #15): measuring done, choosing the fixes with the user. Waiting on feedback: Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
+**Next:** feedback on the balancing pass (#80). Waiting on feedback: the balancing pass (#80), Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71).
 
 **Releases:** the latest is **v2026.10.9.12** (2026-10-09): color rounds (#77) and shopping by item (#78); before it

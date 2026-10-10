@@ -52,12 +52,16 @@ const BASE = {
 
 /**
  * Color rounds (GDD #77): after round 1, every item comes back in a bolder color. Each round starts
- * the catalog pages over once you've found `opensAt` items, with prices `mult` times round 1's.
+ * the catalog pages over once you've found `opensAt` items, with prices `mult` times round 1's (at
+ * least ×11 a round, so every page still earns more per box than the one before, GDD #79) and Sparkle
+ * `sparkle` times (bolder colors shine more in the Dream Dollhouse, §18 #10).
+ * `hearts`: happy customers (state.hearts, all time) each of the round's pages also needs before it
+ * opens, page by page (GDD #80), so the whole Collection takes a few hours of shopkeeping.
  */
 export const ROUNDS = [
-  { name: '', opensAt: 0, mult: 1 },
-  { name: 'Bright', icon: '🌈', opensAt: 32, mult: 16 },
-  { name: 'Dazzle', icon: '💎', opensAt: 64, mult: 256 },
+  { name: '', opensAt: 0, mult: 1, sparkle: 1, hearts: [0, 25, 70, 140] },
+  { name: 'Bright', icon: '🌈', opensAt: 32, mult: 12, sparkle: 1.5, hearts: [300, 420, 560, 720] },
+  { name: 'Dazzle', icon: '💎', opensAt: 64, mult: 144, sparkle: 2, hearts: [900, 1100, 1300, 1500] },
 ];
 
 /** The colors items come in, by name. */
@@ -107,6 +111,7 @@ ROUNDS.forEach((r, round) => {
     const paint = COLORS[id][round - 1];
     ITEMS[themeId(id, round)] = {
       ...item, name: `${paint} ${item.name}`, color: PAINTS[paint], cost: item.cost * r.mult, price: item.price * r.mult,
+      sparkle: Math.round(item.sparkle * r.sparkle),
       set: themeId(item.set, round), round, base: id,
     };
   }
@@ -128,9 +133,10 @@ export const PAGES = [
 
 /**
  * Every page of every round, in the order they open: the catalog's steps. An item is on step
- * `round * PAGES.length + page`.
+ * `round * PAGES.length + page`. A step opens once you've found `opensAt` items and made `hearts`
+ * customers happy (GDD #80).
  */
-export const STEPS = ROUNDS.flatMap((r, round) => PAGES.map((p, page) => ({ round, page, opensAt: r.opensAt + p.opensAt })));
+export const STEPS = ROUNDS.flatMap((r, round) => PAGES.map((p, page) => ({ round, page, opensAt: r.opensAt + p.opensAt, hearts: r.hearts[page] })));
 export const stepOf = (id) => ITEMS[id].round * PAGES.length + ITEMS[id].page;
 
 export const boxCost = (itemId) => ITEMS[itemId].cost * ITEMS[itemId].perBox;
@@ -142,9 +148,9 @@ export const boxProfit = (itemId) => (ITEMS[itemId].price - ITEMS[itemId].cost) 
  * Sparkle's boost), and a coin gift for each theme you complete, bigger each time.
  */
 export const COLLECTION = {
-  perItem: 0.02,   // +2% visitors per item found
-  perTheme: 0.05,  // +5% more per complete theme
-  maxBonus: 0.5,   // up to +50%
+  perItem: 0.008,  // +0.8% visitors per item found (96 items: +77%)...
+  perTheme: 0.01,  // ...+1% more per complete theme (24 themes: +24%)...
+  maxBonus: 1,     // ...so it keeps growing to +100% with the whole Collection (§18 #10)
   giftFirst: 100,  // coins for the first theme you complete...
   giftStep: 50,    // ...and this much more for each one after (both × the round's price `mult`, GDD #77)
 };

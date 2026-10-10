@@ -10,7 +10,7 @@ import { checkoutTap } from '../js/sim/checkout.js';
 import { tickStockers } from '../js/sim/stocker.js';
 import { tickKeeper } from '../js/sim/keeper.js';
 import { dropBox } from '../js/sim/stock.js';
-import { ROOM_COSTS, ROOM_EACH, ROOM_STYLES, STAIR_COSTS } from '../js/data/rooms.js';
+import { ROOM_COSTS, ROOM_GROWTH, ROOM_STYLES, STAIR_COSTS, niceCost } from '../js/data/rooms.js';
 import { ITEMS } from '../js/data/items.js';
 import { rng } from '../js/core/rng.js';
 
@@ -54,11 +54,12 @@ test('rooms cost more the further out from the middle, sideways or up, so a squa
   buildExpansion(s);                       // shop 0, display 1
   buildRoom(s, -1, 0);
   buildStairwell(s);                       // stairs 1, display 2
-  // One shelf room built so far, so every spot costs ROOM_EACH more.
-  assert.equal(roomCost(s, -1, 0), ROOM_COSTS[0] + ROOM_EACH, 'right beside the shop');
-  assert.equal(roomCost(s, 2, 0), ROOM_COSTS[0] + ROOM_EACH, 'right beside the stairs');
-  assert.equal(roomCost(s, -2, 0), ROOM_COSTS[1] + ROOM_EACH);
-  assert.equal(roomCost(s, 4, 0), ROOM_COSTS[2] + ROOM_EACH);
+  // One shelf room built so far, so every spot costs ROOM_GROWTH times as much (GDD #80).
+  const one = (ring) => niceCost(ROOM_COSTS[ring] * ROOM_GROWTH);
+  assert.equal(roomCost(s, -1, 0), one(0), 'right beside the shop');
+  assert.equal(roomCost(s, 2, 0), one(0), 'right beside the stairs');
+  assert.equal(roomCost(s, -2, 0), one(1));
+  assert.equal(roomCost(s, 4, 0), one(2));
   // Going up costs the same as going out (#75): the same ring, the same price...
   assert.equal(roomCost(s, 0, 2), roomCost(s, -2, 0));
   assert.equal(roomCost(s, 0, 3), roomCost(s, 4, 0));
@@ -73,7 +74,7 @@ test('rooms cost more the further out from the middle, sideways or up, so a squa
 
 test('every room built makes every spot dearer, so the cheapest spot always costs more than before', () => {
   const s = createState(0);
-  s.coins = 1e7;
+  s.coins = 1e12;
   buildExpansion(s);
   buildRoom(s, -1, 0);
   buildStairwell(s);

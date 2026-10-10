@@ -3,8 +3,8 @@
 // gift (#70) it gives when complete, and the top shows the Collection bonus. A color round's themes
 // (GDD #77) show once that round has opened; the next one is teased at the bottom. A little house badge marks what's on show in the Dream Dollhouse.
 
-import { ITEMS, ROUNDS, SETS, setRound } from '../data/items.js';
-import { roundOpen } from '../sim/catalog.js';
+import { ITEMS, PAGES, ROUNDS, SETS, setRound } from '../data/items.js';
+import { needText, roundOpen } from '../sim/catalog.js';
 import { dollhouseItems } from '../sim/collection.js';
 import { THEME_STYLES, styleName } from '../data/decor.js';
 import { THEME_LOOKS } from '../data/customers.js';
@@ -32,7 +32,7 @@ export function createAlbum(state, thumbs) {
       </div>`;
     };
     const nextRound = ROUNDS.findIndex((r, round) => !roundOpen(state, round));
-    const teaser = nextRound < 0 ? '' : `<div class="album-reward">${ROUNDS[nextRound].icon} Find ${ROUNDS[nextRound].opensAt} treasures to open ${ROUNDS[nextRound].name} colors of everything!</div>`;
+    const teaser = nextRound < 0 ? '' : `<div class="album-reward">${ROUNDS[nextRound].icon} ${needText(state, nextRound * PAGES.length)} to open ${ROUNDS[nextRound].name} colors of everything!</div>`;
     grid.innerHTML = Object.entries(SETS).filter(([set]) => roundOpen(state, setRound(set))).map(([set, name]) => {
       const inSet = ids.filter((id) => ITEMS[id].set === set);
       const got = inSet.filter((id) => state.collection[id]).length;
