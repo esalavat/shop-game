@@ -4,8 +4,9 @@
 // "Get it". Leaving it (another style, room or Done) puts the room back.
 
 import { DECOR, DECOR_TABS, decorOption, roomDecor, roomLook } from '../data/decor.js';
+import { SETS } from '../data/items.js';
 import { ROOM_TYPES } from '../data/rooms.js';
-import { buyDecor, canStyle, ownsDecor, styleRoom } from '../sim/decor.js';
+import { buyDecor, canStyle, ownsDecor, rewardTheme, styleRoom } from '../sim/decor.js';
 import { swatchURL } from '../render/patterns.js';
 import { events } from '../core/events.js';
 
@@ -109,8 +110,9 @@ export function createStyler(state, { onRoom, onPreview, onClose, onBought }) {
       <div class="sty-opts">${DECOR[kind].map((o) => optionButton(kind, o, ids[kind], look)).join('')}</div></div>`).join('');
     if (preview) {
       const o = decorOption(preview.kind, preview.id), short = o.price - state.ribbons;
+      const theme = rewardTheme(preview.kind, preview.id);
       buy.innerHTML = short > 0
-        ? `<span><b>${o.name}</b> · 🎀 ${o.price}</span><span class="sty-short">${short} more 🎀 to go</span>`
+        ? `<span><b>${o.name}</b> · 🎀 ${o.price}${theme ? `<br><small>or free for completing ${SETS[theme]} 🌟</small>` : ''}</span><span class="sty-short">${short} more 🎀 to go</span>`
         : `<span><b>${o.name}</b> · yours in every room</span><button class="sty-get">Get it! 🎀 ${o.price}</button>`;
     } else {
       buy.innerHTML = '<span class="sty-hint">Earn 🎀 by granting wishes and finding new things</span>';

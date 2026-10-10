@@ -3,7 +3,7 @@
 // room wears is room.decor (kind -> option id), missing kinds showing the room's defaults.
 
 import { events } from '../core/events.js';
-import { DECOR, RIBBONS, decorOption } from '../data/decor.js';
+import { DECOR, RIBBONS, THEME_STYLES, decorOption } from '../data/decor.js';
 import { ITEMS, SETS } from '../data/items.js';
 import { ROOM_TYPES } from '../data/rooms.js';
 
@@ -21,7 +21,7 @@ export function ribbonsForCollection(collection) {
   return found.length * RIBBONS.newItem + themes.length * RIBBONS.theme;
 }
 
-const themeComplete = (collection, set) => Object.keys(ITEMS).filter((id) => ITEMS[id].set === set).every((id) => collection[id]);
+export const themeComplete = (collection, set) => Object.keys(ITEMS).filter((id) => ITEMS[id].set === set).every((id) => collection[id]);
 
 /**
  * A sale rang up: each item someone wished for uses up its wish note (+1 each), and a window-peeker
@@ -43,7 +43,12 @@ export function ribbonsForFinds(state, discovered) {
   if (!discovered.length) return;
   addRibbons(state, discovered.length * RIBBONS.newItem, 'find');
   const sets = new Set(discovered.map((id) => ITEMS[id].set));
-  for (const set of sets) if (themeComplete(state.collection, set)) addRibbons(state, RIBBONS.theme, 'theme', { set });
+  for (const set of sets) {
+    if (!themeComplete(state.collection, set)) continue;
+    const [kind, id] = THEME_STYLES[set];
+    const bought = !!state.decor.owned[`${kind}:${id}`];
+    addRibbons(state, RIBBONS.theme, 'theme', { set, style: bought ? null : { kind, id } });
+  }
 }
 
 /** The end-of-day gift: one Ribbon for every few happy customers. */
@@ -51,9 +56,18 @@ export function ribbonsForDay(state) {
   addRibbons(state, Math.floor(state.day.stats.served / RIBBONS.perHappy), 'day');
 }
 
+/** The theme whose completion gives this style (GDD #69), or null. */
+export function rewardTheme(kind, id) {
+  return Object.keys(THEME_STYLES).find((set) => THEME_STYLES[set][0] === kind && THEME_STYLES[set][1] === id) ?? null;
+}
+
+/** Free, bought, or a complete theme's reward (worked out from the Collection, so no save change). */
 export function ownsDecor(state, kind, id) {
   const o = decorOption(kind, id);
-  return !!o && (o.price === 0 || !!state.decor.owned[`${kind}:${id}`]);
+  if (!o) return false;
+  if (o.price === 0 || state.decor.owned[`${kind}:${id}`]) return true;
+  const set = rewardTheme(kind, id);
+  return !!set && themeComplete(state.collection, set);
 }
 
 /** Buy a style with Ribbons. Returns true if it's now yours. */

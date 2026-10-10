@@ -107,3 +107,28 @@ test('closing gives a Ribbon for every few happy customers', () => {
   startNextDay(s);
   assert.equal(s.day.stats.ribbons, 0);
 });
+
+test('completing a theme gives its room style for free (GDD #69)', async () => {
+  const { THEME_STYLES } = await import('../js/data/decor.js');
+  const s = createState();
+  const [kind, id] = THEME_STYLES.tea;
+  assert.ok(!ownsDecor(s, kind, id));
+  s.collection.cupcakes = s.collection.trolley = true;
+  const before = s.ribbons;
+  let event = null;
+  const { events } = await import('../js/core/events.js');
+  const off = (e) => { if (e.why === 'theme') event = e; };
+  events.on('ribbons', off);
+  s.orders.push({ itemId: 'caketower', qty: 2, arrivesDay: 1 });
+  deliverOrders(s, () => true);
+  assert.ok(ownsDecor(s, kind, id), 'yours now');
+  assert.deepEqual(event.style, { kind, id });
+  assert.equal(s.ribbons, before + RIBBONS.newItem + RIBBONS.theme, 'Ribbons too');
+  assert.ok(styleRoom(s, 'r1', kind, id));
+});
+
+test('a theme completed before this update already counts', () => {
+  const s = createState();
+  Object.assign(s.collection, { cupcakes: true, trolley: true, caketower: true });
+  assert.ok(ownsDecor(s, 'pattern', 'gingham'));
+});

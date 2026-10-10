@@ -888,3 +888,6 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 /* Collection album: one section per theme */
 .album-set { grid-column: 1 / -1; display: flex; justify-content: space-between; margin: 8px 2px 0; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.65; }
 .album-set:first-child { margin-top: 0; }
+.album-reward { grid-column: 1 / -1; margin: -2px 2px 4px; font-size: 12px; font-weight: 700; opacity: 0.6; }
+.album-reward.done { opacity: 0.9; color: #b8336a; }
+.sty-buy small { font-weight: 700; opacity: 0.7; }

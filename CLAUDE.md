@@ -110,12 +110,15 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   `js/sim/decor.js`, `js/ui/styler.js`, `js/render/patterns.js`; save version 17 (existing shops get 🎀 2 per item found +
   5 per complete theme). Prices and rates are first guesses. Debug panel has +20 🎀. Known: the shop's corner piece is
   hidden behind the counter (docs/ISSUES.md).
+- **Theme rewards** (GDD v0.32 #69), done: completing a theme gives a matching room style (`THEME_STYLES` in
+  `js/data/decor.js`; ownership worked out from the Collection, no save change); the album shows each reward. The user
+  approved the Ribbon rates and prices for now.
 - **Planned next, in order:** (#59) **more items** (toward 100+, color variants), the **Collection bonus** and page rewards (coins, confetti, a shopkeeper style). Later: more stockers
   (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issue: delivery boxes stack too
   high (delivery-bin idea, docs/ISSUES.md).
 
-**Next:** the rest of #59 (color variants, more items, Collection bonus, page rewards; maybe a room style as a page
-reward). Still waiting on feedback: the decoration shop and Ribbons (#68), the 24 items
+**Next:** the rest of #59 (color variants, more items, Collection bonus, page rewards; themes already give a room style, #69,
+reward). Still waiting on feedback: the 24 items
 and catalog pages, everything built 2026-10-09 (Stairwell, shelf rooms,
 floors and prices, quick evenings, Close now), M8 (home-screen install, fps on the Pixel), Bea, the first-day guide.
 

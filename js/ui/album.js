@@ -1,8 +1,9 @@
 // The Collection album: every item as a sticker, one section per theme (GDD #66). Found ones are in
-// color; the rest are silhouettes. A little house badge marks what's on show in the Dream Dollhouse.
+// color; the rest are silhouettes. Each theme shows the room style it gives when complete (GDD #69). A little house badge marks what's on show in the Dream Dollhouse.
 
 import { ITEMS, SETS } from '../data/items.js';
 import { dollhouseItems } from '../sim/collection.js';
+import { THEME_STYLES, styleName } from '../data/decor.js';
 
 export function createAlbum(state, thumbs) {
   const sheet = document.getElementById('album');
@@ -27,8 +28,10 @@ export function createAlbum(state, thumbs) {
     grid.innerHTML = Object.entries(SETS).map(([set, name]) => {
       const inSet = ids.filter((id) => ITEMS[id].set === set);
       const got = inSet.filter((id) => state.collection[id]).length;
-      return `<div class="album-set"><span>${name}</span><span>${got === inSet.length ? '🌟' : ''} ${got} / ${inSet.length}</span></div>
-        ${inSet.map(sticker).join('')}`;
+      const done = got === inSet.length;
+      const reward = `<div class="album-reward${done ? ' done' : ''}">🎁 ${styleName(...THEME_STYLES[set])}${done ? ': yours! ✓' : ' room style when complete'}</div>`;
+      return `<div class="album-set"><span>${name}</span><span>${done ? '🌟' : ''} ${got} / ${inSet.length}</span></div>
+        ${inSet.map(sticker).join('')}${reward}`;
     }).join('');
   }
 

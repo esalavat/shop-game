@@ -52,6 +52,7 @@ import { createGrow } from './ui/grow.js';
 import { createDecorate } from './ui/decorate.js';
 import { createStyler } from './ui/styler.js';
 import { SETS } from './data/items.js';
+import { styleName } from './data/decor.js';
 import { createCreator } from './ui/creator.js';
 import { createJuice } from './ui/juice.js';
 import { createAudio } from './audio/audio.js';
@@ -435,7 +436,14 @@ events.on('ribbons', ({ amount, why }) => {
     }
   }
 });
-events.on('ribbons', ({ why, set, amount }) => { if (why === 'theme') toast(`🌟 ${SETS[set]} complete! +${amount} 🎀`); });
+events.on('ribbons', ({ why, set, amount, style }) => {
+  if (why !== 'theme') return;
+  toast(`🌟 ${SETS[set]} complete! +${amount} 🎀`);
+  if (style) {
+    setTimeout(() => toast(`🎁 New room style: ${styleName(style.kind, style.id)}! Try it in Grow → 🎨 Decorate rooms`), 1200);
+    juice.celebrate();
+  }
+});
 events.on('wishGranted', () => audio.play('twinkle'));
 events.on('dollhouseChanged', ({ slotId, gained }) => {
   const p = dollhouseView.worldPosition(slotId);

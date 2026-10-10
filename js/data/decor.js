@@ -92,6 +92,25 @@ export const DECOR_TABS = [
 /** Every room starts with these, unless its type or wallpaper (ROOM_STYLES) says otherwise. */
 const BASE = { paper: 'pink', pattern: 'stripes', floor: 'honey', rug: 'lilac', curtain: 'pink', corner: 'plant' };
 
+/**
+ * Completing a theme in the Collection gives you a matching style for free (GDD #69), on top of the
+ * Ribbons. Still buyable with Ribbons before that. theme (SETS in data/items.js) -> [kind, id].
+ */
+export const THEME_STYLES = {
+  tea: ['pattern', 'gingham'],
+  parlor: ['corner', 'books'],
+  fairy: ['rug', 'flower'],
+  bedroom: ['pattern', 'stars'],
+  dolls: ['pattern', 'hearts'],
+  houses: ['floor', 'pinkcheck'],
+};
+
+/** The full name of a style, e.g. "Gingham wallpaper". */
+export function styleName(kind, id) {
+  const o = decorOption(kind, id);
+  return { paper: `${o.name} wallpaper`, pattern: `${o.name} wallpaper`, floor: `${o.name} floor`, rug: `${o.name} rug`, curtain: `${o.name} curtains`, corner: o.name }[kind];
+}
+
 /** How Ribbons are earned (GDD #68). */
 export const RIBBONS = {
   wish: 1,       // a sale grants a wish note

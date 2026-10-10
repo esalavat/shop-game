@@ -164,6 +164,8 @@ docs/                   # GDD, tech plan
 - Ribbons are earned in the sim: `ribbonsForSale` (from `completeSale`: a wished-for item uses up the oldest matching
   wish note; a window-peeker's `windowWant`), `ribbonsForFinds` (from `deliverOrders`), `ribbonsForDay` (at closing).
   All go through `addRibbons`, which also counts `day.stats.ribbons` and emits `ribbons`.
+- Theme rewards (GDD #69): `ownsDecor` also counts a style as owned when the theme in `THEME_STYLES` that gives it is
+  complete, so nothing extra is saved and old saves get theirs on load.
 
 ### 4.3.2 Helpers & upgrades (M7)
 - `sim/helpers.js`: Mia stands at the counter's use spot (the till). When the shopkeeper is at the counter or walking
