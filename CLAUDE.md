@@ -186,6 +186,8 @@ and pinching out to the whole house (§18 #14); no save changes. Everything on `
 - Background music (a music-box loop by time of day, GDD §15).
 - An Orderer helper who re-orders what sells (GDD §10, not decided).
 - A switch in the Grow sheet to hide purchased upgrades (GDD §18 #16).
+- Hide what isn't available yet (GDD §18 #17): order book shows only the first color until round 1 is complete and only the
+  next locked tab; the Grow sheet shows upgrades and helpers only as they're needed.
 
 ## How the code is organized
 
