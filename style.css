@@ -883,6 +883,7 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
   font-size: 12px;
   box-shadow: 0 2px 0 var(--shadow);
 }
+.page-tab[hidden] { display: none; }
 .page-tab span { font-size: 16px; }
 .page-tab.on { background: var(--pink); color: #fff; box-shadow: 0 2px 0 var(--pink-dark); }
 .page-tab.locked:not(.on) { background: #f7eef2; color: rgba(90, 58, 85, 0.55); box-shadow: none; }
@@ -902,6 +903,7 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 .card.locked { background: #f7eef2; box-shadow: none; }
 .card.locked img { filter: brightness(0); opacity: 0.18; }
 .card-dots { display: flex; gap: 8px; margin: 4px 0 2px; }
+.card-dots[hidden] { display: none; }
 .card-dots .dot {
   position: relative;
   width: 26px;

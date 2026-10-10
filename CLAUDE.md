@@ -178,6 +178,10 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   rooms ×2, `niceCost` rounding; pricier later helpers and upgrades (Theo 1,200, Juno 5,000, ...); **each catalog page also
   needs Hearts** (`ROUNDS[].hearts` in `js/data/items.js`; pages can open on a sale), so the bot finds all 96 in ~3.8 h.
   No save change (opened pages stay open). Lock notes and the album teaser checked at phone size; pushed to `/dev/`.
+- **Simpler order book, built 2026-10-10, waiting for feedback** (GDD v0.44 #82, half of §18 #17): color dots only once Bright
+  opens (then all three, Dazzle locked); of the locked tabs only the next one shows. `js/ui/orderbook.js`. No save change.
+  **Next, to design with the user:** the Grow sheet half of §18 #17 (show upgrades and helpers only as they're needed, #16
+  hide bought ones) together with **re-spacing upgrade and helper prices** (user: too many too close in price).
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
 - **Planned next:** feedback on the balancing pass (#80). Later: more items past 100 (#59), more stockers
