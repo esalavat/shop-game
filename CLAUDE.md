@@ -181,7 +181,7 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 - **Simpler order book, built 2026-10-10, waiting for feedback** (GDD v0.44 #82, half of §18 #17): color dots only once Bright
   opens (then all three, Dazzle locked); of the locked tabs only the next one shows. `js/ui/orderbook.js`. No save change.
 - **Helpers and upgrades as a ladder, built 2026-10-10, waiting for feedback** (GDD v0.45 #83, resolves §18 #16, #17): each
-  appears at a Hearts count and costs ~1.4-1.5× the one before (Stock Cart 60 ... Juno 15,000; `hearts` in `js/data/upgrades.js`,
+  appears at a Hearts count and costs ~1.4-1.5× the one before (Stock Cart 60 ... Juno 12,000, made a little easier in #84; `hearts` in `js/data/upgrades.js`,
   `LADDER` / `ladder()` in `js/sim/upgrades.js`). Grow shows what you can get, the next one as a 🔒 teaser, and an "Already yours"
   icon row. The balance bot buys from the ladder (cheapest first). No save change.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
@@ -194,7 +194,7 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 
 **Releases:** the latest is **v2026.10.10** (2026-10-10): Sweet Shop and Pet Corner (#79), **save version 20**
 (`state.pagesOpen`); before it v2026.10.9.12, color rounds (#77) and shopping by item (#78); v2026.10.9.11, Roller Skates (#76).
-Not released yet: the balancing script, the balancing pass (#80), "new items" (#81), the simpler order book (#82) and the ladder (#83). No save changes. The MVP list in GDD §17 is complete.
+Not released yet: the balancing script, the balancing pass (#80), "new items" (#81), the simpler order book (#82) and the ladder (#83, #84). No save changes. The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).

@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.45 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.46 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -90,6 +90,7 @@
 | 81 | **"New items", not "treasures"** (user): the order book has a Treasures page, so the things you collect are called **items** in the game's words: lock notes say "Find 3 new items and make 25 more customers happy ❤️", the album "2 of 96 items found", and the Window Display "favorites from your Collection" | v0.43 |
 | 82 | **A simpler order book until you need more** (user; the order book half of §18 #17): **no color dots** on the cards until **Bright opens**; then every card shows all three dots, Dazzle's 🔒 with what it still needs. Of the **locked page tabs, only the next one shows** (with its lock note); the rest appear one at a time as they become next. Once round 1 is done all four tabs are open. The album still ends with the teaser for Bright colors. The Grow sheet half of #17 (and #16) is still to design | v0.44 |
 | 83 | **Helpers and upgrades come as a ladder** (user; the Grow sheet half of §18 #17, resolves #16, and re-spaces the prices, which were too close together): each appears once you've made enough customers happy (Hearts ❤️, all time) and costs about 1.4-1.5× the one before. **Stock Cart** 🪙 60 at 0 ❤️ · **Comfy Shoes** 100 at 10 · **Mia** 200 at 25 · **Gift Wrap** 300 at 40 · **Lunchtime Delivery** 450 at 60 · **Bea** 650 at 90 · **Speedy Scanner** 900 at 130 · **Ollie** 1,300 at 180 · **Roller Skates** 1,800 at 250 (and Bea) · **Tall Shelves** 2,600 at 350 · **Rosa** 3,800 at 450 (and the Window Display) · **Theo** 6,000 at 650 · **Juno** 15,000 at 1,000. These prices replace earlier ones (#36, #72, #76, #80). The Grow sheet's **Helpers and upgrades** list shows what you can get now, then **only the next one** as a 🔒 teaser ("Coming at 130 ❤️ · 30 more to go", or "Hire Bea first"); what you already have folds into a small **Already yours** row of icons at the bottom (instead of #16's switch). The register room's "build another floor first" card is gone; it shows up once you can build one. Measured (`npm run balance`, 4 seeds): they arrive on days 2, 4, 5, 7, 11, 11, 13, 18, 23, 26, 29, 32, 40 | v0.45 |
+| 84 | **The ladder a little easier** (user: Grow felt too slow): every rung needs about a third fewer Hearts and costs about 20% less, same order and spacing. **Stock Cart** 🪙 60 at 0 ❤️ · **Comfy Shoes** 80 at 5 · **Mia** 160 at 15 · **Gift Wrap** 240 at 25 · **Lunchtime Delivery** 360 at 40 · **Bea** 520 at 60 · **Speedy Scanner** 720 at 85 · **Ollie** 1,000 at 120 · **Roller Skates** 1,400 at 160 · **Tall Shelves** 2,000 at 225 · **Rosa** 3,000 at 300 · **Theo** 4,800 at 425 · **Juno** 12,000 at 650. Measured: days 2, 4, 5, 6, 9, 11, 13, 16, 20, 24, 27, 29, 34 (was up to day 40) | v0.46 |
 
 ## 1. Pitch
 
