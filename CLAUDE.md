@@ -198,13 +198,13 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   **save version 23** keeps them for shops that had won them. The decorator shows prizes once their round opens.
 - **Smaller decorate panel, 2026-10-10** (user: hard to see the room): each row of choices is one line you swipe sideways
   (with a fade at the right edge), slimmer tabs; 606 → about 300 px tall at phone size. Rows keep their scroll across taps
-  (`render` in `js/ui/styler.js`). Not released yet.
+  (`render` in `js/ui/styler.js`). Released in v2026.10.10.3.
 - **Smaller shopkeeper creator, 2026-10-10** (user: couldn't see the changes): the same swipe-sideways rows as the decorate panel,
-  each with its name beside it; about 340 px tall at phone size (`render` in `js/ui/creator.js`). Not released yet.
+  each with its name beside it; about 340 px tall at phone size (`render` in `js/ui/creator.js`). Released in v2026.10.10.3.
 - **Taller rooms, no upstairs front railing, 2026-10-10** (GDD v0.50 #88, user): `ROOM_SIZE.H` 2.5 → 2.8 in `js/data/rooms.js`
-  (everything, stairs included, follows it); `frontRail` removed from `js/render/building.js`. Not released yet.
+  (everything, stairs included, follows it); `frontRail` removed from `js/render/building.js`. Released in v2026.10.10.3.
 - **Fixed 2026-10-10: the Dream Dollhouse picker ran off the screen** with every color found (user's Pixel): capped at 48% of the
-  screen, items scroll, Done always visible (docs/ISSUES.md). Not released yet.
+  screen, items scroll, Done always visible (docs/ISSUES.md). Released in v2026.10.10.3.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
 - **Planned next:** feedback on the balancing pass (#80). Later: more items past 100 (#59), more stockers
@@ -213,10 +213,10 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 **Next:** playtest feedback on v2026.10.10.2 (#80-#87). Waiting on feedback: the balancing pass (#80), Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71).
 
-**Releases:** the latest is **v2026.10.10.2** (2026-10-10): the balancing pass and script (#80), "new items" (#81), the simpler
-order book (#82), the helper and upgrade ladder (#83, #84), tips by sale and Roller Skates for everyone (#85), decorating with
-the first shelf room (#86) and picture-wallpaper Collection prizes (#87); **save versions 21-23**. Before it v2026.10.10, Sweet Shop
-and Pet Corner (#79, save v20). Everything on `main` is public. The MVP list in GDD §17 is complete.
+**Releases:** the latest is **v2026.10.10.3** (2026-10-10): taller rooms and no upstairs front railing (#88), smaller decorate
+and creator panels, the Dream Dollhouse picker fix; no save change. Before it v2026.10.10.2: the balancing pass and script (#80),
+"new items" (#81), the simpler order book (#82), the helper and upgrade ladder (#83, #84), tips by sale and Roller Skates for
+everyone (#85), decorating with the first shelf room (#86) and picture-wallpaper prizes (#87), save versions 21-23. Everything on `main` is public. The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).
