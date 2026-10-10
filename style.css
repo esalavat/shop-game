@@ -799,6 +799,7 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
   left: 0;
   right: 0;
   bottom: 0;
+  max-height: 48dvh; /* the dollhouse stays in view; the items scroll inside (with every color there are dozens) */
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -846,7 +847,8 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 .deco-room-ico { font-size: 24px; line-height: 36px; height: 36px; opacity: 0.6; }
 .deco-hint { font-size: 13px; font-weight: 700; opacity: 0.75; }
 
-.deco-items { display: flex; flex-wrap: wrap; gap: 8px; }
+.deco-items { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; flex: 1 1 auto; min-height: 76px; overflow-y: auto; overscroll-behavior: contain; padding: 2px 6px 8px 2px; }
+#decorate > :not(.deco-items) { flex-shrink: 0; }
 
 .deco-items button {
   position: relative;

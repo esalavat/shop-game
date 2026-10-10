@@ -23,6 +23,11 @@ Design questions (not bugs) belong in [GDD.md](GDD.md) §18.
 
 ## Fixed
 
+### The Dream Dollhouse picker ran off the screen (2026-10-10, user on the Pixel; fixed 2026-10-10)
+- With every color found (dozens of items per dollhouse room) the item grid was taller than the screen and didn't scroll,
+  so the header and Done were off the top and there was no way out. The panel is now at most 48% of the screen; the
+  items scroll inside it and Done stays visible (`#decorate` / `.deco-items` in `style.css`).
+
 ### Pinch-zoom doesn't go out far enough on a big house (2026-10-09, user) — fixed
 - The furthest pinch-out is a fixed factor of what's framed (`ZOOM_MIN` in `js/render/camera.js`), so on a big
   building you can't see the whole house. It should grow with the house (GDD §18 #14).

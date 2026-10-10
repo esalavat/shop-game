@@ -199,6 +199,8 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 - **Smaller decorate panel, 2026-10-10** (user: hard to see the room): each row of choices is one line you swipe sideways
   (with a fade at the right edge), slimmer tabs; 606 → about 300 px tall at phone size. Rows keep their scroll across taps
   (`render` in `js/ui/styler.js`). Not released yet.
+- **Fixed 2026-10-10: the Dream Dollhouse picker ran off the screen** with every color found (user's Pixel): capped at 48% of the
+  screen, items scroll, Done always visible (docs/ISSUES.md). Not released yet.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
 - **Planned next:** feedback on the balancing pass (#80). Later: more items past 100 (#59), more stockers
