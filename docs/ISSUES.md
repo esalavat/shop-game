@@ -27,6 +27,12 @@ Design questions (not bugs) belong in [GDD.md](GDD.md) §18.
 
 ## Fixed
 
+### Tapping the delivery bin did nothing on the phone (2026-10-09, user) — fixed
+- Taps on the 3D scene fire on `pointerup`; on a phone the browser then sends a click to the same spot. When the bin
+  held only a few kinds of items its sheet was short, so that click landed on the backdrop above it and closed the
+  sheet straight away.
+- **Fix:** `js/ui/bin.js` ignores backdrop clicks for 400 ms after the sheet opens.
+
 ### Delivery boxes stack too high and hide the shelves (2026-10-09, user) — fixed
 - The doorstep had four box spots and every box after that stacked on top, building towers in front of the shop
   that hid the shelves and got in the way of tapping them.

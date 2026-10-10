@@ -32,8 +32,11 @@ export function createBinSheet(state, thumbs, { onPick }) {
   });
   const close = () => { sheet.hidden = true; };
   sheet.querySelector('.close').addEventListener('click', close);
-  sheet.addEventListener('click', (e) => { if (e.target === sheet) close(); });
+  // It opens from a tap on the 3D bin (on pointerup); on a phone the click that follows lands on the
+  // backdrop above a short sheet and would close it straight away, so ignore the backdrop for a moment.
+  let openedAt = 0;
+  sheet.addEventListener('click', (e) => { if (e.target === sheet && performance.now() - openedAt > 400) close(); });
   events.on('boxesChanged', () => { if (!sheet.hidden) render(); });
 
-  return { open() { render(); sheet.hidden = false; }, close };
+  return { open() { render(); sheet.hidden = false; openedAt = performance.now(); }, close };
 }
