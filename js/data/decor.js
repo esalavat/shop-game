@@ -26,6 +26,10 @@ export const DECOR = {
     { id: 'aqua', name: 'Aqua', paper: '#d9f5f3', stripe: '#c2ece8', price: 3 },
     { id: 'violet', name: 'Violet', paper: '#e2d3fa', stripe: '#d2bdf4', price: 3 },
     { id: 'sage', name: 'Sage', paper: '#e4ecdb', stripe: '#d3dfc6', price: 3 },
+    // Bolder ones, free for completing a color round's theme (GDD #77)
+    { id: 'electric', name: 'Electric blue', paper: '#d3e2ff', stripe: '#a9c3ff', price: 15 },
+    { id: 'amethyst', name: 'Amethyst', paper: '#e0cdf7', stripe: '#c3a3ee', price: 20 },
+    { id: 'gold', name: 'Gold', paper: '#fff0c2', stripe: '#f2cf5c', price: 20 },
   ],
   pattern: [
     { id: 'stripes', name: 'Stripes', price: 0 },
@@ -44,6 +48,9 @@ export const DECOR = {
     { id: 'skytiles', name: 'Sky tiles', style: 'tiles', color: '#d4eaff', color2: '#fbfdff', price: 8 },
     { id: 'pinkcheck', name: 'Pink checker', style: 'checker', color: '#ffc9dd', color2: '#fff6ee', price: 10 },
     { id: 'mintcheck', name: 'Mint checker', style: 'checker', color: '#bfeedd', color2: '#fff6ee', price: 10 },
+    { id: 'tangerinecheck', name: 'Tangerine checker', style: 'checker', color: '#ffb877', color2: '#fff6ee', price: 15 },
+    { id: 'rubycheck', name: 'Ruby checker', style: 'checker', color: '#e0457b', color2: '#fff6ee', price: 20 },
+    { id: 'emeraldtiles', name: 'Emerald tiles', style: 'tiles', color: '#6fd6a8', color2: '#effff6', price: 20 },
   ],
   rug: [
     { id: 'lilac', name: 'Lilac', shape: 'round', color: '#c8b6ff', color2: '#ddd1ff', price: 0 },
@@ -55,6 +62,9 @@ export const DECOR = {
     { id: 'heart', name: 'Heart', shape: 'heart', color: '#ff8fb8', color2: '#ffc7dd', price: 12 },
     { id: 'star', name: 'Star', shape: 'star', color: '#ffd166', color2: '#ffe9a8', price: 12 },
     { id: 'flower', name: 'Flower', shape: 'flower', color: '#c8b6ff', color2: '#ffd98a', price: 12 },
+    { id: 'cherry', name: 'Cherry heart', shape: 'heart', color: '#ff2d6f', color2: '#ff9ec4', price: 15 },
+    { id: 'lime', name: 'Lime flower', shape: 'flower', color: '#a6e22e', color2: '#ffe066', price: 15 },
+    { id: 'galaxy', name: 'Galaxy star', shape: 'star', color: '#3a2f8f', color2: '#ffd166', price: 20 },
   ],
   curtain: [
     { id: 'pink', name: 'Pink', color: '#ff9ec4', price: 0 },
@@ -67,6 +77,9 @@ export const DECOR = {
     { id: 'lace', name: 'Lace white', color: '#fffaf4', price: 3 },
     { id: 'berry', name: 'Berry', color: '#e0679a', price: 3 },
     { id: 'teal', name: 'Teal', color: '#6cc7c0', price: 3 },
+    { id: 'grape', name: 'Grape', color: '#8e44ec', price: 15 },
+    { id: 'tangerine', name: 'Tangerine', color: '#ff9a3c', price: 15 },
+    { id: 'midnight', name: 'Midnight', color: '#2b2d6e', price: 20 },
   ],
   corner: [
     { id: 'plant', name: 'Plant', icon: '🪴', price: 0 },
@@ -103,6 +116,11 @@ export const THEME_STYLES = {
   bedroom: ['pattern', 'stars'],
   dolls: ['pattern', 'hearts'],
   houses: ['floor', 'pinkcheck'],
+  // Color rounds (GDD #77)
+  tea2: ['rug', 'cherry'], parlor2: ['curtain', 'grape'], fairy2: ['rug', 'lime'],
+  bedroom2: ['paper', 'electric'], dolls2: ['curtain', 'tangerine'], houses2: ['floor', 'tangerinecheck'],
+  tea3: ['floor', 'rubycheck'], parlor3: ['paper', 'amethyst'], fairy3: ['floor', 'emeraldtiles'],
+  bedroom3: ['rug', 'galaxy'], dolls3: ['paper', 'gold'], houses3: ['curtain', 'midnight'],
 };
 
 /** The full name of a style, e.g. "Gingham wallpaper". */

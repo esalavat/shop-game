@@ -5,7 +5,7 @@
 // worked out from the Collection, like theme room styles.
 
 import { events } from '../core/events.js';
-import { COLLECTION, ITEMS, SETS } from '../data/items.js';
+import { COLLECTION, ITEMS, ROUNDS, SETS, setRound } from '../data/items.js';
 import { THEME_LOOKS } from '../data/customers.js';
 import { themeComplete } from './decor.js';
 import { addCoins } from './economy.js';
@@ -18,8 +18,8 @@ export function collectionBonus(state) {
   return Math.min(COLLECTION.maxBonus, found * COLLECTION.perItem + completeThemes(state).length * COLLECTION.perTheme);
 }
 
-/** Coins for the nth theme completed (0 = the first). */
-export const themeGift = (n) => COLLECTION.giftFirst + n * COLLECTION.giftStep;
+/** Coins for the nth theme completed in a color round (0 = the first), × the round's prices (GDD #77). */
+export const themeGift = (n, round = 0) => (COLLECTION.giftFirst + n * COLLECTION.giftStep) * ROUNDS[round].mult;
 
 /**
  * Give the coin gift for every complete theme that hasn't had one yet: after a delivery, and on
@@ -29,7 +29,8 @@ export function giftCompleteThemes(state) {
   const paid = [];
   for (const set of completeThemes(state)) {
     if (state.themeGifts.includes(set)) continue;
-    const coins = themeGift(state.themeGifts.length);
+    const round = setRound(set);
+    const coins = themeGift(state.themeGifts.filter((t) => setRound(t) === round).length, round);
     state.themeGifts.push(set);
     addCoins(state, coins);
     const [row, value, name] = THEME_LOOKS[set];

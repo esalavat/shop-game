@@ -359,6 +359,7 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 .card-have span { padding: 0 6px; border-radius: 999px; background: #f1ebfa; }
 .card-have.none { padding: 1px 8px; border-radius: 999px; background: #ffe0ec; color: #b8336a; }
 .card-have.none span { background: none; padding: 0; }
+.card-have[hidden] { display: none; }
 .stock-legend { margin: 0 2px 6px; font-size: 11px; font-weight: 700; opacity: 0.65; }
 .card-profit { margin: 4px 0 6px; padding: 1px 8px; border-radius: 999px; background: #d4f3e6; font-size: 12px; font-weight: 800; }
 
@@ -896,6 +897,23 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 .card[hidden] { display: none; }
 .card.locked { background: #f7eef2; box-shadow: none; }
 .card.locked img { filter: brightness(0); opacity: 0.18; }
+.card-dots { display: flex; gap: 8px; margin: 4px 0 2px; }
+.card-dots .dot {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--dot);
+  box-shadow: 0 0 0 2px var(--shadow);
+}
+.card-dots .dot.on { box-shadow: 0 0 0 3px var(--pink-dark); transform: scale(1.12); }
+.card-dots .dot.locked { opacity: 0.45; }
+.card-dots .dot.locked::after { content: '🔒'; position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; }
+.card-dots .dot.new::before { content: ''; position: absolute; top: -5px; right: -5px; width: 9px; height: 9px; border-radius: 50%; background: #ff6f91; box-shadow: 0 0 0 2px #fff; }
+.card-lock { margin: 0 0 6px; padding: 2px 8px; border-radius: 999px; background: #fff4dc; font-size: 12px; font-weight: 800; text-align: center; }
+.card-lock[hidden] { display: none; }
 
 /* Collection album: one section per theme */
 .album-set { grid-column: 1 / -1; display: flex; justify-content: space-between; margin: 8px 2px 0; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.65; }

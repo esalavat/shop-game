@@ -37,8 +37,25 @@ export const THEME_LOOKS = {
   bedroom: ['outfit', '#5f6fcf', 'Starry Night outfit'],
   dolls: ['accessory', 'bunny', 'Bunny Ears'],
   houses: ['accessory', 'crown', 'Royal Crown'],
+  // Bolder ones for the color rounds' themes (GDD #77)
+  tea2: ['outfit', '#ff2d6f', 'Hot Strawberry outfit'],
+  parlor2: ['outfit', '#8a3ffc', 'Grape Soda outfit'],
+  fairy2: ['accessory', 'flowers2', 'Sunset Flower Crown'],
+  bedroom2: ['outfit', '#2f6bff', 'Electric Night outfit'],
+  dolls2: ['accessory', 'bunny2', 'Candy Bunny Ears'],
+  houses2: ['accessory', 'crown2', 'Ruby Crown'],
+  tea3: ['outfit', '#b0124f', 'Ruby outfit'],
+  parlor3: ['outfit', '#3b2470', 'Midnight Velvet outfit'],
+  fairy3: ['accessory', 'flowers3', 'Jewel Flower Crown'],
+  bedroom3: ['outfit', '#26215e', 'Galaxy outfit'],
+  dolls3: ['accessory', 'bunny3', 'Midnight Bunny Ears'],
+  houses3: ['accessory', 'crown3', 'Diamond Crown'],
 };
-const REWARD_ACCESSORIES = [['flowers', 'Flower crown 🌸'], ['bunny', 'Bunny ears 🐰'], ['crown', 'Crown 👑']];
+const REWARD_ACCESSORIES = [
+  ['flowers', 'Flower crown 🌸'], ['bunny', 'Bunny ears 🐰'], ['crown', 'Crown 👑'],
+  ['flowers2', 'Sunset crown 🌺'], ['bunny2', 'Candy ears 🐰'], ['crown2', 'Ruby crown 👑'],
+  ['flowers3', 'Jewel crown 💐'], ['bunny3', 'Midnight ears 🐰'], ['crown3', 'Diamond crown 💎'],
+];
 
 /** Choices in the shopkeeper creator (ui/creator.js). */
 export const CREATOR = {

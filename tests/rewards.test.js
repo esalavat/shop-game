@@ -5,7 +5,7 @@ import { collectionBonus, giftCompleteThemes, ownsLook, themeGift } from '../js/
 import { trafficBoost } from '../js/sim/collection.js';
 import { deliverOrders } from '../js/sim/day.js';
 import { events } from '../js/core/events.js';
-import { COLLECTION, ITEMS } from '../js/data/items.js';
+import { COLLECTION, ITEMS, SETS } from '../js/data/items.js';
 import { CREATOR, THEME_LOOKS } from '../js/data/customers.js';
 
 const theme = (set) => Object.keys(ITEMS).filter((id) => ITEMS[id].set === set);
@@ -56,4 +56,21 @@ test('every theme style is in the creator, for girls and boys', () => {
     if (row === 'outfit') assert.ok(CREATOR.outfits.includes(value));
     else for (const body of ['girl', 'boy']) assert.ok(CREATOR.accessories[body].some(([id]) => id === value), `${body} ${value}`);
   }
+});
+
+test('color round themes have their own gifts, ×16 a round, and styles (GDD #77)', async () => {
+  const { THEME_STYLES, decorOption } = await import('../js/data/decor.js');
+  for (const set of Object.keys(SETS)) {
+    assert.ok(THEME_LOOKS[set], `${set} look`);
+    assert.ok(decorOption(...THEME_STYLES[set]), `${set} room style`);
+  }
+  const s = createState();
+  const coins = s.coins;
+  for (const id of Object.keys(ITEMS)) if (ITEMS[id].set === 'tea2' || ITEMS[id].set === 'parlor2') s.collection[id] = true;
+  giftCompleteThemes(s);
+  assert.equal(s.coins, coins + themeGift(0, 1) + themeGift(1, 1));
+  assert.equal(themeGift(0, 1), COLLECTION.giftFirst * 16);
+  assert.ok(ownsLook(s, 'accessory', 'flowers') === false);
+  assert.ok(ownsLook(s, ...THEME_LOOKS.tea2.slice(0, 2)));
+  assert.ok(CREATOR.accessories.girl.some(([id]) => id === 'crown3'));
 });

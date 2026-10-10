@@ -43,7 +43,7 @@ js/
     save.js             # Load/save/migrate, never overwriting a save it can't read (§9.4)
     channel.js          # Which build this is: 'main' (public) or 'dev' (/dev/), from <html data-channel>
   data/                 # Content as plain data (no logic)
-    items.js            # Products: id, set, price, cost, shelfType, slotType, rarity, model
+    items.js            # Products (BASE round 1, then each item's Bright / Dazzle colors, GDD #77), SETS, PAGES, ROUNDS, STEPS
     shelves.js          # Shelf types and capacities
     rooms.js            # Room types and sizes; shelf room styles and prices (ROOM_STYLES, ROOM_COSTS, ROOM_EACH, STAIR_COSTS)
     dollhouse.js        # Dream Dollhouse slots, Sparkle tuning, shop expansions (costs)
@@ -59,7 +59,7 @@ js/
     customers.js        # Spawning, browsing, buying, wish notes (state machines); walk to the room that has their item
     checkout.js         # Queue, scanning, tips
     marketing.js        # Morning picks, special days, Sparkle → foot traffic
-    catalog.js          # Order book pages: which are open (by items found), canOrder, orderableItems (GDD #66)
+    catalog.js          # Order book steps (every page of every color round): which are open (by items found), canOrder, orderableItems (GDD #66, #77)
     collection.js       # Dream Dollhouse placing, Sparkle, foot-traffic boost, window spot (unlocks happen in day.js)
     helpers.js          # Hired helpers doing jobs: Mia the cashier (state.cashier, live-only); Ollie the greeter and Rosa the window dresser standing at the bonus spots (state.greeter / state.dresser, live-only, GDD #72)
     tutorial.js         # First-day guide steps (state.tutorial: box → shelf → open → register → done), advanced each tick
@@ -169,6 +169,14 @@ docs/                   # GDD, tech plan
   All go through `addRibbons`, which also counts `day.stats.ribbons` and emits `ribbons`.
 - Theme rewards (GDD #69): `ownsDecor` also counts a style as owned when the theme in `THEME_STYLES` that gives it is
   complete, so nothing extra is saved and old saves get theirs on load.
+- Color rounds (GDD #77, `data/items.js`): `ITEMS` is generated: round 1 from `BASE` (ids unchanged), then for each of
+  `ROUNDS` 2 and 3 a copy of every item with id `${id}${round + 1}` ('teaset2'), a color from `COLORS` / `PAINTS`,
+  cost and price × `mult` (16, 256), set `${set}${round + 1}` ('tea2'), and `round` / `base` fields. `STEPS` lists every
+  page of every round in the order they open (`opensAt` = round's + page's); an item is on step `stepOf(id)` =
+  `round * 4 + page`. `openPageCount` and the `pageOpened` event count steps. The order book has one card per `base`
+  with a dot per color (`colorsOf`). `themeGift(n, round)` scales by the round's `mult` and counts gifts per round.
+  Bolder accessories are ids with a digit ('crown3'): `TINTS` in `render/models/character.js`. No save change: the
+  Collection is keyed by item id, and new ids are just new keys.
 - Collection rewards (GDD #70, `sim/rewards.js`): `collectionBonus` (+2% per item found, +5% per complete theme, up to
   +50%; numbers in `COLLECTION`, `data/items.js`) is added to Sparkle's boost in `trafficBoost`. `giftCompleteThemes`
   pays a coin gift for each complete theme not yet in `state.themeGifts` (🪙 100, then +50 each) and emits `themeGift`;
@@ -430,7 +438,8 @@ Each milestone ends with a push so it's playable on your phone.
 | More helpers and upgrades (#72) | ✅ built (greeter, window dresser, scanner, gift wrap; tall shelves; up to three stockers, save v19); the second register became #73 |
 | Delivery bin (#74) | ✅ built (waiting for the user's feedback); `js/ui/bin.js`, `BIN` in `sim/stock.js` |
 | Register rooms (#73) | ✅ built (waiting for the user's feedback); `registerOf` in `sim/checkout.js`, `addRegisterRoom` in `sim/building.js` |
-| Color variants and more items (#59) | ⏭ later |
+| Color rounds: two more colors of every item, ×16 prices a round (#77, part of #59) | ✅ built (waiting for the user's feedback) |
+| More items and themes toward 100+ (#59) | ⏭ later |
 
 ### 11.1 Plan: Stairwell and upstairs (#58 step 2) — ✅ built 2026-10-09
 The plan as worked out; it was built this way (GDD #61, §4.3.3). Differences: the upstairs half is its own room

@@ -1,8 +1,10 @@
 // The Collection album: every item as a sticker, one section per theme (GDD #66). Found ones are in
 // color; the rest are silhouettes. Each theme shows the room style (GDD #69), shopkeeper style and coin
-// gift (#70) it gives when complete, and the top shows the Collection bonus. A little house badge marks what's on show in the Dream Dollhouse.
+// gift (#70) it gives when complete, and the top shows the Collection bonus. A color round's themes
+// (GDD #77) show once that round has opened; the next one is teased at the bottom. A little house badge marks what's on show in the Dream Dollhouse.
 
-import { ITEMS, SETS } from '../data/items.js';
+import { ITEMS, ROUNDS, SETS, setRound } from '../data/items.js';
+import { roundOpen } from '../sim/catalog.js';
 import { dollhouseItems } from '../sim/collection.js';
 import { THEME_STYLES, styleName } from '../data/decor.js';
 import { THEME_LOOKS } from '../data/customers.js';
@@ -29,7 +31,9 @@ export function createAlbum(state, thumbs) {
         <div class="card-name">${item.name}</div>
       </div>`;
     };
-    grid.innerHTML = Object.entries(SETS).map(([set, name]) => {
+    const nextRound = ROUNDS.findIndex((r, round) => !roundOpen(state, round));
+    const teaser = nextRound < 0 ? '' : `<div class="album-reward">${ROUNDS[nextRound].icon} Find ${ROUNDS[nextRound].opensAt} treasures to open ${ROUNDS[nextRound].name} colors of everything!</div>`;
+    grid.innerHTML = Object.entries(SETS).filter(([set]) => roundOpen(state, setRound(set))).map(([set, name]) => {
       const inSet = ids.filter((id) => ITEMS[id].set === set);
       const got = inSet.filter((id) => state.collection[id]).length;
       const done = got === inSet.length;
@@ -37,7 +41,7 @@ export function createAlbum(state, thumbs) {
       const reward = `<div class="album-reward${done ? ' done' : ''}">🎁 ${done ? `${prizes}: yours! ✓` : `${prizes}, plus a 🪙 gift, when complete`}</div>`;
       return `<div class="album-set"><span>${name}</span><span>${done ? '🌟' : ''} ${got} / ${inSet.length}</span></div>
         ${inSet.map(sticker).join('')}${reward}`;
-    }).join('');
+    }).join('') + teaser;
   }
 
   sheet.querySelector('.close').addEventListener('click', () => (sheet.hidden = true));

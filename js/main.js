@@ -36,7 +36,7 @@ import { UPGRADES, HELPERS, REGISTER_CASHIERS } from './data/upgrades.js';
 import { separate } from './sim/crowd.js';
 import { checkoutTap, keeperAtCounter, registerOf } from './sim/checkout.js';
 import { displayRoom } from './sim/collection.js';
-import { ITEMS, PAGES } from './data/items.js';
+import { ITEMS, PAGES, ROUNDS, STEPS } from './data/items.js';
 import { buildRoom, roomSpots, roomCost } from './sim/building.js';
 import { attachGestures } from './input/touch.js';
 import { createHud } from './ui/hud.js';
@@ -409,7 +409,12 @@ events.on('dayStarted', ({ day, delivered, rescued }) => {
   pageToasts(delivered);
 });
 function pageToasts(delivered) {
-  for (const page of delivered.opened) toast(`${PAGES[page].icon} New page in the Order Book: ${PAGES[page].name}!`);
+  for (const step of delivered.opened) {
+    const { round, page } = STEPS[step];
+    toast(round
+      ? `${ROUNDS[round].icon} New ${ROUNDS[round].name} colors in the Order Book: ${PAGES[page].name}!`
+      : `${PAGES[page].icon} New page in the Order Book: ${PAGES[page].name}!`);
+  }
 }
 events.on('boxPicked', ({ spare, by }) => {
   if (by !== 'keeper') return; // stockers need no instructions

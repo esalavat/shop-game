@@ -9,6 +9,18 @@ import { PALETTE as P } from '../toon.js';
 
 const GOLD = '#ffd24d', GEM = '#ff7fb0', EAR = '#fff6ee', EAR_IN = '#ffb8d0', LEAF = '#8fd19e';
 const FLOWERS = ['#ff9ec4', '#ffd98a', '#c8b6ff', '#fff6ee'];
+// Theme reward accessories come in bolder colors for the color rounds (GDD #77): 'flowers2', 'crown3', ...
+const TINTS = {
+  flowers: { flowers: FLOWERS, leaf: LEAF },
+  flowers2: { flowers: ['#ff5a5f', '#ff9f1c', '#ffd21f', '#ff3d8b'], leaf: '#5fbf6a' },
+  flowers3: { flowers: ['#c2185b', '#1fa36b', '#2546b8', '#e8b923'], leaf: '#2e8b57' },
+  bunny: { ear: EAR, inner: EAR_IN },
+  bunny2: { ear: '#ff8fc8', inner: '#fff06a' },
+  bunny3: { ear: '#2b2d6e', inner: '#e8b923' },
+  crown: { gold: GOLD, gem: GEM },
+  crown2: { gold: GOLD, gem: '#d0103a' },
+  crown3: { gold: '#dfe6ef', gem: '#8fe3ff' },
+};
 const EYE = '#3a2a3a', CHEEK = '#ff9fb0', SHOE = '#5a3a55', BOW = '#ff7fb0', FRAMES = '#5a3a55', CAP = '#8fc8f0', BRIM = '#6fb0e0';
 
 /** Grown-up size relative to the room; kids can pass a smaller scale. */
@@ -80,6 +92,8 @@ export function createCharacter({ hair = 'bob', hairColor = '#6b3e2e', skin = '#
 }
 
 function addAccessory(inner, accessory, hair) {
+  const tint = TINTS[accessory];
+  accessory = accessory.replace(/\d$/, '');
   if (accessory === 'bow') {
     // On the side of the head, clear of a bun or ponytail.
     const x = hair === 'pigtails' ? 0.12 : 0.16, y = hair === 'pigtails' ? 1.06 : 1.02;
@@ -106,28 +120,28 @@ function addAccessory(inner, accessory, hair) {
     for (let i = 0; i < 12; i++) {
       const a = (i / 12) * Math.PI * 2;
       const x = Math.sin(a) * 0.235, z = Math.cos(a) * 0.215 - 0.02;
-      if (i % 2) ball(inner, 0.03, LEAF, x, 1.0, z, 0).scale.set(1, 0.6, 1.4);
-      else ball(inner, 0.052, FLOWERS[(i / 2) % FLOWERS.length], x, 1.0, z, 0);
+      if (i % 2) ball(inner, 0.03, tint.leaf, x, 1.0, z, 0).scale.set(1, 0.6, 1.4);
+      else ball(inner, 0.052, tint.flowers[(i / 2) % tint.flowers.length], x, 1.0, z, 0);
     }
   } else if (accessory === 'bunny') { // tall ears on a headband
     for (const side of [-1, 1]) {
-      const ear = ball(inner, 0.07, EAR, side * 0.11, 1.24, -0.03);
+      const ear = ball(inner, 0.07, tint.ear, side * 0.11, 1.24, -0.03);
       ear.scale.set(0.6, 2.0, 0.45);
       ear.rotation.z = -side * 0.22;
-      const inside = ball(inner, 0.045, EAR_IN, side * 0.112, 1.23, 0.0, 0);
+      const inside = ball(inner, 0.045, tint.inner, side * 0.112, 1.23, 0.0, 0);
       inside.scale.set(0.55, 1.9, 0.3);
       inside.rotation.z = -side * 0.22;
     }
   } else if (accessory === 'crown') { // a little gold crown with points and a pink gem
     const tilt = -0.15;
-    cyl(inner, 0.14, 0.13, 0.08, 14, GOLD, 0, 1.11, -0.01).rotation.x = tilt;
+    cyl(inner, 0.14, 0.13, 0.08, 14, tint.gold, 0, 1.11, -0.01).rotation.x = tilt;
     for (let i = 0; i < 5; i++) {
       const a = ((i - 2) / 5) * Math.PI * 2 * 0.9;
-      const point = mesh(inner, new THREE.ConeGeometry(0.035, 0.08, 5), GOLD, Math.sin(a) * 0.13, 1.18 - Math.cos(a) * 0.01, Math.cos(a) * 0.12 - 0.02);
+      const point = mesh(inner, new THREE.ConeGeometry(0.035, 0.08, 5), tint.gold, Math.sin(a) * 0.13, 1.18 - Math.cos(a) * 0.01, Math.cos(a) * 0.12 - 0.02);
       point.rotation.x = tilt;
-      ball(inner, 0.018, GOLD, point.position.x, point.position.y + 0.045, point.position.z, 0);
+      ball(inner, 0.018, tint.gold, point.position.x, point.position.y + 0.045, point.position.z, 0);
     }
-    ball(inner, 0.03, GEM, 0, 1.11, 0.13, 0);
+    ball(inner, tint.gem === GEM ? 0.03 : 0.04, tint.gem, 0, 1.11, 0.13, 0); // bolder crowns get a bigger gem
   } else if (accessory === 'hat') {
     cyl(inner, 0.33, 0.33, 0.025, 14, P.butter, 0, 1.0, -0.02).rotation.x = -0.12;
     cyl(inner, 0.17, 0.2, 0.15, 12, P.butter, 0, 1.08, -0.03).rotation.x = -0.12;

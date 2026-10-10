@@ -5,6 +5,7 @@
 import { ITEMS } from '../data/items.js';
 import { DOLLHOUSE_SLOTS } from '../data/dollhouse.js';
 import { fitsSlot, placeInDollhouse, slotById } from '../sim/collection.js';
+import { roundOpen } from '../sim/catalog.js';
 import { events } from '../core/events.js';
 
 export function createDecorate(state, thumbs, { onSelect, onClose }) {
@@ -48,7 +49,8 @@ export function createDecorate(state, thumbs, { onSelect, onClose }) {
       return `<button data-slot="${s.id}" class="${s.id === selected ? 'on' : ''}">${pic}<span>${s.name}</span></button>`;
     }).join('');
 
-    const fits = Object.keys(ITEMS).filter((id) => fitsSlot(selected, id));
+    // Colors from rounds that haven't opened yet stay hidden (GDD #77).
+    const fits = Object.keys(ITEMS).filter((id) => fitsSlot(selected, id) && (state.collection[id] || roundOpen(state, ITEMS[id].round)));
     const found = fits.filter((id) => state.collection[id]);
     const current = state.dollhouse.slots[selected] ?? null;
     hint.textContent = found.length

@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.38 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.39 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -83,6 +83,7 @@
 | 74 | **Delivery bin** (user; fixes "boxes stack too high and hide the shelves", docs/ISSUES.md): the first **two boxes** sit on the doorstep as before (one tap to grab), and everything past that goes into a **delivery bin** at the right end of the doorstep, where the third spot was, with a **count badge**. Nothing stacks any more. **Tap the bin** to open a list of the boxes inside (item picture, name, how many) and tap one: your shopkeeper fetches it from the bin. When a doorstep spot frees up, the next box comes out of the bin onto it. Stockers take doorstep boxes first, then from the bin. (Two loose spots, not four: the bin has to sit in front of the shop so it's in view when the camera is on the shop.) | v0.36 |
 | 75 | **Room prices: same by ring, and always climbing** (user; resolves §18 #13, replaces the per-floor markup of #65, which made shops grow into a pyramid): a spot's price depends only on its **ring** (how far out from the middle it is, sideways or up, whichever is more), so **the same distance out costs the same on every floor** (🪙 250, 400, 600, 850, 1150, 1500, then +450 a ring). On top of that, **every spot costs 🪙 50 more for each shelf room you already have**, so whenever you build a room, every price goes up and the cheapest spot always costs more than before. The middle is the shop's column and the Stairwell's; **register rooms don't count**: they sit in the middle and don't add to the price. **Staircases are cheaper** so going up keeps pace with going out: 🪙 350 (the Stairwell), 500, 700, 950, 1250, then +350 each. First guesses | v0.37 |
 | 76 | **Roller Skates 🛼** (user): Comfy Shoes only speeds up your shopkeeper, so stockers get their own upgrade: **Roller Skates** (🪙 180, in Upgrades, locked until Bea is hired) make **every stocker walk 40% faster** (the same boost Comfy Shoes gives your shopkeeper). Unpacking takes as long as before. Price a first guess | v0.38 |
+| 77 | **Color rounds** (user; part of #59): every item comes back in **two more colors**, bolder each time, in **rounds**. **Round 1** is the game as it was (24 items, four pages, six themes, same rewards). Once you've found **all 24**, **round 2, Bright** (hot pink, tangerine, lime, electric blue, ...) starts the catalog over: its Starter colors open at **24** found, Favorites at **28**, Fancy Finds at **34**, Treasures at **40**. **Round 3, Dazzle** (gold, ruby, emerald, midnight, ...) opens the same way at **48, 52, 58, 64**: 72 stickers in all. **Prices go up ×16 a round** (cost and sell price; box sizes stay), so each round's Starter costs more than the last round's Treasures: Tiny Tea Set sells for 10, then 160, then 2,560; the Castle Dollhouse for 150, 2,400, 38,400. **Order book:** still one card per item, with a **color dot for each round**; tap a dot to see that color's cost, price, profit and stock, and order it. A dot that isn't open yet shows 🔒 and how many more finds it needs; the card starts on the newest color you can order. **Each round's colors are new themes** (18 in all, e.g. "Tea Time ✦ Bright"), each with its own album section and the same kinds of rewards: 🎀 5, a **coin gift** (round 1 as before; each round's gifts are ×16: 🪙 1,600 for the first Bright theme, +800 each after), a **bolder room style** and a **bolder shopkeeper style** (e.g. Strawberry → Hot Strawberry → Ruby outfit; Flower Crown → Sunset → Jewel Flower Crown). Each color is its own sticker (+2% visitors, +2 🎀 when found). Album sections for a round show once that round has opened. Numbers are first guesses | v0.39 |
 
 ## 1. Pitch
 
@@ -206,6 +207,45 @@ Your very own dollhouse, displayed in the shop's front window.
   (cost → sell price per item. Boxes hold 3 on the first two pages, 2 after that, except the Cottage Dollhouse at 2.)
 - Anything in your Collection can be placed in the Dream Dollhouse **for free and forever**. It doesn't use up shop stock.
 - Collection pages fill in by theme (Tea Time, Sweet Dreams Bedroom, Pet Friends, Princess Castle…). Completing a page gives a reward.
+- **Color rounds (v0.39, #77):** after the 24 items, every item comes back in a **Bright** color (round 2) and then a **Dazzle** color (round 3). Each round starts the four pages over (opening at 24 / 28 / 34 / 40 found, then 48 / 52 / 58 / 64) with prices ×16 the round before, and its six themes are new album sections with their own rewards. The order book shows one card per item with a dot per color.
+
+  | Item | Bright (round 2) | Dazzle (round 3) |
+  |---|---|---|
+  | Tiny Tea Set | Tangerine | Gold |
+  | Cozy Chair | Hot Pink | Sapphire |
+  | Mushroom Lamp | Violet | Emerald |
+  | Star Nightlight | Electric Blue | Amethyst |
+  | Teddy Bear | Lime | Rose Gold |
+  | Tiny Birdhouse | Cherry | Midnight |
+  | Cupcake Stand | Turquoise | Ruby |
+  | Rocking Chair | Hot Pink | Emerald |
+  | Fairy Swing | Sunshine | Amethyst |
+  | Rosy Bed | Lime | Ruby |
+  | Petal Doll | Electric Blue | Rose Gold |
+  | Cottage Dollhouse | Turquoise | Sapphire |
+  | Tea Trolley | Cherry | Gold |
+  | Velvet Sofa | Tangerine | Emerald |
+  | Firefly Lantern | Violet | Gold |
+  | Canopy Bed | Electric Blue | Midnight |
+  | Bunny Family | Hot Pink | Silver |
+  | Treehouse | Lime | Amethyst |
+  | Royal Cake Tower | Sunshine | Sapphire |
+  | Grand Piano | Cherry | Midnight |
+  | Unicorn Carousel | Tangerine | Silver |
+  | Cloud Princess Bed | Sunshine | Rose Gold |
+  | Porcelain Princess | Turquoise | Ruby |
+  | Castle Dollhouse | Violet | Gold |
+
+  Theme rewards for rounds 2 and 3 (room style · shopkeeper style):
+
+  | Theme | Bright | Dazzle |
+  |---|---|---|
+  | Tea Time | Cherry heart rug · Hot Strawberry outfit | Ruby checker floor · Ruby outfit |
+  | Cozy Parlor | Grape curtains · Grape Soda outfit | Amethyst wallpaper · Midnight Velvet outfit |
+  | Fairy Garden | Lime flower rug · Sunset Flower Crown | Emerald tiles floor · Jewel Flower Crown |
+  | Sweet Dreams | Electric wallpaper · Electric Night outfit | Galaxy star rug · Galaxy outfit |
+  | Doll Friends | Tangerine curtains · Candy Bunny Ears | Gold wallpaper · Midnight Bunny Ears |
+  | Little Houses | Tangerine checker floor · Ruby Crown | Midnight curtains · Diamond Crown |
 - **Growing to 100+ items (v0.23, #59):** prices scale up the way they do now (fancier = costs more, more profit). Many items come in **color variants**, each its own sticker. New **catalog pages open in the order book as you find more items**; the fanciest come last.
 - **Collection bonus (#59, built in v0.33 #70):** each item found brings **+2%** more customers and each complete theme **+5%**, up to **+50%**, added to Sparkle's boost. **Completing a theme** also gives a **coin gift with confetti** (🪙 100 for the first, +50 for each after), a room style (#69), 🎀 5 (#68), and a **shopkeeper style**:
 
@@ -432,7 +472,8 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 - [x] **Delivery bin** (#74)
 - [x] **Register rooms**, one per floor above the shop, each with a cashier (#73)
 - [ ] **Instant Delivery** upgrade: orders arrive right away (§11; design to discuss)
-- [ ] **Color variants and more items toward 100+** (#59)
+- [x] **Color rounds: two more colors of every item, ×16 prices, 72 stickers** (#77, part of #59)
+- [ ] **More items and themes toward 100+** (#59)
 - [x] **Decoration shop with Ribbons 🎀:** style every room's walls, floor, rug, curtains and corner (#68)
 - Building grid expansion (X and Y), room types, pan/zoom
 - More morning picks and special days
@@ -466,3 +507,4 @@ Goal: prove that the shop jobs, the day rhythm, and the Dream Dollhouse feel goo
 12. ~~**More helpers and upgrades**~~ (user, 2026-10-09). **Resolved in v0.35 (#72).**
 13. **Room prices make a pyramid, not a square** (user, 2026-10-09): with prices by ring around the middle plus +15% per floor (#65), building wide on the ground floor stays cheaper than going up, so shops naturally grow into a pyramid instead of the squarish house #65 meant to encourage. ✅ **Resolved (#75):** prices by ring only, the same on every floor, +🪙 50 per shelf room built; cheaper staircases.
 14. **Pinch out further on a big house** (user, 2026-10-09): the furthest you can zoom out by pinching should grow with the house, so a big shop fits on screen. ✅ **Done (2026-10-09):** past the usual limit, pinching out keeps going until the whole house fits, drifting to its middle (`limits.fit` in `js/render/camera.js`).
+15. **Coins after the color rounds** (2026-10-09, #77): with prices ×16 a round, rooms, staircases, upgrades and helpers (a few hundred coins) get cheap fast once Bright colors sell. The Collection bonus also maxes out (+50%) during round 1. Retune those (or scale them with the round) after playing a round 2 shop.
