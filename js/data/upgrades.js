@@ -7,13 +7,15 @@ export const UPGRADES = {
   lunch: { name: 'Lunchtime Delivery', icon: '🥪', cost: 100, desc: 'Pip comes at midday too. Order before lunch and it arrives halfway through the day.' },
   scanner: { name: 'Speedy Scanner', icon: '⚡', cost: 120, desc: 'Each tap at the register scans two items, and cashiers scan faster too.' },
   tall: { name: 'Tall Shelves', icon: '📚', cost: 250, desc: 'Every shelf gets a row on top: room for 12 things instead of 9, so you restock less often.' },
+  skates: { name: 'Roller Skates', icon: '🛼', cost: 180, needs: 'stocker', desc: 'Roller skates for your stockers: they zip boxes from the doorstep to the shelves much faster.' },
   giftwrap: { name: 'Gift Wrap', icon: '🎁', cost: 150, desc: 'Pretty wrapping paper: tips are twice as big when you ring people up yourself.' },
 };
 
 export const SCANNER = { perTap: 2, helperSpeed: 0.6 }; // Speedy Scanner: items per tap; cashiers' scan time × this
 export const GIFT_WRAP_TIPS = 2;                          // Gift Wrap: tips × this
 
-export const SHOES_SPEED = 1.4; // walking speed multiplier with Comfy Shoes
+export const SHOES_SPEED = 1.4;  // walking speed multiplier with Comfy Shoes (your shopkeeper only)
+export const SKATES_SPEED = 1.4; // stockers' walking speed multiplier with Roller Skates (GDD #76)
 
 export const HELPERS = {
   cashier: {

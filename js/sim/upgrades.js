@@ -10,13 +10,16 @@ export const hasHelper = (state, id) => !!state.helpers?.[id];
 
 export function buyUpgrade(state, id) {
   const u = UPGRADES[id];
-  if (!u || hasUpgrade(state, id) || state.coins < u.cost) return false;
+  if (!u || hasUpgrade(state, id) || !canBuyUpgrade(state, id) || state.coins < u.cost) return false;
   addCoins(state, -u.cost);
   state.upgrades[id] = true;
   if (id === 'tall') fitShelves(state);
   events.emit('upgradeBought', { id });
   return true;
 }
+
+/** Some upgrades need a helper first: Roller Skates need a stocker to wear them. */
+export const canBuyUpgrade = (state, id) => !UPGRADES[id]?.needs || hasHelper(state, UPGRADES[id].needs);
 
 /** Some helpers need something first: Rosa the Window Display, each stocker the one before. */
 export function canHire(state, id) {

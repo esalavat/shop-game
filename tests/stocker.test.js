@@ -6,8 +6,8 @@ import { tickStockers, chooseBox, STOCKER_WAIT } from '../js/sim/stocker.js';
 import { tickKeeper, walkToBox } from '../js/sim/keeper.js';
 import { dropBox, settleBoxes, pickUpBox, boxSpot, inBin, BOX_SPOTS } from '../js/sim/stock.js';
 import { soldOut } from '../js/sim/day.js';
-import { hireHelper } from '../js/sim/upgrades.js';
-import { HELPERS } from '../js/data/upgrades.js';
+import { hireHelper, buyUpgrade } from '../js/sim/upgrades.js';
+import { HELPERS, UPGRADES } from '../js/data/upgrades.js';
 
 const shelvesOf = (s) => s.building.rooms[0].fixtures.filter((f) => f.slots);
 const navsFor = (s) => new Map(s.building.rooms.map((r) => [r.id, buildNav(r)]));
@@ -129,4 +129,22 @@ test('Theo comes after Bea and Juno after Theo; they never head for the same box
   assert.equal(s.boxes.length, 0);
   assert.equal(stocked(s), 6);
   assert.ok(s.stockers.every((b) => !b.carrying && !b.spare));
+});
+
+test('Roller Skates need a stocker first, then make stockers finish the doorstep boxes sooner', () => {
+  const s0 = createState();
+  s0.coins = 1000;
+  assert.equal(buyUpgrade(s0, 'skates'), false, 'no stocker to wear them');
+  const timeToEmpty = (skates) => {
+    const { s, navs } = beaShop();
+    if (skates) {
+      s.coins = UPGRADES.skates.cost;
+      assert.ok(buyUpgrade(s, 'skates'));
+    }
+    let t = 0;
+    for (; s.boxes.length || s.stockers[0]?.carrying || stocked(s) < 6; t += 0.1) { tickKeeper(s, 0.1); tickStockers(s, navs, 0.1); }
+    return t;
+  };
+  const plain = timeToEmpty(false), fast = timeToEmpty(true);
+  assert.ok(fast < plain * 0.9, `${fast.toFixed(1)} s with skates vs ${plain.toFixed(1)} s`);
 });

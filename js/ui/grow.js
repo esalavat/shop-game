@@ -8,7 +8,7 @@
 import { nextExpansion, buildExpansion, canBuildRooms, roomSpots, roomCost, canBuildStairwell, buildStairwell, hasStairwell, buildFloor, stairCost, stairRooms, nextRegisterFloor, registerCost, buildRegister, registerRoomsBuilt } from '../sim/building.js';
 import { REGISTER_CASHIERS } from '../data/upgrades.js';
 import { displayRoom } from '../sim/collection.js';
-import { buyUpgrade, hireHelper, hasUpgrade, hasHelper, canHire } from '../sim/upgrades.js';
+import { buyUpgrade, hireHelper, hasUpgrade, hasHelper, canHire, canBuyUpgrade } from '../sim/upgrades.js';
 import { UPGRADES, HELPERS } from '../data/upgrades.js';
 import { events } from '../core/events.js';
 
@@ -111,7 +111,7 @@ export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
     }
     for (const [id, u] of Object.entries(UPGRADES)) {
       if (!upgradeListed(id)) continue;
-      html += small({ art: u.icon, name: u.name, desc: u.desc, cost: u.cost, owned: hasUpgrade(state, id), ownedText: 'Yours ✓', buy: `upgrade:${id}`, buyText: 'Buy' });
+      html += small({ art: u.icon, name: u.name, desc: u.desc, cost: u.cost, owned: hasUpgrade(state, id), ownedText: 'Yours ✓', buy: `upgrade:${id}`, buyText: 'Buy', locked: canBuyUpgrade(state, id) ? null : `Hire ${HELPERS[u.needs].name} first` });
     }
     list.innerHTML = html;
   }
@@ -128,7 +128,7 @@ export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
       canBuildStairwell(state) || hasStairwell(state) ? stairCost(state) : null,
       nextRegisterFloor(state) !== null ? registerCost(state) : null,
       ...Object.entries(HELPERS).filter(([id]) => !hasHelper(state, id) && canHire(state, id)).map(([, h]) => h.cost),
-      ...Object.entries(UPGRADES).filter(([id]) => !hasUpgrade(state, id) && upgradeListed(id)).map(([, u]) => u.cost),
+      ...Object.entries(UPGRADES).filter(([id]) => !hasUpgrade(state, id) && upgradeListed(id) && canBuyUpgrade(state, id)).map(([, u]) => u.cost),
     ];
     return costs.some((c) => c != null && state.coins >= c);
   }

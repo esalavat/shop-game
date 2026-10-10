@@ -7,9 +7,9 @@
 // Each tick: walk; when she arrives, pause a moment, then do the job (pick up / unpack); when idle,
 // plan the next job. Plans are re-checked on arrival, since the shopkeeper may have got there first.
 
-import { HELPERS } from '../data/upgrades.js';
+import { HELPERS, SKATES_SPEED } from '../data/upgrades.js';
 import { useSpot } from '../data/fixtures.js';
-import { hasHelper } from './upgrades.js';
+import { hasHelper, hasUpgrade } from './upgrades.js';
 import { sellingRooms } from './building.js';
 import { finishRoute, routeTo, walkRoute } from './route.js';
 import { boxSpot, canCarryMore, freeSlots, pickUpBox, shopRoomId, stockShelf, DOORWAY_Z } from './stock.js';
@@ -104,7 +104,7 @@ function tickStocker(state, navs, b, dt) {
   if (!navs.get(b.roomId)) return;
 
   if (b.path.length) {
-    if (walkRoute(state, b, H.speed, dt)) {
+    if (walkRoute(state, b, H.speed * (hasUpgrade(state, 'skates') ? SKATES_SPEED : 1), dt)) {
       finishRoute(b); // walked over from another room
       if (b.arriveFacing !== null) b.facing = b.arriveFacing;
       b.timer = b.job ? H.pause : 0;
