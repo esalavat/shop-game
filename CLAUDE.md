@@ -117,14 +117,12 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issue: delivery boxes stack too
   high (delivery-bin idea, docs/ISSUES.md).
 
-**Next:** the rest of #59 (color variants, more items, Collection bonus, page rewards; themes already give a room style, #69,
-reward). Still waiting on feedback: the 24 items
+**Next:** the rest of #59 (color variants, more items, Collection bonus, page rewards; themes already give a room style, #69). Still waiting on feedback: the 24 items
 and catalog pages, everything built 2026-10-09 (Stairwell, shelf rooms,
 floors and prices, quick evenings, Close now), M8 (home-screen install, fps on the Pixel), Bea, the first-day guide.
 
-**Releases:** the latest is **v2026.10.9.5** (2026-10-09): back to the summary after ordering and a pink Day summary
-button (#67); save version 16 (unchanged). Everything on `main` is public. The MVP list in GDD
-§17 is complete.
+**Releases:** the latest is **v2026.10.9.6** (2026-10-09): the decoration shop with Ribbons 🎀 (#68) and theme
+rewards (#69); save version 16 → 17. Everything on `main` is public. The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).
