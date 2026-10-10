@@ -409,7 +409,7 @@ they share `localStorage`, and the test build often has a newer save version tha
   `--seeds K` (median over K seeds), `--json file`. The bot: unpacks then opens, rings up at 4 taps/s, closes early when
   sold out; at closing fills the dollhouse, orders one box of every new item, stocks about two days of sales in the
   best-paying colors, then buys growth in a fixed order (`PLAN`). It never uses Lunchtime Delivery, greets or shows off.
-- `?debug` URL flag: fps meter, speed-up time, add coins, skip to phase, reset save (and copy the main save, on dev).
+- `?debug` URL flag: fps meter, speed-up time, add coins, +50 Hearts, skip to phase, reset save (and copy the main save, on dev).
 
 ## 11. Build Order (MVP milestones)
 

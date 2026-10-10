@@ -6,6 +6,8 @@ import { addRoom, addStairwell, addFloor, hasStairwell, roomSpots } from '../sim
 import { ITEMS } from '../data/items.js';
 import { spawnCustomer } from '../sim/customers.js';
 import { openShop, DAY_LENGTH } from '../sim/day.js';
+import { notePagesOpen } from '../sim/catalog.js';
+import { events } from '../core/events.js';
 
 export function createDebug({ state, renderer, quality, onViewAll, onReset, onCopyMain, onStockChanged }) {
   const root = document.createElement('div');
@@ -15,6 +17,7 @@ export function createDebug({ state, renderer, quality, onViewAll, onReset, onCo
     <div class="debug-panel" hidden>
       <div class="debug-stats"></div>
       <button data-act="coins">+100 coins</button>
+      <button data-act="hearts">+50 ❤️</button>
       <button data-act="ribbons">+20 🎀</button>
       <button data-act="fill">Fill shelves</button>
       <button data-act="customer">Spawn customer</button>
@@ -35,6 +38,11 @@ export function createDebug({ state, renderer, quality, onViewAll, onReset, onCo
   const actions = {
     coins: () => addCoins(state, 100),
     ribbons: () => addRibbons(state, 20, 'debug'),
+    hearts: () => { // happy customers open catalog pages and the next helpers and upgrades (GDD #80, #83)
+      state.hearts += 50;
+      for (const page of notePagesOpen(state)) events.emit('pageOpened', { page });
+      events.emit('coins', { amount: 0, total: state.coins }); // refreshes an open Grow sheet
+    },
     fill: () => {
       const ids = Object.keys(ITEMS);
       let n = 0;
