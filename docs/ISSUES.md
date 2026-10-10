@@ -27,6 +27,12 @@ Design questions (not bugs) belong in [GDD.md](GDD.md) §18.
 
 ## Fixed
 
+### After ordering from the day summary there's no "Start Day" button (2026-10-09, user) — fixed
+- Summary → "Order for tomorrow" → ✕ left you on the toolbar; you had to know to tap "Day summary" (a plain button)
+  to find "Start Day N".
+- **Fix (GDD #67):** closing the order book (✕ or the backdrop) after opening it from the summary brings the summary
+  back (`open({ then })` in `js/ui/orderbook.js`). The toolbar's "Day summary" button is pink (`primary`) after closing.
+
 ### Evening waits for customers to walk all the way off-screen (2026-10-09, user) — fixed
 - In the evening the day only closes once `state.customers` is empty (`tickDay` in `js/sim/day.js`), and a
   customer is only removed when they reach the end of the road. With the Window Display and theme rooms the

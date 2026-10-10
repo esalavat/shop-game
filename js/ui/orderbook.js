@@ -87,16 +87,21 @@ export function createOrderBook(state, thumbs) {
   events.on('phaseChanged', refresh);
   events.on('lunchDelivery', refresh);
   events.on('pageOpened', ({ page }) => { shown = page; refresh(); });
-  sheet.querySelector('.close').addEventListener('click', () => close());
-  sheet.addEventListener('click', (e) => { if (e.target === sheet) close(); });
+  // Closed by the player (✕ or the backdrop): go back to wherever they came from.
+  let onClose = null;
+  const closeByPlayer = () => { const back = onClose; close(); back?.(); };
+  sheet.querySelector('.close').addEventListener('click', closeByPlayer);
+  sheet.addEventListener('click', (e) => { if (e.target === sheet) closeByPlayer(); });
 
-  function open() {
+  /** `then` runs when the player closes the book (e.g. back to the day summary). */
+  function open({ then = null } = {}) {
+    onClose = then;
     // Start on the newest page you haven't looked at yet, if there is one.
     const fresh = PAGES.findIndex((p, i) => i < openPageCount(state) && !seen.has(i));
     if (fresh >= 0) shown = fresh;
     refresh();
     sheet.hidden = false;
   }
-  function close() { sheet.hidden = true; }
+  function close() { sheet.hidden = true; onClose = null; }
   return { open, close, get isOpen() { return !sheet.hidden; } };
 }

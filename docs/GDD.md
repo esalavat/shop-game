@@ -1,6 +1,6 @@
 # My Dream Dollhouse Shop — Game Design Document
 
-> **Status:** Draft v0.29 — for iteration. Nothing here is locked.
+> **Status:** Draft v0.30 — for iteration. Nothing here is locked.
 > Items marked **❓** are open questions. Items marked **💡** are proposals to react to.
 
 ## Decisions Log
@@ -73,6 +73,7 @@
 | 64 | **The Stairwell's spot is fixed** (user; changes #61): it's still a Grow purchase (🪙 350, after the first expansion room), but you don't choose where it goes: it's always built **right next to the main shop**, and the Window Display and any rooms on that side **move over one place**. **Upstairs rooms must sit on top of a room below** (nothing floats) | v0.27 |
 | 65 | **Plain shelf rooms, more floors, prices by distance** (user; replaces the theme rooms of #58 and Sorting Smarts of #60): expansion rooms are **plain shelf rooms** (3 shelves, a pastel wallpaper each, handed out in turn); a **decoration shop** with its own currency will let you restyle them later. No theme bonus. **More floors:** after the Stairwell, Grow offers **Another floor**: the stairs go up one more floor with a landing and a shelf; **each staircase costs more** (🪙 350 for the Stairwell, then 700, 1200, 1900, 2800, then +1200 each). **Room prices grow with distance from the middle** (the shop and the Stairwell) so a **compact, squarish house is cheapest**: a spot's *ring* is how far out it is sideways or up, whichever is more (🪙 250, 400, 600, 850, 1150, 1500, then +450 a ring), and every floor up adds 15% over the same spot below. Each ＋ shows its price. Upstairs rooms always sit on a room below. Theme rooms already built on `/dev/` became shelf rooms with their stock; Sorting Smarts was refunded | v0.28 |
 | 66 | **24 items on four catalog pages** (user; first step of #59): six themes × four items. The order book has **four pages** (tabs), **one item per theme on each page**, fancier and more profitable as you go: **Starter** (open from the start, box profit 🪙 12-18), **Favorites** (opens when you've found **4** items, 🪙 21-32), **Fancy Finds** (**10** found, 🪙 36-56), **Treasures** (**16** found, 🪙 70-120). A page opening gets a toast, confetti and a "new" dot on its tab. **Items you've already found can always be ordered again**, whatever page they're on. Customers only **wish for items you can order now**. The album shows one section per theme ("2 / 4"). The six original items keep their prices. Prices and Sparkle (about price ÷ 4) are first guesses; the user may swap or rename items later. Color variants, the Collection bonus and page rewards are still to come (#59) | v0.29 |
+| 67 | **Back to the summary after ordering** (user): closing the order book you opened from the day summary brings the summary back, so "Start Day N" is right there. After closing, the toolbar's **Day summary** button is pink like the other "do this next" buttons (Open shop, Close early) | v0.30 |
 
 ## 1. Pitch
 

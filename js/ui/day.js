@@ -97,7 +97,11 @@ export function createDayUI(state, thumbs, orderBook, toast, audio) {
   }
 
   sheet.querySelector('.close').addEventListener('click', () => (sheet.hidden = true));
-  sheet.querySelector('.summary-order').addEventListener('click', () => { sheet.hidden = true; orderBook.open(); });
+  sheet.querySelector('.summary-order').addEventListener('click', () => {
+    sheet.hidden = true;
+    // Done ordering: back to the summary so "Start Day N" is right there.
+    orderBook.open({ then: () => { if (state.day.phase === 'close') showSummary(); } });
+  });
   sheet.querySelector('.summary-next').addEventListener('click', () => { sheet.hidden = true; startNextDay(state); });
   events.on('dayClosed', () => showSummary({ animate: true }));
 
@@ -120,7 +124,7 @@ export function createDayUI(state, thumbs, orderBook, toast, audio) {
         else next = ['🕒', 'Close', 'passive']; // no digital time: the HUD bar shows how much day is left
       }
       else if (d.phase === 'evening') next = performance.now() < armedUntil ? ['🌙', 'Tap again to close', 'primary'] : ['🌙', 'Close now', 'passive'];
-      else next = ['📋', 'Day summary', ''];
+      else next = ['📋', 'Day summary', 'primary'];
       const key = next.join('|');
       if (key === shown) return;
       shown = key;

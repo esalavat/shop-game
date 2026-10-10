@@ -99,6 +99,8 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   album sections per theme. `js/sim/catalog.js`, `PAGES` and `page` in `js/data/items.js`, 18 new models in
   `js/render/models/items.js`. No save change. The user may swap or rename items later; the item table is in GDD §6.2.
   Open tuning question: Sparkle maxes out traffic with one Treasure (GDD §18 #10).
+- **Back to the summary after ordering** (GDD v0.30 #67), done: ✕ on an order book opened from the summary
+  reopens it; the toolbar's Day summary button is pink.
 - **Next to design:** the **decoration shop** (its own currency) to restyle rooms (GDD #65).
 - **Planned next, in order:** (#59) **more items** (toward 100+, color variants), the **Collection bonus** and page rewards (coins, confetti, a shopkeeper style). Later: more stockers
   (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issue: delivery boxes stack too
