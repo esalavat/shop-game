@@ -157,8 +157,8 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 **Next:** the rest of #59 (color variants, more items). Waiting on feedback: room prices (#75), register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71).
 
-**Releases:** the latest is **v2026.10.9.9** (2026-10-09): more helpers and upgrades (#72), the delivery bin (#74) and
-register rooms (#73); save version 18 → 19. Everything on `main` is public. The MVP list in GDD §17 is complete.
+**Releases:** the latest is **v2026.10.9.10** (2026-10-09): room prices (#75) and pinching out to the whole house
+(§18 #14); no save change. Everything on `main` is public. The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).
