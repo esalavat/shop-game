@@ -109,8 +109,8 @@ build. After that, the rest of #59 (color variants, Collection bonus, page rewar
 and catalog pages, everything built 2026-10-09 (Stairwell, shelf rooms,
 floors and prices, quick evenings, Close now), M8 (home-screen install, fps on the Pixel), Bea, the first-day guide.
 
-**Releases:** the latest is **v2026.10.9.3** (2026-10-09): shelf rooms with prices by distance, the Stairwell and
-floors, quick evenings, Close now, the crowd fix; save version 16. Everything on `main` is public. The MVP list in GDD
+**Releases:** the latest is **v2026.10.9.4** (2026-10-09): 24 items on four catalog pages (#66); save version 16
+(unchanged since v2026.10.9.3: shelf rooms with prices by distance, the Stairwell and floors, quick evenings, Close now). Everything on `main` is public. The MVP list in GDD
 §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
@@ -153,8 +153,9 @@ floors, quick evenings, Close now, the crowd fix; save version 16. Everything on
 - **Verify in the browser at phone size** (375x812) before pushing.
 - **Deploy:** push to `main` → the test build at `/dev/` (GitHub Actions `.github/workflows/pages.yml` runs
   the tests, then `scripts/stamp.js` version-stamps every module URL so phones never mix cached files).
-  **Releases** to the public link happen only when the user asks: `npm run release` (it shows what's going
-  out and asks first). Mention it when a save-version change is going out. Details in `docs/TECH.md` §9.1.
+  **Releases** to the public link happen only when the user asks, and Claude runs them itself (the user asked not to
+  be handed commands): first `echo n | npm run release` to preview what's going out, then `echo y | npm run release`
+  to publish (a blind `--yes` gets blocked), `git pull`, and wait for the deploy with `gh run watch`. Mention it when a save-version change is going out. Details in `docs/TECH.md` §9.1.
 - **Commits:** plain messages, with no "Co-Authored-By: Claude" trailer.
 - **No digital timers** (countdowns like 2:15) anywhere in the game UI. Show time as a bar or
   through the lighting.
