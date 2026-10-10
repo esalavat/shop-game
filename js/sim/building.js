@@ -141,7 +141,7 @@ function insertColumn(state, col) {
     if (w > gap) p.x += S;
     p.x -= (state.building.rooms.find((r) => r.id === frame).col - oldCol.get(frame)) * S;
   };
-  const people = [state.keeper, state.stocker, state.cashier, ...(state.customers ?? [])].filter(Boolean);
+  const people = [state.keeper, ...state.stockers, state.cashier, ...(state.customers ?? [])].filter(Boolean);
   for (const a of people) {
     if (!oldCol.has(a.roomId)) continue;
     if (a.arriveRoom || a.legs?.length) { // walking in another room's coordinates

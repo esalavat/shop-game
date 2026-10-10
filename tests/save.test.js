@@ -200,7 +200,7 @@ test('a v10 save has no stocker yet, and floating boxes settle on load', () => {
   store.setItem(SAVE_KEY, JSON.stringify(v10));
   const s = loadGame(store);
   assert.equal(s.version, STATE_VERSION);
-  assert.equal(s.stocker, null);
+  assert.deepEqual(s.stockers, []);
   assert.equal(s.boxes[0].spot, 0);
 });
 
@@ -232,14 +232,15 @@ test('a v13 save lets Bea walk between rooms', () => {
   store.setItem(SAVE_KEY, JSON.stringify(v13));
   const s = loadGame(store);
   assert.equal(s.version, STATE_VERSION);
-  assert.equal(s.stocker.arriveRoom, null);
-  assert.equal(s.stocker.x, 1.4);
+  assert.equal(s.stockers[0].arriveRoom, null);
+  assert.equal(s.stockers[0].x, 1.4);
+  assert.equal(s.stockers[0].who, 'stocker');
 });
 
 test('a v13 save without Bea stays without her', () => {
   const store = memoryStorage();
   store.setItem(SAVE_KEY, JSON.stringify({ ...createState(0), version: 13 }));
-  assert.equal(loadGame(store).stocker, null);
+  assert.deepEqual(loadGame(store).stockers, []);
 });
 
 test('a v14 save gets walks in legs and a height for the stairs (GDD #58)', () => {
@@ -252,8 +253,8 @@ test('a v14 save gets walks in legs and a height for the stairs (GDD #58)', () =
   assert.equal(s.version, STATE_VERSION);
   assert.deepEqual(s.keeper.legs, []);
   assert.equal(s.keeper.y, 0);
-  assert.deepEqual(s.stocker.legs, []);
-  assert.equal(s.stocker.carrying.itemId, 'doll');
+  assert.deepEqual(s.stockers[0].legs, []);
+  assert.equal(s.stockers[0].carrying.itemId, 'doll');
 });
 
 test('a v16 save gets Ribbons for its Collection and no styles yet (GDD #68)', () => {

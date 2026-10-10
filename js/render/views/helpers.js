@@ -1,5 +1,5 @@
 // Draws helpers from state: Mia the cashier behind the counter (sim/helpers.js), Bea the stocker
-// carrying boxes to the shelves (sim/stocker.js), Ollie the greeter at the door and Rosa the window
+// (and Theo and Juno) carrying boxes to the shelves (sim/stocker.js), Ollie the greeter at the door and Rosa the window
 // dresser by the Dream Dollhouse (GDD #72), once each is hired. They move smoothly between sim
 // ticks, bob while walking, and hop when they do something (Mia on each scan, Bea on each pickup).
 
@@ -10,6 +10,7 @@ import { HELPERS } from '../../data/upgrades.js';
 import { BOX_SIZE } from '../../sim/stock.js';
 import { events } from '../../core/events.js';
 import { groundAt } from '../../sim/route.js';
+import { STOCKERS } from '../../sim/stocker.js';
 
 const lerp = (a, b, t) => a + (b - a) * t;
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
@@ -92,22 +93,23 @@ function createHelper(id, agent) {
 export function createHelpersView(state, roomOrigin) {
   const group = new THREE.Group();
   const mia = createHelper('cashier', () => state.cashier);
-  const bea = createHelper('stocker', () => state.stocker);
+  // Stockers by HELPERS id (Bea, Theo, Juno; GDD #72).
+  const stockers = Object.fromEntries(STOCKERS.map((who) => [who, createHelper(who, () => state.stockers.find((b) => b.who === who))]));
   const ollie = createHelper('greeter', () => state.greeter);
   const rosa = createHelper('dresser', () => state.dresser);
-  const all = [mia, bea, ollie, rosa];
+  const all = [mia, ...Object.values(stockers), ollie, rosa];
   group.add(...all.map((h) => h.root));
 
   events.on('scanned', () => { if (state.cashier?.serving) mia.hop = 1; });
   events.on('greeted', () => { if (state.greeter) ollie.hop = 1; });
   events.on('peek', () => { if (state.dresser) rosa.hop = 1; });
-  events.on('boxPicked', ({ by }) => { if (by === 'stocker') bea.hop = 1; });
+  events.on('boxPicked', ({ by }) => { if (stockers[by]) stockers[by].hop = 1; });
 
   return {
     group,
     beforeTick() { for (const h of all) h.beforeTick(); },
-    /** World position of Bea's hands (where stocked items hop from). */
-    stockerHand: () => bea.handPosition(),
+    /** World position of a stocker's hands (where stocked items hop from). */
+    stockerHand: (who) => (stockers[who] ?? stockers.stocker).handPosition(),
     frame(dt, alpha) { for (const h of all) h.frame(dt, alpha, roomOrigin); },
   };
 }

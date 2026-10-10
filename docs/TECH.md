@@ -124,7 +124,7 @@ docs/                   # GDD, tech plan
 
 ```js
 {
-  version: 18,                         // STATE_VERSION (js/sim/state.js)
+  version: 19,                         // STATE_VERSION (js/sim/state.js)
   day: { number: 1, phase: 'morning', time: 0 },
   coins: 50, hearts: 0, sparkle: 0, ribbons: 4,   // Ribbons 🎀 for room styles (v17)
   decor: { owned: { 'pattern:stars': true } },     // styles bought (v17); free ones (price 0) aren't listed
@@ -138,7 +138,7 @@ docs/                   # GDD, tech plan
   helpers: { cashier: true },          // one-time hires (v8); Mia's position is live-only in `cashier`
   upgrades: { cart: true, shoes: true, lunch: true },   // (Sorting Smarts was removed in v16)
   keeper: { ..., carrying, spare, arriveRoom, legs, y }, // `spare` = second box on the Stock Cart; `arriveRoom` while walking between rooms (v9); `legs` / `y` for routes up the stairs (v15)
-  stocker: { ...same walking fields, carrying, spare, job, timer } | null, // Bea, once hired (v11)
+  stockers: [{ who, ...same walking fields, carrying, spare, job, timer }], // Bea, Theo, Juno once hired (v11 as `stocker`; a list since v19); who = HELPERS id
   shopkeeper: { hair, hairColor, skin, outfit, accessory, created },
   story: { seen: [...], flags: {...} },
   settings: { muted: false },
@@ -423,7 +423,7 @@ Each milestone ends with a push so it's playable on your phone.
 | 24 items on four catalog pages that open as you collect (#66) | ✅ approved |
 | Collection bonus and theme rewards: coins, shopkeeper styles (#70, part of #59) | ✅ built (waiting for the user's feedback) |
 | Stock counts in the order book (#71) | ✅ built (waiting for the user's feedback); `stockCount` in `sim/stock.js` |
-| More helpers and upgrades (#72) | 🚧 steps 1-2 built (greeter, window dresser, scanner, gift wrap; tall shelves) |
+| More helpers and upgrades (#72) | 🚧 steps 1-3 built (greeter, window dresser, scanner, gift wrap; tall shelves; up to three stockers, save v19) |
 | Color variants and more items (#59) | ⏭ later |
 
 ### 11.1 Plan: Stairwell and upstairs (#58 step 2) — ✅ built 2026-10-09

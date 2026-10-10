@@ -122,6 +122,11 @@ const MIGRATIONS = {
   // v18: theme coin gifts (GDD #70). None given yet: themes already complete are paid on the next
   // load (giftCompleteThemes in main.js), with the celebration.
   17: (d) => ({ ...d, version: 18, themeGifts: [] }),
+  // v19: up to three stockers (GDD #72): state.stocker (Bea) becomes the first of state.stockers.
+  18: (d) => {
+    const { stocker, ...rest } = d;
+    return { ...rest, version: 19, stockers: stocker ? [{ ...stocker, who: 'stocker' }] : [] };
+  },
 };
 
 export function migrate(data) {

@@ -7,7 +7,7 @@ import { dropBox } from './stock.js';
 import { emptyStats } from './day.js';
 import { ribbonsForCollection } from './decor.js';
 
-export const STATE_VERSION = 18;
+export const STATE_VERSION = 19;
 
 /** Live-only fields: never saved, reset on every load (customers just walk in again). */
 export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer', 'cashier', 'greeter', 'dresser'];
@@ -57,7 +57,7 @@ export function createState(now = Date.now()) {
     themeGifts: [], // themes whose coin gift was given, in order (sim/rewards.js, GDD #70)
     upgrades: {}, // id -> true (data/upgrades.js)
     helpers: {},  // id -> true
-    stocker: null, // Bea, once hired (sim/stocker.js); saved, so boxes in her hands are never lost
+    stockers: [], // Bea, Theo and Juno, once hired (sim/stocker.js, GDD #72); saved, so boxes in their hands are never lost
     settings: { muted: false }, // sounds and vibration (audio/audio.js)
     best: { coins: 0 },          // best day so far (sim/day.js recordBest)
     tutorial: 'box',             // the first-day guide's step (sim/tutorial.js); 'done' once finished

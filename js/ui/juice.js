@@ -44,7 +44,7 @@ export function createJuice({ audio, fx, overlay, keeperView, helpersView, custo
   events.on('stocked', ({ by }) => { if (by === 'keeper') audio.buzz(10); }); // only buzz for your own work
   events.on('boxEmptied', ({ by }) => {
     audio.play('poof');
-    fx.poof(by === 'stocker' ? helpersView.stockerHand() : keeperView.handPosition());
+    fx.poof(by === 'keeper' ? keeperView.handPosition() : helpersView.stockerHand(by));
   });
   events.on('shelfFull', () => audio.play('boop'));
   events.on('lunchDelivery', () => audio.play('pop'));

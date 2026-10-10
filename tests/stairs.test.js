@@ -8,7 +8,7 @@ import { buildExpansion, buildRoom, buildStairwell, buildFloor, canBuildStairwel
 import { walkTo, walkToFixture, tickKeeper } from '../js/sim/keeper.js';
 import { spawnCustomer, tickCustomers } from '../js/sim/customers.js';
 import { tickHelpers } from '../js/sim/helpers.js';
-import { tickStocker } from '../js/sim/stocker.js';
+import { tickStockers } from '../js/sim/stocker.js';
 import { separate } from '../js/sim/crowd.js';
 import { tickDay, openShop } from '../js/sim/day.js';
 import { dropBox } from '../js/sim/stock.js';
@@ -174,7 +174,7 @@ test('the stairs are off the walk grid, so nobody walks through them', () => {
 });
 
 const tickAll = (s, navs, rand) => {
-  tickKeeper(s, 0.1); tickHelpers(s, 0.1, rand); tickStocker(s, navs, 0.1); tickCustomers(s, navs, 0.1, rand); separate(s, navs); tickDay(s, 0.1);
+  tickKeeper(s, 0.1); tickHelpers(s, 0.1, rand); tickStockers(s, navs, 0.1); tickCustomers(s, navs, 0.1, rand); separate(s, navs); tickDay(s, 0.1);
 };
 
 test('a customer buys something upstairs and pays at the counter downstairs', () => {
@@ -211,9 +211,9 @@ test('Bea carries boxes up the stairs to an upstairs room', () => {
   const fairyItem = 'teaset';
   dropBox(s, fairyItem, 3);
   let wentUp = false;
-  for (let t = 0; t < 120 && (s.boxes.length || s.stocker?.carrying); t += 0.1) {
-    tickStocker(s, navs, 0.1);
-    if (s.stocker.roomId === fairy.id) wentUp = true;
+  for (let t = 0; t < 120 && (s.boxes.length || s.stockers[0]?.carrying); t += 0.1) {
+    tickStockers(s, navs, 0.1);
+    if (s.stockers[0].roomId === fairy.id) wentUp = true;
   }
   assert.ok(wentUp);
   assert.equal(fairy.fixtures.flatMap((f) => f.slots ?? []).filter((x) => x === fairyItem).length, 3);

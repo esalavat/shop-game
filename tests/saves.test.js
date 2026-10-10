@@ -63,7 +63,7 @@ for (const { name, raw } of fixtures) {
     assert.equal(s.boxes.length, old.boxes.length, 'boxes');
     for (const key of ['hair', 'hairColor', 'skin', 'outfit', 'accessory', 'created']) assert.equal(s.shopkeeper[key], old.shopkeeper[key], key);
     assert.equal(s.settings.muted, old.settings.muted);
-    assert.equal(!!s.stocker, !!old.stocker);
+    assert.equal(s.stockers.length, old.stockers?.length ?? (old.stocker ? 1 : 0), 'stockers');
   });
 
   test(`${name} keeps a copy of itself when it's upgraded, and round-trips`, () => {

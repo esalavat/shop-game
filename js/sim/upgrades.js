@@ -18,8 +18,13 @@ export function buyUpgrade(state, id) {
   return true;
 }
 
-/** Some helpers need a room first (Rosa needs the Window Display). */
-export const canHire = (state, id) => HELPERS[id]?.needs !== 'display' || state.building.rooms.some((r) => r.type === 'display' && r.floor === 0);
+/** Some helpers need something first: Rosa the Window Display, each stocker the one before. */
+export function canHire(state, id) {
+  const needs = HELPERS[id]?.needs;
+  if (!needs) return true;
+  if (needs === 'display') return state.building.rooms.some((r) => r.type === 'display' && r.floor === 0);
+  return hasHelper(state, needs);
+}
 
 export function hireHelper(state, id) {
   const h = HELPERS[id];

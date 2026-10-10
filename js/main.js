@@ -30,7 +30,7 @@ import { GREETER, SIDEWALK, STAIRS, groundAt, shopRoom, streetBounds, stairRoom,
 import { tickDay, twilightFor } from './sim/day.js';
 import { tickCustomers } from './sim/customers.js';
 import { tickHelpers } from './sim/helpers.js';
-import { tickStocker } from './sim/stocker.js';
+import { tickStockers } from './sim/stocker.js';
 import { canCarryMore } from './sim/stock.js';
 import { UPGRADES, HELPERS } from './data/upgrades.js';
 import { separate } from './sim/crowd.js';
@@ -152,7 +152,7 @@ buildWorld();
 focusRoom(roomById(state.keeper.roomId), true);
 const keeperView = createKeeperView(state, roomOrigin);
 const boxesView = createBoxesView(state, roomOrigin);
-const shelvesView = createShelvesView(state, roomOrigin, (by) => (by === 'stocker' ? helpersView.stockerHand() : keeperView.handPosition()), (p, step) => juice.itemLanded(p, step));
+const shelvesView = createShelvesView(state, roomOrigin, (by) => (by === 'keeper' ? keeperView.handPosition() : helpersView.stockerHand(by)), (p, step) => juice.itemLanded(p, step));
 const customersView = createCustomersView(state, roomOrigin);
 const checkoutView = createCheckoutView(state, roomOrigin);
 const dollhouseView = createDollhouseView(state, roomOrigin);
@@ -391,6 +391,7 @@ events.on('lunchDelivery', ({ delivered }) => {
 events.on('upgradeBought', ({ id }) => toast(`${UPGRADES[id].icon} ${UPGRADES[id].name}: yours!`));
 const HELPER_JOBS = {
   cashier: "She'll mind the register.", stocker: "She'll keep the shelves stocked.",
+  stocker2: "He'll help keep the shelves stocked.", stocker3: "She'll help keep the shelves stocked.",
   greeter: "He'll say hello at the door.", dresser: "She'll show off your Dream Dollhouse.",
 };
 events.on('helperHired', ({ id }) => {
@@ -408,7 +409,7 @@ function pageToasts(delivered) {
   for (const page of delivered.opened) toast(`${PAGES[page].icon} New page in the Order Book: ${PAGES[page].name}!`);
 }
 events.on('boxPicked', ({ spare, by }) => {
-  if (by !== 'keeper') return; // Bea needs no instructions
+  if (by !== 'keeper') return; // stockers need no instructions
   if (spare) toast('Two boxes on the cart! Tap a shelf to unpack 🛒');
   else if (canCarryMore(state) && state.boxes.length) toast('Grab another box for the cart, or tap a shelf to unpack!');
   else toast('Now tap a shelf to unpack it!');
@@ -591,7 +592,7 @@ startLoop({
     customersView.beforeTick();
     tickKeeper(state, dt);
     tickHelpers(state, dt);
-    tickStocker(state, navs, dt);
+    tickStockers(state, navs, dt);
     tickCustomers(state, navs, dt);
     separate(state, navs);
     tickDay(state, dt);

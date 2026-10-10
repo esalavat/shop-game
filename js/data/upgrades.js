@@ -30,6 +30,17 @@ export const HELPERS = {
     speed: 1.2,      // walking speed (the shopkeeper's is 1.7)
     pause: 0.45,     // seconds she takes to pick up a box or start unpacking
   },
+  // More stockers (GDD #72), each after the one before; they work just like Bea.
+  stocker2: {
+    name: 'Theo', job: 'Stocker', icon: '📦', cost: 350, needs: 'stocker',
+    desc: 'Another pair of hands for the boxes. Theo and Bea never grab the same one.',
+    look: { hair: 'swoop', hairColor: '#6b3e2e', skin: '#8d5a3c', outfit: '#a8d8ff', accessory: 'bowtie' },
+  },
+  stocker3: {
+    name: 'Juno', job: 'Stocker', icon: '📦', cost: 500, needs: 'stocker2',
+    desc: 'For a really big shop: Juno joins Bea and Theo filling shelves on every floor.',
+    look: { hair: 'bun', hairColor: '#c2563a', skin: '#ffd9c2', outfit: '#b8e6a0', accessory: 'bow' },
+  },
   // GDD #72: they stand at the bonus spots, so your shopkeeper doesn't have to.
   greeter: {
     name: 'Ollie', job: 'Greeter', icon: '👋', cost: 250,

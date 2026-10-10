@@ -1,7 +1,8 @@
-// Bea the stocker (GDD #51, #53): once hired, she carries delivery boxes from the doorstep to the
-// shelves and unpacks them, in the morning, during open hours and in the evening. She fills the
-// emptiest shelf in any room, walking over along the sidewalk or up the stairs (sim/route.js). Unlike Mia, she's saved
-// (state.stocker), so a box in her hands is never lost on reload.
+// Stockers (GDD #51, #53, #72): Bea, then Theo and Juno, once hired. Each carries delivery boxes from
+// the doorstep to the shelves and unpacks them, in the morning, during open hours and in the evening,
+// filling the emptiest shelf in any room, walking over along the sidewalk or up the stairs
+// (sim/route.js). Unlike Mia, they're saved (state.stockers, each with `who`: its HELPERS id), so a
+// box in their hands is never lost on reload. They never fetch the same box.
 //
 // Each tick: walk; when she arrives, pause a moment, then do the job (pick up / unpack); when idle,
 // plan the next job. Plans are re-checked on arrival, since the shopkeeper may have got there first.
@@ -13,13 +14,17 @@ import { sellingRooms } from './building.js';
 import { finishRoute, routeTo, walkRoute } from './route.js';
 import { boxSpot, canCarryMore, freeSlots, pickUpBox, shopRoomId, stockShelf, DOORWAY_Z } from './stock.js';
 
-/** Where she waits when there's nothing to do: by the right wall, out of the customers' way. */
+/** Where Bea waits when there's nothing to do: by the right wall, out of the customers' way. */
 export const STOCKER_WAIT = { x: 1.4, z: 0.7, face: 0 };
+/** The stockers you can hire, in order (HELPERS ids); each waits a little further from the wall. */
+export const STOCKERS = ['stocker', 'stocker2', 'stocker3'];
+const waitSpot = (who) => ({ ...STOCKER_WAIT, x: STOCKER_WAIT.x - STOCKERS.indexOf(who) * 0.35 });
 const WORKING = new Set(['morning', 'open', 'evening']);
 
-export function createStocker(roomId) {
+export function createStocker(roomId, who = 'stocker') {
+  const wait = waitSpot(who);
   return {
-    roomId, x: STOCKER_WAIT.x, z: STOCKER_WAIT.z, facing: STOCKER_WAIT.face,
+    who, roomId, x: wait.x, z: wait.z, facing: wait.face,
     path: [], arriveFacing: null, arriveRoom: null, legs: [], y: 0,
     carrying: null, spare: null, // boxes, like the shopkeeper's
     job: null,                    // { type: 'pickup', boxId } | { type: 'stock', fixtureId } on the way / pausing
@@ -41,16 +46,17 @@ const onShelves = (state) => new Set(state.building.rooms.flatMap((r) => r.fixtu
 
 /**
  * Which doorstep box to fetch next: wished-for items first, then items that aren't on the shelves at
- * all, then the lowest box. Never the one the shopkeeper is walking to.
+ * all, then the lowest box. Never the one the shopkeeper or another stocker is heading for.
  */
-export function chooseBox(state) {
+export function chooseBox(state, me = null) {
   const k = state.keeper;
-  const taken = k.task?.type === 'pickup' ? k.task.boxId : null;
+  const taken = new Set([k.task?.type === 'pickup' ? k.task.boxId : null]);
+  for (const o of state.stockers) if (o !== me && o.job?.type === 'pickup') taken.add(o.job.boxId);
   const wished = new Set(state.wishes.map((w) => w.itemId));
   const shelved = onShelves(state);
   const score = (b) => (wished.has(b.itemId) ? 0 : shelved.has(b.itemId) ? 2 : 1) * 1000 + b.spot;
   return state.boxes
-    .filter((b) => b.id !== taken && b.roomId === shopRoomId(state))
+    .filter((b) => !taken.has(b.id) && b.roomId === shopRoomId(state))
     .sort((a, b) => score(a) - score(b))[0] ?? null;
 }
 
@@ -62,11 +68,11 @@ function walk(state, navs, b, dest, face, job) {
   return true;
 }
 
-/** Back to her spot by the shop's right wall, unless she's there. */
+/** Back to their spot by the shop's right wall, unless they're there. */
 function goWait(state, navs, b) {
-  const shopId = shopRoomId(state);
-  if (b.roomId === shopId && Math.hypot(b.x - STOCKER_WAIT.x, b.z - STOCKER_WAIT.z) <= 0.05) return;
-  walk(state, navs, b, { roomId: shopId, x: STOCKER_WAIT.x, z: STOCKER_WAIT.z }, STOCKER_WAIT.face, null);
+  const shopId = shopRoomId(state), wait = waitSpot(b.who);
+  if (b.roomId === shopId && Math.hypot(b.x - wait.x, b.z - wait.z) <= 0.05) return;
+  walk(state, navs, b, { roomId: shopId, x: wait.x, z: wait.z }, wait.face, null);
 }
 
 function plan(state, b, navs) {
@@ -74,7 +80,7 @@ function plan(state, b, navs) {
   const held = (b.carrying?.qty ?? 0) + (b.spare?.qty ?? 0);
   // Fetch a box if there's shelf space for it (and a free hand, or room on the Stock Cart).
   if (space > held && canCarryMore(state, b)) {
-    const box = chooseBox(state);
+    const box = chooseBox(state, b);
     if (box && walk(state, navs, b, { roomId: box.roomId, x: boxSpot(box.spot).x, z: DOORWAY_Z }, 0, { type: 'pickup', boxId: box.id })) return;
   }
   const target = b.carrying && shelfFor(state, b);
@@ -86,11 +92,15 @@ function plan(state, b, navs) {
   goWait(state, navs, b);
 }
 
-export function tickStocker(state, navs, dt) {
-  if (!hasHelper(state, 'stocker')) return;
-  const H = HELPERS.stocker;
-  if (!state.stocker) state.stocker = createStocker(shopRoomId(state));
-  const b = state.stocker;
+export function tickStockers(state, navs, dt) {
+  for (const who of STOCKERS) {
+    if (hasHelper(state, who) && !state.stockers.some((b) => b.who === who)) state.stockers.push(createStocker(shopRoomId(state), who));
+  }
+  for (const b of state.stockers) tickStocker(state, navs, b, dt);
+}
+
+function tickStocker(state, navs, b, dt) {
+  const H = HELPERS.stocker; // they all work at Bea's pace
   if (!navs.get(b.roomId)) return;
 
   if (b.path.length) {
@@ -105,8 +115,8 @@ export function tickStocker(state, navs, dt) {
     if ((b.timer -= dt) > 0) return;
     const job = b.job;
     b.job = null;
-    if (job.type === 'pickup') pickUpBox(state, job.boxId, b, 'stocker'); // gone already? she just re-plans
-    else stockShelf(state, job.fixtureId, b, 'stocker');
+    if (job.type === 'pickup') pickUpBox(state, job.boxId, b, b.who); // gone already? they just re-plan
+    else stockShelf(state, job.fixtureId, b, b.who);
     return;
   }
   if (WORKING.has(state.day.phase)) plan(state, b, navs);

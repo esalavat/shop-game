@@ -1,6 +1,7 @@
 // Delivery boxes and shelf stock: boxes land at the front of the shop, the shopkeeper (or Bea the
 // stocker, sim/stocker.js) picks one up, and carries it to a shelf where its items fill the free slots.
-// A "carrier" is anyone with { carrying, spare }; events say `by: 'keeper' | 'stocker'`.
+// A "carrier" is anyone with { carrying, spare }; events say `by: 'keeper'` or the stocker's HELPERS id
+// ('stocker' for Bea, 'stocker2', 'stocker3'; GDD #72).
 
 import { events } from '../core/events.js';
 import { FIXTURES } from '../data/fixtures.js';
@@ -128,7 +129,7 @@ export function stockCount(state, itemId) {
   for (const room of state.building.rooms) {
     for (const f of room.fixtures) if (f.slots) shelf += f.slots.filter((s) => s === itemId).length;
   }
-  const boxes = [...state.boxes, state.keeper.carrying, state.keeper.spare, state.stocker?.carrying, state.stocker?.spare];
+  const boxes = [...state.boxes, state.keeper.carrying, state.keeper.spare, ...state.stockers.flatMap((b) => [b.carrying, b.spare])];
   const boxed = boxes.filter((b) => b?.itemId === itemId).reduce((n, b) => n + b.qty, 0);
   const coming = state.orders.filter((o) => o.itemId === itemId).reduce((n, o) => n + o.qty, 0);
   return { shelf, boxed, coming };

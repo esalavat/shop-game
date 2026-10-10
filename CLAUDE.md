@@ -56,7 +56,7 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   the Grow sheet. She fetches doorstep boxes (wished-for items first, then items not on the shelves) and
   unpacks them onto the emptiest shelf, in the morning, open hours and evening; never takes the box your
   shopkeeper is heading for; waits by the right wall. Code: `js/sim/stocker.js`, drawn in
-  `js/render/views/helpers.js`. Stock events carry `by: 'keeper' | 'stocker'`. Save version 11.
+  `js/render/views/helpers.js`. Save version 11 (now `state.stockers`, v19).
 - **Midday mark** on the day bar for Lunchtime Delivery (#52), done.
 - **Order book** cards show the sell price per item and a mint "+🪙 12 profit" tag for the box (#54), done.
 - **Boy or girl shopkeeper** (#43, #55), done: the creator's first row; boys' hair short / spiky / curly /
@@ -130,7 +130,9 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   2. ✅ **Tall Shelves** (🪙 250): every shelf gets a top row, 12 slots instead of 9, filled last (`fitShelves` in
      `js/sim/upgrades.js`, run on purchase and whenever a room is built; `tallSlots` in `js/data/fixtures.js`). Slot
      arrays just get longer, so no save change.
-  3. Up to three stockers (Bea, Theo 🪙 350, Juno 🪙 500).
+  3. ✅ **Up to three stockers**: Bea, then Theo (🪙 350), then Juno (🪙 500); each waits a little further from the right
+     wall and they never head for the same box. **Save version 19:** `state.stocker` became `state.stockers` (each with
+     `who`, its HELPERS id: 'stocker' | 'stocker2' | 'stocker3'); stock events say `by: 'keeper'` or that id.
   4. A second register on the same counter, with Kai the cashier (🪙 400), two lines.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.

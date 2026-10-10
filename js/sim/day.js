@@ -40,11 +40,11 @@ export function closeEarly(state) {
   return true;
 }
 
-/** Nothing left to sell: empty shelves, no boxes waiting, nothing in the shopkeeper's (or Bea's) hands. */
+/** Nothing left to sell: empty shelves, no boxes waiting, nothing in the shopkeeper's (or a stocker's) hands. */
 export function soldOut(state) {
   const shelvesEmpty = state.building.rooms.every((r) => r.fixtures.every((f) => !f.slots || f.slots.every((s) => !s)));
   const holding = (c) => !!(c?.carrying || c?.spare);
-  return shelvesEmpty && state.boxes.length === 0 && !holding(state.keeper) && !holding(state.stocker);
+  return shelvesEmpty && state.boxes.length === 0 && !holding(state.keeper) && !state.stockers.some(holding);
 }
 
 /** Everyone left is on their way out (they keep walking off behind the closing summary). */

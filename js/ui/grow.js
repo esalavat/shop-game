@@ -94,7 +94,7 @@ export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
     }
     html += '<div class="grow-section">Helpers</div>';
     for (const [id, h] of Object.entries(HELPERS)) {
-      html += small({ art: h.icon, name: `${h.name} the ${h.job}`, desc: h.desc, cost: h.cost, owned: hasHelper(state, id), ownedText: 'Hired 💖', buy: `helper:${id}`, buyText: 'Hire', locked: canHire(state, id) ? null : 'Build the Window Display first' });
+      html += small({ art: h.icon, name: `${h.name} the ${h.job}`, desc: h.desc, cost: h.cost, owned: hasHelper(state, id), ownedText: 'Hired 💖', buy: `helper:${id}`, buyText: 'Hire', locked: canHire(state, id) ? null : h.needs === 'display' ? 'Build the Window Display first' : `Hire ${HELPERS[h.needs].name} first` });
     }
     html += '<div class="grow-section">Upgrades</div>';
     for (const [id, u] of Object.entries(UPGRADES)) {

@@ -7,7 +7,7 @@ import { buildNav } from '../js/sim/nav.js';
 import { buildExpansion, buildRoom, buildStairwell, buildFloor, roomSpots, roomCost, stairCost, canBuildRooms } from '../js/sim/building.js';
 import { spawnCustomer, tickCustomers, QUEUE_SPOTS } from '../js/sim/customers.js';
 import { checkoutTap } from '../js/sim/checkout.js';
-import { tickStocker } from '../js/sim/stocker.js';
+import { tickStockers } from '../js/sim/stocker.js';
 import { tickKeeper } from '../js/sim/keeper.js';
 import { dropBox } from '../js/sim/stock.js';
 import { ROOM_COSTS, ROOM_STYLES, STAIR_COSTS } from '../js/data/rooms.js';
@@ -138,7 +138,7 @@ function beaWithTeaRoom() {
   for (const room of [w.shop, w.tea]) for (const f of shelvesIn(room)) f.slots.fill('doll');
   return w;
 }
-const run = (s, navs, seconds) => { for (let t = 0; t < seconds; t += 0.1) { tickKeeper(s, 0.1); tickStocker(s, navs, 0.1); } };
+const run = (s, navs, seconds) => { for (let t = 0; t < seconds; t += 0.1) { tickKeeper(s, 0.1); tickStockers(s, navs, 0.1); } };
 
 test('Bea stocks shelves in other rooms too, walking over along the sidewalk', () => {
   const { s, tea, shop, navs } = beaWithTeaRoom();
@@ -146,8 +146,8 @@ test('Bea stocks shelves in other rooms too, walking over along the sidewalk', (
   dropBox(s, 'chair', 3);
   run(s, navs, 40);
   assert.equal(shelvesIn(tea)[2].slots.filter((x) => x === 'chair').length, 3);
-  assert.equal(s.stocker.roomId, shop.id, 'back to her spot in the shop');
-  assert.equal(s.stocker.arriveRoom, null);
+  assert.equal(s.stockers[0].roomId, shop.id, 'back to her spot in the shop');
+  assert.equal(s.stockers[0].arriveRoom, null);
 });
 
 test('Bea takes a box to the emptiest shelf, wherever it is', () => {

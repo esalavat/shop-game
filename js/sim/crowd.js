@@ -33,8 +33,7 @@ function slipping(p) {
 }
 
 export function separate(state, navs) {
-  const people = [state.keeper, ...state.customers];
-  if (state.stocker) people.push(state.stocker);
+  const people = [state.keeper, ...state.customers, ...state.stockers];
   const slip = new Set(people.filter(slipping));
   for (let i = 0; i < people.length; i++) {
     for (let j = i + 1; j < people.length; j++) {

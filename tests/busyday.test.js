@@ -11,7 +11,7 @@ import { buildExpansion, buildRoom, roomSpots } from '../js/sim/building.js';
 import { tickCustomers } from '../js/sim/customers.js';
 import { tickKeeper } from '../js/sim/keeper.js';
 import { tickHelpers } from '../js/sim/helpers.js';
-import { tickStocker } from '../js/sim/stocker.js';
+import { tickStockers } from '../js/sim/stocker.js';
 import { separate } from '../js/sim/crowd.js';
 import { tickDay, openShop } from '../js/sim/day.js';
 import { dropBox } from '../js/sim/stock.js';
@@ -35,7 +35,7 @@ for (const seed of [2332, 2235]) {
     openShop(s);
     let t = 0;
     while (s.day.phase !== 'close' && t < 900) {
-      tickKeeper(s, 0.1); tickHelpers(s, 0.1, rand); tickStocker(s, navs, 0.1); tickCustomers(s, navs, 0.1, rand); separate(s, navs); tickDay(s, 0.1);
+      tickKeeper(s, 0.1); tickHelpers(s, 0.1, rand); tickStockers(s, navs, 0.1); tickCustomers(s, navs, 0.1, rand); separate(s, navs); tickDay(s, 0.1);
       t += 0.1;
     }
     assert.equal(s.day.phase, 'close', `still ${s.day.phase} with ${s.customers.length} customers: ${s.customers.map((c) => c.state).join(', ')}`);
