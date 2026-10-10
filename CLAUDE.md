@@ -177,6 +177,7 @@ and pinching out to the whole house (§18 #14); no save changes. Everything on `
 - Demand-based pricing vs fixed prices (§18 #5).
 - Background music (a music-box loop by time of day, GDD §15).
 - An Orderer helper who re-orders what sells (GDD §10, not decided).
+- A switch in the Grow sheet to hide purchased upgrades (GDD §18 #16).
 
 ## How the code is organized
 
