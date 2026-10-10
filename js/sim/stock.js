@@ -118,3 +118,18 @@ export function stockShelf(state, fixtureId, carrier = state.keeper, by = 'keepe
   }
   return total;
 }
+
+/**
+ * How many of an item you have (GDD #71): on the shelves in every room, in boxes (on the doorstep or
+ * in someone's hands), and on order. For the order book, so it's easy to stock evenly.
+ */
+export function stockCount(state, itemId) {
+  let shelf = 0;
+  for (const room of state.building.rooms) {
+    for (const f of room.fixtures) if (f.slots) shelf += f.slots.filter((s) => s === itemId).length;
+  }
+  const boxes = [...state.boxes, state.keeper.carrying, state.keeper.spare, state.stocker?.carrying, state.stocker?.spare];
+  const boxed = boxes.filter((b) => b?.itemId === itemId).reduce((n, b) => n + b.qty, 0);
+  const coming = state.orders.filter((o) => o.itemId === itemId).reduce((n, o) => n + o.qty, 0);
+  return { shelf, boxed, coming };
+}

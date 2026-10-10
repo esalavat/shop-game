@@ -3,10 +3,12 @@
 // the box arrives the next morning (or at lunchtime, with the Lunchtime Delivery upgrade).
 // Items sit on catalog pages (tabs); fancier pages open as you collect (GDD #66). A page that isn't
 // open yet shows its items as silhouettes, except ones you've already found.
+// Each item you've found shows how many you have (GDD #71): on the shelves, in boxes, and on the way.
 
 import { ITEMS, PAGES, boxCost, boxProfit } from '../data/items.js';
 import { placeOrder, canAfford, lunchDeliveryOpen } from '../sim/orders.js';
 import { canOrder, foundCount, openPageCount, toNextPage } from '../sim/catalog.js';
+import { stockCount } from '../sim/stock.js';
 import { events } from '../core/events.js';
 
 export function createOrderBook(state, thumbs) {
@@ -15,6 +17,7 @@ export function createOrderBook(state, thumbs) {
   const pending = sheet.querySelector('.pending');
   const tabs = sheet.querySelector('.page-tabs');
   const lockNote = sheet.querySelector('.page-lock');
+  const legend = sheet.querySelector('.stock-legend');
   const cards = new Map();
   let shown = 0; // which page is showing
   // Pages opened while you play get a "new" dot until you look at them.
@@ -38,6 +41,7 @@ export function createOrderBook(state, thumbs) {
       <div class="card-sub">Box of ${item.perBox}</div>
       <div class="card-sub">Sells for 🪙 ${item.price} each</div>
       <div class="card-profit">+🪙 ${boxProfit(id)} profit</div>
+      <div class="card-have"></div>
       <button class="buy"><span aria-hidden="true">🪙</span> ${boxCost(id)}</button>`;
     card.querySelector('.buy').addEventListener('click', () => placeOrder(state, id));
     list.append(card);
@@ -55,6 +59,7 @@ export function createOrderBook(state, thumbs) {
     });
     const next = toNextPage(state);
     lockNote.hidden = shown < open;
+    legend.hidden = shown >= open;
     if (shown >= open) {
       const need = PAGES[shown].opensAt - foundCount(state);
       lockNote.textContent = shown === next?.page
@@ -66,6 +71,7 @@ export function createOrderBook(state, thumbs) {
       const orderable = canOrder(state, id);
       card.classList.toggle('locked', !orderable);
       card.querySelector('.buy').disabled = !orderable || !canAfford(state, id);
+      showStock(card.querySelector('.card-have'), id);
     }
     if (!state.orders.length) {
       pending.textContent = `Pick something lovely — Pip brings it ${lunchDeliveryOpen(state) ? 'at lunchtime 🥪' : 'tomorrow morning'}.`;
@@ -81,11 +87,23 @@ export function createOrderBook(state, thumbs) {
     pending.textContent = [lunch.length && `Arriving at lunchtime: ${list(lunch)}`, later.length && `Arriving tomorrow: ${list(later)}`].filter(Boolean).join(' · ');
   }
 
+  /** Chips like "🏪 4  📦 3  🚚 3" (the legend is at the top of the book), or "None in the shop!". Only for items you've found. */
+  function showStock(el, id) {
+    el.hidden = !state.collection[id];
+    if (el.hidden) return;
+    const { shelf, boxed, coming } = stockCount(state, id);
+    const chips = [['🏪', shelf], ['📦', boxed], ['🚚', coming]].filter(([, n]) => n).map(([icon, n]) => `<span>${icon} ${n}</span>`);
+    el.classList.toggle('none', !shelf && !boxed);
+    el.innerHTML = !shelf && !boxed ? `None in the shop!${coming ? ` <span>🚚 ${coming}</span>` : ''}` : chips.join('');
+  }
+
   events.on('coins', refresh);
   events.on('orderPlaced', refresh);
   events.on('dayStarted', refresh);
   events.on('phaseChanged', refresh);
   events.on('lunchDelivery', refresh);
+  // Sales and Bea's stocking go on while the book is open.
+  for (const name of ['shelvesChanged', 'boxesChanged', 'itemTaken', 'stocked']) events.on(name, () => { if (!sheet.hidden) refresh(); });
   events.on('pageOpened', ({ page }) => { shown = page; refresh(); });
   // Closed by the player (✕ or the backdrop): go back to wherever they came from.
   let onClose = null;

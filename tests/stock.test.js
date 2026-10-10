@@ -5,7 +5,7 @@ import { buildNav } from '../js/sim/nav.js';
 import { placeOrder } from '../js/sim/orders.js';
 import { startNextDay } from '../js/sim/day.js';
 import { walkToBox, walkToFixture, tickKeeper } from '../js/sim/keeper.js';
-import { pickUpBox, stockShelf, freeSlots, dropBox, BOX_SPOTS } from '../js/sim/stock.js';
+import { pickUpBox, stockShelf, freeSlots, dropBox, stockCount, BOX_SPOTS } from '../js/sim/stock.js';
 import { boxCost, boxProfit, ITEMS } from '../js/data/items.js';
 
 const run = (state, seconds = 8) => { for (let t = 0; t < seconds; t += 0.1) tickKeeper(state, 0.1); };
@@ -94,4 +94,15 @@ test('every box spot can be reached and picked up', () => {
 test('a box earns its sell price minus its cost, for every item in it', () => {
   assert.equal(boxProfit('teaset'), (10 - 6) * 3);
   for (const id of Object.keys(ITEMS)) assert.ok(boxProfit(id) > 0, `${id} should make a profit`);
+});
+
+test('stock counts add up shelves in every room, boxes (also in hand) and orders (GDD #71)', () => {
+  const s = createState();
+  assert.deepEqual(stockCount(s, 'teaset'), { shelf: 0, boxed: 3, coming: 0 });
+  const shelf = s.building.rooms[0].fixtures.find((f) => f.slots);
+  shelf.slots[0] = shelf.slots[1] = 'teaset';
+  s.keeper.carrying = { id: 'b9', itemId: 'teaset', qty: 2 };
+  s.orders.push({ itemId: 'teaset', qty: 3, arrivesDay: 2 });
+  assert.deepEqual(stockCount(s, 'teaset'), { shelf: 2, boxed: 5, coming: 3 });
+  assert.deepEqual(stockCount(s, 'lamp'), { shelf: 0, boxed: 0, coming: 0 });
 });

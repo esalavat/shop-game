@@ -119,15 +119,19 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   outfits, Flower Crown, Bunny Ears, Royal Crown), 🔒 in the creator until then. Old saves get theirs on first load.
   Code: `js/sim/rewards.js`, `COLLECTION` in `js/data/items.js`, `THEME_LOOKS` in `js/data/customers.js`; save version 18
   (`state.themeGifts`).
+- **Stock counts in the order book, built 2026-10-09, waiting for feedback (also from the tester who asked)** (GDD v0.34
+  #71): chips on each found item's card, 🏪 on shelves / 📦 in boxes / 🚚 coming, or "None in the shop!"; legend under the
+  tabs. `stockCount` in `js/sim/stock.js`. No save change.
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
 - **Planned next, in order:** (#59) **more items** (toward 100+, color variants). Later: more stockers
   (#60), Instant Delivery (GDD §11), Heart/Sparkle milestone unlocks (§18 #6). Open issue: delivery boxes stack too
   high (delivery-bin idea, docs/ISSUES.md).
 
-**Next:** to discuss with the user: stock counts in the order book (tester, GDD §18 #11) and more helpers / upgrades
-(more registers, more stockers, a greeter; §18 #12). Then the rest of #59 (color variants, more items). Waiting on
-feedback: the Collection bonus and theme rewards (#70).
+**Next:** to discuss with the user: more helpers / upgrades (more registers, more stockers, a greeter; GDD §18 #12;
+proposal: a second register with its own cashier, a second stocker, a door greeter, all from Grow, priced up as you
+hire more). Then the rest of #59 (color variants, more items). Waiting on feedback: the Collection bonus and theme
+rewards (#70), stock counts (#71).
 
 **Releases:** the latest is **v2026.10.9.7** (2026-10-09): the day summary scrolls on a big day so "Start Day" stays on
 screen (no save change). Everything on `main` is public. The MVP list in GDD §17 is complete.
