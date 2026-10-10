@@ -17,6 +17,7 @@ import { CHANNEL } from './channel.js';
 import { ITEMS, SETS } from '../data/items.js';
 import { themeComplete } from '../sim/decor.js';
 import { REFUNDS } from '../data/upgrades.js';
+import { OLD_THEME_STYLES } from '../data/decor.js';
 
 /** Old theme room types (v14-v15) and the ROOM_STYLES look each one becomes. */
 const THEME_STYLE = { tea: 0, parlor: 1, fairy: 2, bedroom: 3, dolls: 4, houses: 5 };
@@ -156,6 +157,13 @@ const MIGRATIONS = {
   // v22: decorating opens with the first shelf room (GDD #86). Every shop until now has had Ribbons from
   // the start, so it's open for them: nothing changes.
   21: (d) => ({ ...d, version: 22, decorOpen: true }),
+  // v23: themes give picture wallpapers now (GDD #87) and their old prizes went on sale for Ribbons:
+  // shops that had won one keep it, as if bought.
+  22: (d) => {
+    const owned = { ...d.decor?.owned };
+    for (const [set, [kind, id]] of Object.entries(OLD_THEME_STYLES)) if (themeComplete(d.collection ?? {}, set)) owned[`${kind}:${id}`] = true;
+    return { ...d, version: 23, decor: { ...d.decor, owned } };
+  },
 };
 
 export function migrate(data) {

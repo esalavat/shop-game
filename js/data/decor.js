@@ -10,6 +10,23 @@
 
 import { ROOM_TYPES, ROOM_STYLES } from './rooms.js';
 
+/**
+ * Collection prizes (GDD #87): each theme's picture wallpaper, drawn in render/patterns.js (PRIZE_TILES),
+ * once per round in that round's colours: theme -> [motif, name].
+ */
+const PRIZE_MOTIFS = {
+  tea: ['teacups', 'Teacups'], parlor: ['frames', 'Picture frames'], fairy: ['mushrooms', 'Toadstools'],
+  bedroom: ['moons', 'Moon and clouds'], dolls: ['teddies', 'Teddy faces'], houses: ['houses', 'Tiny houses'],
+  sweets: ['lollipops', 'Lollipops'], pets: ['cats', 'Cat faces'],
+};
+const ROUND_NAMES = ['', 'Bright', 'Dazzle'];
+const prizeId = (motif, round) => (round ? `${motif}${round + 1}` : motif);
+function PRIZE_PATTERNS() {
+  return ROUND_NAMES.flatMap((round_, round) => Object.values(PRIZE_MOTIFS).map(([motif, name]) => (
+    { id: prizeId(motif, round), name: round ? `${round_} ${name.toLowerCase()}` : name, prize: motif, round }
+  )));
+}
+
 export const DECOR = {
   paper: [
     { id: 'pink', name: 'Pink', paper: '#ffe1ec', stripe: '#ffd0e2', price: 0 },
@@ -41,6 +58,8 @@ export const DECOR = {
     { id: 'hearts', name: 'Hearts', price: 10 },
     { id: 'candy', name: 'Candy', price: 10 },
     { id: 'paws', name: 'Paw prints', price: 10 },
+    // Collection prizes (GDD #87): a picture per theme, in each round's colours; won, never bought.
+    ...PRIZE_PATTERNS(),
   ],
   floor: [
     { id: 'honey', name: 'Honey wood', style: 'planks', color: '#e8b98a', price: 0 },
@@ -112,10 +131,17 @@ export const DECOR_TABS = [
 const BASE = { paper: 'pink', pattern: 'stripes', floor: 'honey', rug: 'lilac', curtain: 'pink', corner: 'plant' };
 
 /**
- * Completing a theme in the Collection gives you a matching style for free (GDD #69), on top of the
- * Ribbons. Still buyable with Ribbons before that. theme (SETS in data/items.js) -> [kind, id].
+ * Completing a theme in the Collection gives its picture wallpaper (GDD #69, #87), only ever as a prize:
+ * theme (SETS in data/items.js) -> [kind, id].
  */
-export const THEME_STYLES = {
+export const THEME_STYLES = Object.fromEntries(Object.entries(PRIZE_MOTIFS).flatMap(([set, [motif]]) =>
+  [0, 1, 2].map((round) => [round ? `${set}${round + 1}` : set, ['pattern', prizeId(motif, round)]])));
+
+/**
+ * The prizes before #87, now on sale for Ribbons again. Shops that had won them keep them (save v23
+ * copies them into decor.owned).
+ */
+export const OLD_THEME_STYLES = {
   tea: ['pattern', 'gingham'],
   parlor: ['corner', 'books'],
   fairy: ['rug', 'flower'],

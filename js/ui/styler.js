@@ -8,6 +8,7 @@ import { SETS } from '../data/items.js';
 import { ROOM_TYPES } from '../data/rooms.js';
 import { buyDecor, canStyle, ownsDecor, rewardTheme, styleRoom } from '../sim/decor.js';
 import { swatchURL } from '../render/patterns.js';
+import { roundOpen } from '../sim/catalog.js';
 import { events } from '../core/events.js';
 
 const ROW_NAMES = { paper: 'Colour', pattern: 'Pattern' };
@@ -87,6 +88,9 @@ export function createStyler(state, { onRoom, onPreview, onClose, onBought }) {
     render();
   }
 
+  /** Collection prizes (GDD #87) show once their color round has opened, or once they're yours. */
+  const shown = (kind, o) => !o.prize || roundOpen(state, o.round) || ownsDecor(state, kind, o.id);
+
   function optionButton(kind, opt, current, look) {
     const owned = ownsDecor(state, kind, opt.id);
     const on = preview?.kind === kind ? preview.id === opt.id : current === opt.id;
@@ -109,7 +113,7 @@ export function createStyler(state, { onRoom, onPreview, onClose, onBought }) {
     tabs.innerHTML = tabsFor(r).map((t) => `<button data-tab="${t.id}" class="${t.id === tab ? 'on' : ''}"><span aria-hidden="true">${t.icon}</span>${t.name}</button>`).join('');
     const kinds = DECOR_TABS.find((t) => t.id === tab).kinds;
     rows.innerHTML = kinds.map((kind) => `<div class="sty-row">${kinds.length > 1 ? `<span>${ROW_NAMES[kind]}</span>` : ''}
-      <div class="sty-opts">${DECOR[kind].map((o) => optionButton(kind, o, ids[kind], look)).join('')}</div></div>`).join('');
+      <div class="sty-opts">${DECOR[kind].filter((o) => shown(kind, o)).map((o) => optionButton(kind, o, ids[kind], look)).join('')}</div></div>`).join('');
     if (preview) {
       const o = decorOption(preview.kind, preview.id), short = o.price - state.ribbons;
       const theme = rewardTheme(preview.kind, preview.id);

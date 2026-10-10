@@ -25,7 +25,7 @@ test('decorating opens with the first shelf room, paying the Collection\'s Ribbo
   ribbonsForFinds(s, ['caketower', 'teddy']);
   assert.equal(s.ribbons, 0);
   // ...and a theme's style can't be bought (it's a reward), though it's already yours.
-  assert.ok(ownsDecor(s, 'pattern', 'gingham'));
+  assert.ok(ownsDecor(s, 'pattern', 'teacups'));
   // The first shelf room opens it, with every one-time Ribbon so far: 6 items and Tea Time.
   s.coins = 1e4;
   buildExpansion(s);
@@ -162,5 +162,22 @@ test('completing a theme gives its room style for free (GDD #69)', async () => {
 test('a theme completed before this update already counts', () => {
   const s = decorShop();
   Object.assign(s.collection, { cupcakes: true, trolley: true, caketower: true });
-  assert.ok(ownsDecor(s, 'pattern', 'gingham'));
+  assert.ok(ownsDecor(s, 'pattern', 'teacups'));
+});
+
+test('each theme\'s prize is its own picture wallpaper, one per round; the old prizes are on sale (GDD #87)', async () => {
+  const { THEME_STYLES, OLD_THEME_STYLES, decorOption } = await import('../js/data/decor.js');
+  const { SETS } = await import('../js/data/items.js');
+  assert.deepEqual(Object.keys(THEME_STYLES).sort(), Object.keys(SETS).sort());
+  const ids = new Set();
+  for (const [set, [kind, id]] of Object.entries(THEME_STYLES)) {
+    const o = decorOption(kind, id);
+    assert.ok(o?.prize, `${set} has a picture`);
+    assert.equal(o.round, /\d$/.test(set) ? Number(set.at(-1)) - 1 : 0, `${set} in its round's colors`);
+    ids.add(id);
+  }
+  assert.equal(ids.size, 24, 'all different');
+  const s = decorShop();
+  s.ribbons = 1000;
+  for (const [kind, id] of Object.values(OLD_THEME_STYLES)) assert.ok(buyDecor(s, kind, id), `${kind}:${id} can be bought now`);
 });

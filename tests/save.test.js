@@ -267,7 +267,7 @@ test('a v16 save gets Ribbons for its Collection and no styles yet (GDD #68)', (
   const s = loadGame(store);
   assert.equal(s.version, STATE_VERSION);
   assert.equal(s.ribbons, 5 * 2 + 5);
-  assert.deepEqual(s.decor, { owned: {} });
+  assert.deepEqual(s.decor, { owned: { 'pattern:gingham': true } }, 'Tea Time\'s old prize, kept when it went on sale (v23)');
   assert.equal(s.day.stats.ribbons, 0);
   assert.equal(s.building.rooms[0].decor, undefined);
 });
