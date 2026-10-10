@@ -152,7 +152,7 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 - **Roller Skates 🛼, built 2026-10-09, waiting for feedback** (GDD v0.38 #76): 🪙 180 upgrade, locked until Bea is hired;
   every stocker walks ×1.4 (`SKATES_SPEED`; Comfy Shoes is the shopkeeper's only). No skates drawn on them (user). Upgrades can have `needs` (a helper id,
   `canBuyUpgrade` in `js/sim/upgrades.js`). No save change.
-- **Color rounds, built 2026-10-09, waiting for feedback** (GDD v0.39 #77, part of #59): every item comes in two more
+- **Color rounds, built 2026-10-09, approved and released** (GDD v0.39 #77, part of #59): every item comes in two more
   colors, **Bright** (round 2) and **Dazzle** (round 3), 72 stickers. Each round starts the four pages over once you've
   found 24 / 48 items (pages at +0 / +4 / +10 / +16), with prices ×16 a round. Order book: one card per item with a
   color dot per round (🔒 + "find N more" until open). Each round's themes are new themes ('tea2' "Tea Time ✦ Bright")
@@ -166,10 +166,11 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 - **Planned next, in order:** (#59) **more items and themes** (toward 100+). Later: more stockers
   (#60), **Instant Delivery** (GDD §11, on the §17 roadmap, design to discuss), Heart/Sparkle milestone unlocks (§18 #6). 
 
-**Next:** the rest of #59 (more items and themes toward 100+). Waiting on feedback: color rounds (#77), Roller Skates (#76), room prices (#75), register rooms (#73), the
+**Next:** the rest of #59 (more items and themes toward 100+). Waiting on feedback: Roller Skates (#76), room prices (#75), register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71).
 
-**Releases:** the latest is **v2026.10.9.11** (2026-10-09): Roller Skates (#76); before it v2026.10.9.10, room prices (#75)
+**Releases:** the latest is **v2026.10.9.12** (2026-10-09): color rounds (#77) and shopping by item (#78); before it
+v2026.10.9.11, Roller Skates (#76); v2026.10.9.10, room prices (#75)
 and pinching out to the whole house (§18 #14); no save changes. Everything on `main` is public. The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**

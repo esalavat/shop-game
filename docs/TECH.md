@@ -438,7 +438,7 @@ Each milestone ends with a push so it's playable on your phone.
 | More helpers and upgrades (#72) | ✅ built (greeter, window dresser, scanner, gift wrap; tall shelves; up to three stockers, save v19); the second register became #73 |
 | Delivery bin (#74) | ✅ built (waiting for the user's feedback); `js/ui/bin.js`, `BIN` in `sim/stock.js` |
 | Register rooms (#73) | ✅ built (waiting for the user's feedback); `registerOf` in `sim/checkout.js`, `addRegisterRoom` in `sim/building.js` |
-| Color rounds: two more colors of every item, ×16 prices a round (#77, part of #59) | ✅ built (waiting for the user's feedback) |
+| Color rounds: two more colors of every item, ×16 prices a round (#77, part of #59) | ✅ approved, released v2026.10.9.12 |
 | More items and themes toward 100+ (#59) | ⏭ later |
 
 ### 11.1 Plan: Stairwell and upstairs (#58 step 2) — ✅ built 2026-10-09
