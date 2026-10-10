@@ -111,8 +111,8 @@ build. After that, the rest of #59 (color variants, Collection bonus, page rewar
 and catalog pages, everything built 2026-10-09 (Stairwell, shelf rooms,
 floors and prices, quick evenings, Close now), M8 (home-screen install, fps on the Pixel), Bea, the first-day guide.
 
-**Releases:** the latest is **v2026.10.9.4** (2026-10-09): 24 items on four catalog pages (#66); save version 16
-(unchanged since v2026.10.9.3: shelf rooms with prices by distance, the Stairwell and floors, quick evenings, Close now). Everything on `main` is public. The MVP list in GDD
+**Releases:** the latest is **v2026.10.9.5** (2026-10-09): back to the summary after ordering and a pink Day summary
+button (#67); save version 16 (unchanged). Everything on `main` is public. The MVP list in GDD
 §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
