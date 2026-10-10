@@ -523,6 +523,10 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
 .summary-record[hidden] { display: none; }
 .stat span { font-size: 12px; font-weight: 700; opacity: 0.7; }
 
+/* The middle scrolls on a big day, so the title and the Start Day button always show. */
+.summary-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin: 0 -4px; padding: 0 4px 4px; }
+.summary-actions { flex: none; }
+
 .summary-section { margin: 6px 0; font-size: 13px; font-weight: 700; }
 .summary-section:empty { display: none; }
 .thumb-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }

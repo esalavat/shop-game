@@ -33,6 +33,12 @@ Design questions (not bugs) belong in [GDD.md](GDD.md) §18.
 
 ## Fixed
 
+### A big day's summary hides the "Start Day" button (2026-10-09, tester, Day 37) — fixed
+- With many kinds of items sold, the summary grew taller than the sheet: "Start Day N" was pushed off the bottom
+  of the screen and nothing scrolled, so the player was stuck.
+- **Fix:** the middle of the summary (record, stats, Ribbons, sold, wishes) is a scroll box (`.summary-scroll`);
+  the title and the Order / Start Day buttons always stay on screen.
+
 ### After ordering from the day summary there's no "Start Day" button (2026-10-09, user) — fixed
 - Summary → "Order for tomorrow" → ✕ left you on the toolbar; you had to know to tap "Day summary" (a plain button)
   to find "Start Day N".

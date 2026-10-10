@@ -64,6 +64,7 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   swoop and a bow tie or cap (`CREATOR` in `js/data/customers.js`, drawn in `js/render/models/character.js`).
   `shopkeeper.body`, save version 12.
 - **Fixed:** boxes floating when you take one from the bottom of a stack (`settleBoxes`, docs/ISSUES.md).
+- **Fixed 2026-10-09:** a big day's summary pushed "Start Day" off the screen (tester); the middle now scrolls.
 - **Fixed 2026-10-09:** customers stuck behind the line so the shop could never close (user, with more rooms):
   walkers slip past people when blocked (`sim/crowd.js`), customers give up after 150 s, `tests/busyday.test.js`.
 
