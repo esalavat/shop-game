@@ -66,7 +66,7 @@ export function createGrow(state, { onDecorate, onPlaceRoom, onStyle }) {
 
   function render() {
     const next = nextExpansion(state);
-    let html = `<div class="grow-card small grow-style"><div class="grow-art" aria-hidden="true">🎨</div><div><h3>Decorate rooms</h3>
+    let html = !state.decorOpen ? '' : `<div class="grow-card small grow-style"><div class="grow-art" aria-hidden="true">🎨</div><div><h3>Decorate rooms</h3>
       <p>Wallpaper, floors, rugs, curtains and corner pieces, paid for with Ribbons 🎀 from granted wishes and new finds.</p></div>
       <button class="grow-build" data-buy="style">Decorate · 🎀 ${state.ribbons}</button></div>`;
     html += '<div class="grow-section">Rooms</div>';

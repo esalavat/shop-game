@@ -188,17 +188,22 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
   (`CUSTOMER.tip` = [0.05, 0.15] in `js/data/customers.js`, `completeSale` in `js/sim/checkout.js`); Roller Skates speed the
   shopkeeper too and don't need Bea. **Save version 21:** owners get 🪙 80 / 🪙 150 back with a toast (`REFUNDS` in
   `js/data/upgrades.js`; the migration leaves a live-only `state.refunds` that `main.js` toasts once).
+- **Decorating opens with the first shelf room, built 2026-10-10, waiting for feedback** (GDD v0.48 #86): no Ribbons before then
+  (`addRibbons` does nothing while `state.decorOpen` is false; HUD pill and Grow card hidden); `openDecor` in `js/sim/decor.js`
+  (called from `addRoom` for a shelf room) pays `ribbonsForCollection` at the new rates (+1 an item, +3 a theme). Theme reward
+  styles can't be bought (`buyDecor`). Complete themes emit `themeDone`. **Save version 22** (`decorOpen`, true for existing saves).
+  **Next to design with the user:** fun, theme-matched Collection reward styles (GDD §18 #18).
 - **Approved by the user 2026-10-09:** everything built that day (24 items and catalog pages, Stairwell and floors,
   shelf rooms and prices, quick evenings and Close now, Bea, the first-day guide, decoration shop) and the Pixel checks.
 - **Planned next:** feedback on the balancing pass (#80). Later: more items past 100 (#59), more stockers
   (#60), **Instant Delivery** (GDD §11, on the §17 roadmap, design to discuss), Heart/Sparkle milestone unlocks (§18 #6). 
 
-**Next:** feedback on the balancing pass (#80), the simpler order book (#82), the ladder (#83, #84) and #85; then a release. Waiting on feedback: the balancing pass (#80), Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
+**Next:** feedback on the balancing pass (#80), the simpler order book (#82), the ladder (#83, #84), #85 and #86; designing special Collection reward styles (§18 #18); then a release. Waiting on feedback: the balancing pass (#80), Sweet Shop and Pet Corner (#79), Roller Skates (#76), room prices (#75), register rooms (#73), the
 #72 helpers and upgrades, Collection rewards (#70), stock counts (#71).
 
 **Releases:** the latest is **v2026.10.10** (2026-10-10): Sweet Shop and Pet Corner (#79), **save version 20**
 (`state.pagesOpen`); before it v2026.10.9.12, color rounds (#77) and shopping by item (#78); v2026.10.9.11, Roller Skates (#76).
-Not released yet: the balancing script, the balancing pass (#80), "new items" (#81), the simpler order book (#82), the ladder (#83, #84) and #85. **Save version 21** goes out with #85. The MVP list in GDD §17 is complete.
+Not released yet: the balancing script, the balancing pass (#80), "new items" (#81), the simpler order book (#82), the ladder (#83, #84), #85 and #86. **Save versions 21 and 22** go out with them. The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).

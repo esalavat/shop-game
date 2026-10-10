@@ -85,6 +85,7 @@ button:active:not(:disabled) { scale: 0.92; transition-duration: 0.05s; }
   font-size: 16px;
 }
 
+.pill[hidden] { display: none; }
 .pill .ico { font-size: 16px; }
 .hud-row .pill { gap: 4px; }
 .pill b { font-variant-numeric: tabular-nums; }

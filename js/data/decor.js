@@ -138,12 +138,12 @@ export function styleName(kind, id) {
   return { paper: `${o.name} wallpaper`, pattern: `${o.name} wallpaper`, floor: `${o.name} floor`, rug: `${o.name} rug`, curtain: `${o.name} curtains`, corner: o.name }[kind];
 }
 
-/** How Ribbons are earned (GDD #68). */
+/** How Ribbons are earned (GDD #68), once decorating is open (#86). */
 export const RIBBONS = {
   wish: 1,       // a sale grants a wish note
   window: 1,     // a window-peeker buys what they pointed at
-  newItem: 2,    // each new Collection item
-  theme: 5,      // all four items of a theme found
+  newItem: 1,    // each new Collection item (was 2 before #86)...
+  theme: 3,      // ...and all four items of a theme found (was 5): both paid in full for everything found so far when decorating opens
   perHappy: 5,   // +1 at closing for every this many happy customers
 };
 

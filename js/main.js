@@ -458,11 +458,16 @@ events.on('ribbons', ({ amount, why }) => {
     }
   }
 });
-events.on('ribbons', ({ why, set, amount, style }) => {
-  if (why !== 'theme') return;
-  toast(`🌟 ${SETS[set]} complete! +${amount} 🎀`);
+events.on('themeDone', ({ set, ribbons, style }) => {
+  toast(`🌟 ${SETS[set]} complete!${ribbons ? ` +${ribbons} 🎀` : ''}`);
   if (style) setTimeout(() => toast(`🎁 New room style: ${styleName(style.kind, style.id)}! Try it in Grow → 🎨 Decorate rooms`), 1200);
 });
+// Decorating opens with the first shelf room (GDD #86), after the new room's own toasts.
+events.on('decorOpened', ({ ribbons }) => setTimeout(() => {
+  juice.celebrate();
+  toast(`🎨 Decorating is open! +${ribbons} 🎀 for everything you've collected`);
+  setTimeout(() => toast('Spend Ribbons in Grow → 🎨 Decorate rooms'), 1400);
+}, 2600));
 // A complete theme's coin gift and shopkeeper style (GDD #70), with confetti. Toasts wait their turn
 // behind the Ribbon and room style ones above.
 let giftDelay = 0;

@@ -13,12 +13,20 @@ import { defaultFixtures } from '../sim/building.js';
 import { createKeeper } from '../sim/keeper.js';
 import { emptyStats } from '../sim/day.js';
 import { settleBoxes } from '../sim/stock.js';
-import { ribbonsForCollection } from '../sim/decor.js';
 import { CHANNEL } from './channel.js';
+import { ITEMS, SETS } from '../data/items.js';
+import { themeComplete } from '../sim/decor.js';
 import { REFUNDS } from '../data/upgrades.js';
 
 /** Old theme room types (v14-v15) and the ROOM_STYLES look each one becomes. */
 const THEME_STYLE = { tea: 0, parlor: 1, fairy: 2, bedroom: 3, dolls: 4, houses: 5 };
+
+/** The Ribbons v17 gave for a Collection, at that version's rates (+2 an item, +5 a theme), whatever RIBBONS says now. */
+function ribbonsV17(collection) {
+  const found = Object.keys(ITEMS).filter((id) => collection[id]);
+  const themes = Object.keys(SETS).filter((set) => themeComplete(collection, set));
+  return found.length * 2 + themes.length * 5;
+}
 
 export const MAIN_SAVE_KEY = 'mdds_save';
 export const SAVE_KEY = CHANNEL === 'main' ? MAIN_SAVE_KEY : `${MAIN_SAVE_KEY}_${CHANNEL}`;
@@ -116,7 +124,7 @@ const MIGRATIONS = {
   16: (d) => ({
     ...d,
     version: 17,
-    ribbons: ribbonsForCollection(d.collection ?? {}),
+    ribbons: ribbonsV17(d.collection ?? {}),
     decor: { owned: {} },
     day: { ...d.day, stats: { ribbons: 0, ...d.day.stats } },
   }),
@@ -145,6 +153,9 @@ const MIGRATIONS = {
     const coins = refunds.reduce((n, r) => n + r.coins, d.coins);
     return { ...d, version: 21, upgrades, coins, ...(refunds.length ? { refunds } : {}) };
   },
+  // v22: decorating opens with the first shelf room (GDD #86). Every shop until now has had Ribbons from
+  // the start, so it's open for them: nothing changes.
+  21: (d) => ({ ...d, version: 22, decorOpen: true }),
 };
 
 export function migrate(data) {

@@ -5,9 +5,8 @@ import { makeRoom } from './building.js';
 import { createKeeper } from './keeper.js';
 import { dropBox } from './stock.js';
 import { emptyStats } from './day.js';
-import { ribbonsForCollection } from './decor.js';
 
-export const STATE_VERSION = 21;
+export const STATE_VERSION = 22;
 
 /** Live-only fields: never saved, reset on every load (customers just walk in again). */
 export const TRANSIENT = ['customers', 'queue', 'checkout', 'spawnTimer', 'cashier', 'greeter', 'dresser', 'registers', 'refunds'];
@@ -42,7 +41,8 @@ export function createState(now = Date.now()) {
     coins: 50,
     hearts: 0,
     sparkle: 0,
-    ribbons: 0, // Ribbons 🎀 for room styles (GDD #68); set below from the starter Collection
+    ribbons: 0, // Ribbons 🎀 for room styles (GDD #68), from when decorating opens
+    decorOpen: false, // decorating and Ribbons open with the first shelf room (sim/decor.js openDecor, GDD #86)
     building: {
       rooms: [makeRoom('r1', 'shop', 0, 0)],
     },
@@ -66,6 +66,5 @@ export function createState(now = Date.now()) {
     lastSeen: now,
   };
   giveStarterBoxes(state);
-  state.ribbons = ribbonsForCollection(state.collection);
   return resetTransient(state);
 }

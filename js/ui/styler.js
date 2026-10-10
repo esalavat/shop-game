@@ -94,8 +94,10 @@ export function createStyler(state, { onRoom, onPreview, onClose, onBought }) {
     const face = kind === 'paper' || kind === 'curtain'
       ? `<span class="sty-dot" style="background:${kind === 'paper' ? `linear-gradient(90deg, ${opt.paper} 60%, ${opt.stripe} 60%)` : opt.color}"></span>`
       : url ? `<img alt="" src="${url}">` : `<span class="sty-emoji">${opt.icon}</span>`;
-    const tag = owned ? '' : `<i>🎀${opt.price}</i>`;
-    return `<button data-opt="${kind}:${opt.id}" class="${on ? 'on' : ''}${owned ? '' : ' locked'}" title="${opt.name}" aria-label="${opt.name}${owned ? '' : `, ${opt.price} ribbons`}">${face}${tag}</button>`;
+    const prize = !owned && rewardTheme(kind, opt.id); // a theme's reward: won, never bought (GDD #86)
+    const tag = owned ? '' : prize ? '<i>🌟</i>' : `<i>🎀${opt.price}</i>`;
+    const label = owned ? '' : prize ? `, complete ${SETS[prize]} to get it` : `, ${opt.price} ribbons`;
+    return `<button data-opt="${kind}:${opt.id}" class="${on ? 'on' : ''}${owned ? '' : ' locked'}" title="${opt.name}" aria-label="${opt.name}${label}">${face}${tag}</button>`;
   }
 
   function render() {
@@ -111,9 +113,11 @@ export function createStyler(state, { onRoom, onPreview, onClose, onBought }) {
     if (preview) {
       const o = decorOption(preview.kind, preview.id), short = o.price - state.ribbons;
       const theme = rewardTheme(preview.kind, preview.id);
-      buy.innerHTML = short > 0
-        ? `<span><b>${o.name}</b> · 🎀 ${o.price}${theme ? `<br><small>or free for completing ${SETS[theme]} 🌟</small>` : ''}</span><span class="sty-short">${short} more 🎀 to go</span>`
-        : `<span><b>${o.name}</b> · yours in every room</span><button class="sty-get">Get it! 🎀 ${o.price}</button>`;
+      buy.innerHTML = theme
+        ? `<span><b>${o.name}</b> · a Collection prize 🌟</span><span class="sty-short">🔒 Complete ${SETS[theme]} to get it</span>`
+        : short > 0
+          ? `<span><b>${o.name}</b> · 🎀 ${o.price}</span><span class="sty-short">${short} more 🎀 to go</span>`
+          : `<span><b>${o.name}</b> · yours in every room</span><button class="sty-get">Get it! 🎀 ${o.price}</button>`;
     } else {
       buy.innerHTML = '<span class="sty-hint">Earn 🎀 by granting wishes and finding new things</span>';
     }

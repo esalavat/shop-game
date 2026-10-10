@@ -47,6 +47,7 @@ export function createHud(state, audio) {
         c.el.textContent = fmt.format(value);
         c.shown = value;
       }
+      counters[3].el.parentElement.hidden = !state.decorOpen; // no Ribbons until decorating opens (GDD #86)
       const text = `Day ${state.day.number} · ${PHASE_NAMES[state.day.phase]}`;
       if (text !== dayText) {
         dayEl.textContent = dayText = text;

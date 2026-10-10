@@ -1,6 +1,9 @@
 // The decoration shop (GDD #68): Ribbons 🎀 are earned by caring for customers and collecting, and
 // spent on room styles. A bought style is owned in every room for good (state.decor.owned); what each
 // room wears is room.decor (kind -> option id), missing kinds showing the room's defaults.
+// Decorating opens with the first shelf room (GDD #86): until then there are no Ribbons at all, and when it
+// opens the Collection's one-time Ribbons (every item and theme found so far) are paid in one go.
+// A theme's reward style (#69) is only ever a reward: it can't be bought with Ribbons (#86).
 
 import { events } from '../core/events.js';
 import { DECOR, RIBBONS, THEME_STYLES, decorOption } from '../data/decor.js';
@@ -8,13 +11,13 @@ import { ITEMS, SETS, baseOf } from '../data/items.js';
 import { ROOM_TYPES } from '../data/rooms.js';
 
 export function addRibbons(state, amount, why, detail = {}) {
-  if (amount <= 0) return;
+  if (amount <= 0 || !state.decorOpen) return; // no Ribbons before decorating opens (GDD #86)
   state.ribbons += amount;
   state.day.stats.ribbons = (state.day.stats.ribbons ?? 0) + amount;
   events.emit('ribbons', { amount, why, total: state.ribbons, ...detail });
 }
 
-/** Ribbons a new game starts with: what its Collection would have earned (the starter items). */
+/** The one-time Ribbons a Collection has earned: every item found and every theme complete. */
 export function ribbonsForCollection(collection) {
   const found = Object.keys(ITEMS).filter((id) => collection[id]);
   const themes = Object.keys(SETS).filter((set) => themeComplete(collection, set));
@@ -38,7 +41,10 @@ export function ribbonsForSale(state, customer, itemIds) {
   if (customer?.windowWant && itemIds.some((id) => baseOf(id) === baseOf(customer.windowWant))) addRibbons(state, RIBBONS.window, 'window');
 }
 
-/** New Collection items (+2 each) and any themes they complete (+5 each). */
+/**
+ * New Collection items (+1 each) and any themes they complete (+3 each). A complete theme is announced
+ * (`themeDone`) even before decorating opens; its room style waits for you either way.
+ */
 export function ribbonsForFinds(state, discovered) {
   if (!discovered.length) return;
   addRibbons(state, discovered.length * RIBBONS.newItem, 'find');
@@ -47,8 +53,23 @@ export function ribbonsForFinds(state, discovered) {
     if (!themeComplete(state.collection, set)) continue;
     const [kind, id] = THEME_STYLES[set];
     const bought = !!state.decor.owned[`${kind}:${id}`];
-    addRibbons(state, RIBBONS.theme, 'theme', { set, style: bought ? null : { kind, id } });
+    const ribbons = state.decorOpen ? RIBBONS.theme : 0;
+    addRibbons(state, ribbons, 'theme', { set });
+    events.emit('themeDone', { set, ribbons, style: bought || !state.decorOpen ? null : { kind, id } });
   }
+}
+
+/**
+ * Open decorating (GDD #86), when the first shelf room is built: Ribbons start, beginning with every
+ * one-time Ribbon the Collection has earned so far. Returns true if it just opened.
+ */
+export function openDecor(state) {
+  if (state.decorOpen) return false;
+  state.decorOpen = true;
+  const ribbons = ribbonsForCollection(state.collection);
+  addRibbons(state, ribbons, 'open');
+  events.emit('decorOpened', { ribbons });
+  return true;
 }
 
 /** The end-of-day gift: one Ribbon for every few happy customers. */
@@ -70,10 +91,10 @@ export function ownsDecor(state, kind, id) {
   return !!set && themeComplete(state.collection, set);
 }
 
-/** Buy a style with Ribbons. Returns true if it's now yours. */
+/** Buy a style with Ribbons. Theme reward styles can't be bought (GDD #86). Returns true if it's now yours. */
 export function buyDecor(state, kind, id) {
   const o = decorOption(kind, id);
-  if (!o || ownsDecor(state, kind, id) || state.ribbons < o.price) return false;
+  if (!o || rewardTheme(kind, id) || ownsDecor(state, kind, id) || state.ribbons < o.price) return false;
   state.ribbons -= o.price;
   state.decor.owned[`${kind}:${id}`] = true;
   events.emit('decorBought', { kind, id });

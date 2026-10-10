@@ -7,6 +7,7 @@ import { EXPANSIONS } from '../data/dollhouse.js';
 import { addCoins } from './economy.js';
 import { newId } from './stock.js';
 import { fitShelves } from './upgrades.js';
+import { openDecor } from './decor.js';
 
 export const hasRoom = (state, col, floor) =>
   state.building.rooms.some((r) => r.col === col && r.floor === floor);
@@ -39,6 +40,7 @@ export function addRoom(state, type, col, floor) {
   state.building.rooms.push(room);
   fitShelves(state);
   events.emit('buildingChanged', { room });
+  if (type === 'room') openDecor(state); // the first shelf room opens decorating (GDD #86)
   return room;
 }
 

@@ -124,7 +124,7 @@ docs/                   # GDD, tech plan
 
 ```js
 {
-  version: 21,                         // STATE_VERSION (js/sim/state.js); v21 refunded Comfy Shoes / Gift Wrap (GDD #85, `refunds` is live-only)
+  version: 22,                         // STATE_VERSION (js/sim/state.js); v22 added decorOpen (GDD #86); v21 refunded Comfy Shoes / Gift Wrap (GDD #85, `refunds` is live-only)
   day: { number: 1, phase: 'morning', time: 0 },
   coins: 50, hearts: 0, sparkle: 0, ribbons: 4,   // Ribbons 🎀 for room styles (v17)
   decor: { owned: { 'pattern:stars': true } },     // styles bought (v17); free ones (price 0) aren't listed
