@@ -122,8 +122,8 @@ creator, walking out to the Window Display and the greeter spot, Pip's rescue bo
 and catalog pages, everything built 2026-10-09 (Stairwell, shelf rooms,
 floors and prices, quick evenings, Close now), M8 (home-screen install, fps on the Pixel), Bea, the first-day guide.
 
-**Releases:** the latest is **v2026.10.9.6** (2026-10-09): the decoration shop with Ribbons 🎀 (#68) and theme
-rewards (#69); save version 16 → 17. Everything on `main` is public. The MVP list in GDD §17 is complete.
+**Releases:** the latest is **v2026.10.9.7** (2026-10-09): the day summary scrolls on a big day so "Start Day" stays on
+screen (no save change). Everything on `main` is public. The MVP list in GDD §17 is complete.
 
 **Not scheduled yet (ideas the user raised, in the GDD):**
 - Demand-based pricing vs fixed prices (§18 #5).
