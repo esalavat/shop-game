@@ -97,17 +97,17 @@ export const ROOM_STYLES = [
 
 /**
  * Shelf rooms cost more the further they are from the middle of the building (the shop and the
- * Stairwell, on the ground), so a compact, squarish house is the cheapest way to grow (user, GDD #65).
+ * Stairwell, on the ground), so a compact, squarish house is the cheapest way to grow (user, GDD #65, #75).
  * A spot's ring is how far out it is, sideways or up, whichever is more: ROOM_COSTS[ring - 1], then
- * ROOM_COST_STEP more for each ring past the end of the list.
+ * ROOM_COST_STEP more for each ring past the end of the list. Going up costs the same as going out, and
+ * every spot costs ROOM_EACH more for each shelf room you already have, so prices always climb (#75).
  */
 export const ROOM_COSTS = [250, 400, 600, 850, 1150, 1500];
 export const ROOM_COST_STEP = 450;
-/** ...and each floor up costs this much more than the same spot below (a share, rounded to 10s). */
-export const ROOM_FLOOR_MARKUP = 0.15;
-/** The Stairwell (both of its first two floors), then each staircase up to a new floor: each costs more. */
-export const STAIR_COSTS = [350, 700, 1200, 1900, 2800];
-export const STAIR_COST_STEP = 1200;
+export const ROOM_EACH = 50;
+/** The Stairwell (both of its first two floors), then each staircase up to a new floor: each costs a bit more. */
+export const STAIR_COSTS = [350, 500, 700, 950, 1250];
+export const STAIR_COST_STEP = 350;
 /** Register rooms (GDD #73): the first costs this, and each one higher up costs REGISTER_COST_STEP more. */
 export const REGISTER_COST = 400;
 export const REGISTER_COST_STEP = 200;

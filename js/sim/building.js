@@ -1,7 +1,7 @@
 // Building grid actions. Rooms sit on a (col, floor) grid that grows sideways and upward.
 
 import { events } from '../core/events.js';
-import { ROOM_TYPES, ROOM_SIZE, ROOM_STYLES, ROOM_COSTS, ROOM_COST_STEP, ROOM_FLOOR_MARKUP, STAIR_COSTS, STAIR_COST_STEP, REGISTER_COST, REGISTER_COST_STEP } from '../data/rooms.js';
+import { ROOM_TYPES, ROOM_SIZE, ROOM_STYLES, ROOM_COSTS, ROOM_COST_STEP, ROOM_EACH, STAIR_COSTS, STAIR_COST_STEP, REGISTER_COST, REGISTER_COST_STEP } from '../data/rooms.js';
 import { FIXTURES } from '../data/fixtures.js';
 import { EXPANSIONS } from '../data/dollhouse.js';
 import { addCoins } from './economy.js';
@@ -89,11 +89,14 @@ export function distanceOut(state, col) {
   return col < lo ? lo - col : col > hi ? col - hi : 0;
 }
 
-/** What a shelf room costs at a spot: by its ring around the middle, plus a bit more per floor up (GDD #65). */
+/**
+ * What a shelf room costs at a spot: by its ring around the middle, sideways or up (the same on every
+ * floor), plus ROOM_EACH for each shelf room already built, so every spot goes up as the house grows (GDD #65, #75).
+ */
 export function roomCost(state, col, floor = 0) {
   const ring = Math.max(1, distanceOut(state, col), floor);
   const base = ring <= ROOM_COSTS.length ? ROOM_COSTS[ring - 1] : ROOM_COSTS.at(-1) + ROOM_COST_STEP * (ring - ROOM_COSTS.length);
-  return Math.round((base * (1 + ROOM_FLOOR_MARKUP * floor)) / 10) * 10;
+  return base + ROOM_EACH * state.building.rooms.filter(isShelfRoom).length;
 }
 
 /**

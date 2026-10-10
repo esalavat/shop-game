@@ -4,13 +4,13 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createState } from '../js/sim/state.js';
 import { buildNav } from '../js/sim/nav.js';
-import { buildExpansion, buildRoom, buildStairwell, buildFloor, roomSpots, roomCost, stairCost, canBuildRooms } from '../js/sim/building.js';
+import { buildExpansion, buildRoom, buildStairwell, buildFloor, roomSpots, roomCost, stairCost, canBuildRooms, buildRegister } from '../js/sim/building.js';
 import { spawnCustomer, tickCustomers, QUEUE_SPOTS } from '../js/sim/customers.js';
 import { checkoutTap } from '../js/sim/checkout.js';
 import { tickStockers } from '../js/sim/stocker.js';
 import { tickKeeper } from '../js/sim/keeper.js';
 import { dropBox } from '../js/sim/stock.js';
-import { ROOM_COSTS, ROOM_STYLES, STAIR_COSTS } from '../js/data/rooms.js';
+import { ROOM_COSTS, ROOM_EACH, ROOM_STYLES, STAIR_COSTS } from '../js/data/rooms.js';
 import { ITEMS } from '../js/data/items.js';
 import { rng } from '../js/core/rng.js';
 
@@ -54,20 +54,52 @@ test('rooms cost more the further out from the middle, sideways or up, so a squa
   buildExpansion(s);                       // shop 0, display 1
   buildRoom(s, -1, 0);
   buildStairwell(s);                       // stairs 1, display 2
-  assert.equal(roomCost(s, -1, 0), ROOM_COSTS[0], 'right beside the shop');
-  assert.equal(roomCost(s, 2, 0), ROOM_COSTS[0], 'right beside the stairs');
-  assert.equal(roomCost(s, -2, 0), ROOM_COSTS[1]);
-  assert.equal(roomCost(s, 4, 0), ROOM_COSTS[2]);
-  // Each floor up costs more than the same spot below...
-  for (const col of [-2, -1, 0, 2, 3]) {
-    for (let f = 0; f < 4; f++) assert.ok(roomCost(s, col, f + 1) > roomCost(s, col, f), `col ${col} floor ${f + 1}`);
-  }
-  // ...and filling in the square is cheaper than going further out.
+  // One shelf room built so far, so every spot costs ROOM_EACH more.
+  assert.equal(roomCost(s, -1, 0), ROOM_COSTS[0] + ROOM_EACH, 'right beside the shop');
+  assert.equal(roomCost(s, 2, 0), ROOM_COSTS[0] + ROOM_EACH, 'right beside the stairs');
+  assert.equal(roomCost(s, -2, 0), ROOM_COSTS[1] + ROOM_EACH);
+  assert.equal(roomCost(s, 4, 0), ROOM_COSTS[2] + ROOM_EACH);
+  // Going up costs the same as going out (#75): the same ring, the same price...
+  assert.equal(roomCost(s, 0, 2), roomCost(s, -2, 0));
+  assert.equal(roomCost(s, 0, 3), roomCost(s, 4, 0));
+  assert.equal(roomCost(s, 0, 3), roomCost(s, -3, 0));
+  // ...and filling in the square is cheaper than going further out, either way.
   assert.ok(roomCost(s, -1, 1) < roomCost(s, -2, 0));
   assert.ok(roomCost(s, -2, 2) < roomCost(s, -3, 0));
   assert.ok(roomCost(s, -2, 2) < roomCost(s, -2, 3));
   s.coins = roomCost(s, -2, 0) - 1;
   assert.equal(buildRoom(s, -2, 0), null, 'not enough coins');
+});
+
+test('every room built makes every spot dearer, so the cheapest spot always costs more than before', () => {
+  const s = createState(0);
+  s.coins = 1e7;
+  buildExpansion(s);
+  buildRoom(s, -1, 0);
+  buildStairwell(s);
+  let last = 0;
+  for (let i = 0; i < 30; i++) {
+    if (i % 6 === 5) buildFloor(s);
+    const spots = roomSpots(s);
+    const cheapest = Math.min(...spots.map((p) => roomCost(s, p.col, p.floor)));
+    assert.ok(cheapest > last, `room ${i}: ${cheapest} after ${last}`);
+    last = cheapest;
+    const p = spots.find((q) => roomCost(s, q.col, q.floor) === cheapest);
+    assert.ok(buildRoom(s, p.col, p.floor));
+  }
+});
+
+test('register rooms neither push spots further out nor add to room prices', () => {
+  const s = createState(0);
+  s.coins = 1e7;
+  buildExpansion(s);
+  buildRoom(s, -1, 0);
+  buildStairwell(s);
+  buildRoom(s, -2, 0);
+  const prices = () => roomSpots(s).map((p) => roomCost(s, p.col, p.floor)).sort((a, b) => a - b);
+  const before = prices();
+  assert.ok(buildRegister(s));
+  assert.deepEqual(prices(), before);
 });
 
 test('each staircase up costs more than the last, and opens a floor for rooms', () => {

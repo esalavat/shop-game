@@ -45,7 +45,7 @@ js/
   data/                 # Content as plain data (no logic)
     items.js            # Products: id, set, price, cost, shelfType, slotType, rarity, model
     shelves.js          # Shelf types and capacities
-    rooms.js            # Room types and sizes; shelf room styles and prices (ROOM_STYLES, ROOM_COSTS, STAIR_COSTS)
+    rooms.js            # Room types and sizes; shelf room styles and prices (ROOM_STYLES, ROOM_COSTS, ROOM_EACH, STAIR_COSTS)
     dollhouse.js        # Dream Dollhouse slots, Sparkle tuning, shop expansions (costs)
     customers.js        # Customer types: wants, budgets, looks
     story.js            # Regulars, story beats, triggers
@@ -211,7 +211,8 @@ docs/                   # GDD, tech plan
   anyone mid-walk (their path points past the gap) so they still arrive. `buildFloor` adds a `landing` on top and a
   `stairs` fixture to the landing below. `stairRooms` lists the column bottom up; `stairCost` (STAIR_COSTS) rises per
   staircase. Shelf rooms are type `room` with `room.style` (ROOM_STYLES, drawn in `render/building.js`);
-  `roomCost(state, col, floor)` = ROOM_COSTS by ring (`max(distanceOut, floor)`) × (1 + 0.15·floor);
+  `roomCost(state, col, floor)` = ROOM_COSTS by ring (`max(distanceOut, floor)`) + ROOM_EACH × shelf rooms built
+  (#75; register rooms and the Stairwell don't count);
   `roomSpots` lists ends of the ground floor plus any spot on top of a room next to a room on that floor.
   Routes climb floor by floor (`planRoute`, a climb leg per floor; `stairRoom(state, floor)` in `sim/route.js`).
   Fixtures `stairs` / `stairhole` keep the corner off the walk grids. Drawing: an L-shaped landing slab and floor,
