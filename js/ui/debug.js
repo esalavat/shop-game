@@ -16,6 +16,7 @@ export function createDebug({ state, renderer, quality, onReset, onCopyMain, onS
     <div class="debug-panel" hidden>
       <div class="debug-stats"></div>
       <button data-act="coins">+1000 🪙</button>
+      <button data-act="coins10k">+10000 🪙</button>
       <button data-act="hearts">+50 ❤️</button>
       <button data-act="ribbons">+20 🎀</button>
       <button data-act="fill">Fill shelves</button>
@@ -31,6 +32,7 @@ export function createDebug({ state, renderer, quality, onReset, onCopyMain, onS
 
   const actions = {
     coins: () => addCoins(state, 1000),
+    coins10k: () => addCoins(state, 10000),
     ribbons: () => addRibbons(state, 20, 'debug'),
     hearts: () => { // happy customers open catalog pages and the next helpers and upgrades (GDD #80, #83)
       state.hearts += 50;
